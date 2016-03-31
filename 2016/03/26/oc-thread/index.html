@@ -60,14 +60,14 @@
 <meta name="description" content="简介在软件开发中，多线程编程技术被广泛应用，相信多线程任务对我们来说已经不再陌生了。有了多线程技术，我们可以同做多个事情，而不是一个一个任务地进行。比如：前端和后台作交互、大任务（需要耗费一定的时间和资源）等等。也就是说，我们可以使用线程把占据时间长的任务放到后台中处理，而不影响到用户的使用。
 线程间通讯有一个非常重要的队列，就是主队列。在这个队列中处理多点触控及所有与UI相关操作等等。它非常特殊">
 <meta property="og:type" content="article">
-<meta property="og:title" content="多线程编程技术(Thread、Cocoa operations、GCG)">
+<meta property="og:title" content="多线程编程技术(Thread、Cocoa operations、GCD)">
 <meta property="og:url" content="http://yoursite.com/2016/03/26/oc-thread/index.html">
 <meta property="og:site_name" content="刘启明">
 <meta property="og:description" content="简介在软件开发中，多线程编程技术被广泛应用，相信多线程任务对我们来说已经不再陌生了。有了多线程技术，我们可以同做多个事情，而不是一个一个任务地进行。比如：前端和后台作交互、大任务（需要耗费一定的时间和资源）等等。也就是说，我们可以使用线程把占据时间长的任务放到后台中处理，而不影响到用户的使用。
 线程间通讯有一个非常重要的队列，就是主队列。在这个队列中处理多点触控及所有与UI相关操作等等。它非常特殊">
-<meta property="og:updated_time" content="2016-03-26T16:13:39.000Z">
+<meta property="og:updated_time" content="2016-03-31T12:06:39.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="多线程编程技术(Thread、Cocoa operations、GCG)">
+<meta name="twitter:title" content="多线程编程技术(Thread、Cocoa operations、GCD)">
 <meta name="twitter:description" content="简介在软件开发中，多线程编程技术被广泛应用，相信多线程任务对我们来说已经不再陌生了。有了多线程技术，我们可以同做多个事情，而不是一个一个任务地进行。比如：前端和后台作交互、大任务（需要耗费一定的时间和资源）等等。也就是说，我们可以使用线程把占据时间长的任务放到后台中处理，而不影响到用户的使用。
 线程间通讯有一个非常重要的队列，就是主队列。在这个队列中处理多点触控及所有与UI相关操作等等。它非常特殊">
 
@@ -87,7 +87,7 @@
   };
 </script>
 
-  <title> 多线程编程技术(Thread、Cocoa operations、GCG) | 刘启明 </title>
+  <title> 多线程编程技术(Thread、Cocoa operations、GCD) | 刘启明 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -217,7 +217,7 @@
             
             
               
-                多线程编程技术(Thread、Cocoa operations、GCG)
+                多线程编程技术(Thread、Cocoa operations、GCD)
               
             
           </h1>
@@ -321,7 +321,7 @@
 <p>GCD也可以创建同步的线程，只需要把async改成sync即可。</p>
 <h5 id="2-重复执行线程-dispatch-apply"><a href="#2-重复执行线程-dispatch-apply" class="headerlink" title="2)重复执行线程: dispatch_apply"></a>2)重复执行线程: dispatch_apply</h5><p>以下代码会执行4次:<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">dispatch_apply(<span class="number">4</span>, DISPATCH_QUEUE_PRIORITY_DEFAULT, ^(size_t index) &#123;</span><br><span class="line">    <span class="comment">// index则为执行的次数 0开始递增</span></span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"one - %ld"</span>, index);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></p>
 <p>index参数为执行的次数，从0开始递增。</p>
-<p>其中需要注意的是，每次执行都会开辟一条子线程，因为是异步的原因，它们不会是顺序的。<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[657:159159] one - 0, thread - &#60;NSThread: 0x100110b50&#62;&#123;number = 1, name = main&#125;&#10;[657:159191] one - 2, thread - &#60;NSThread: 0x103800000&#62;&#123;number = 2, name = (null)&#125;&#10;[657:159192] one - 3, thread - &#60;NSThread: 0x100112b90&#62;&#123;number = 3, name = (null)&#125;&#10;[657:159190] one - 1, thread - &#60;NSThread: 0x100501180&#62;&#123;number = 4, name = (null)&#125;</span><br></pre></td></tr></table></figure></p>
+<p>其中需要注意的是，每次执行都会开辟一条子线程，因为是异步的原因，它们不会是顺序的。<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[<span class="number">657</span>:<span class="number">159159</span>] one - <span class="number">0</span>, thread - &lt;<span class="built_in">NSThread</span>: <span class="number">0x100110b50</span>&gt;&#123;number = <span class="number">1</span>, name = main&#125;</span><br><span class="line">[<span class="number">657</span>:<span class="number">159191</span>] one - <span class="number">2</span>, thread - &lt;<span class="built_in">NSThread</span>: <span class="number">0x103800000</span>&gt;&#123;number = <span class="number">2</span>, name = (null)&#125;</span><br><span class="line">[<span class="number">657</span>:<span class="number">159192</span>] one - <span class="number">3</span>, thread - &lt;<span class="built_in">NSThread</span>: <span class="number">0x100112b90</span>&gt;&#123;number = <span class="number">3</span>, name = (null)&#125;</span><br><span class="line">[<span class="number">657</span>:<span class="number">159190</span>] one - <span class="number">1</span>, thread - &lt;<span class="built_in">NSThread</span>: <span class="number">0x100501180</span>&gt;&#123;number = <span class="number">4</span>, name = (null)&#125;</span><br></pre></td></tr></table></figure></p>
 <p>然而，GCD还有一次性执行的方法:<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">dispatch_once_t</span> once;</span><br><span class="line"><span class="built_in">dispatch_once</span>(&amp;once, ^&#123;</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"once - %@"</span>, [<span class="built_in">NSThread</span> currentThread]); <span class="comment">// 主线程</span></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></p>
 <p>它通常用于创建单列</p>
 <h5 id="3-操作队列-dispatch-queue-create"><a href="#3-操作队列-dispatch-queue-create" class="headerlink" title="3)操作队列:dispatch_queue_create"></a>3)操作队列:dispatch_queue_create</h5><p>使用GCD也能创建串行队列，具体代码如下:<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span><br><span class="line"> *  GCD创建串行队列</span><br><span class="line"> *</span><br><span class="line"> *  @param "com.GarveyCalvin.queue"  队列字符串标识</span><br><span class="line"> *  @param DISPATCH_QUEUE_CONCURRENT 可选的，可以是NULL</span><br><span class="line"> *</span><br><span class="line"> *  @return dispatch_queue_t</span><br><span class="line"> */</span></span><br><span class="line"><span class="built_in">dispatch_queue_t</span> queue = dispatch_queue_create(<span class="string">"com.GarveyCalvin.queue"</span>, DISPATCH_QUEUE_CONCURRENT);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 线程A</span></span><br><span class="line"><span class="built_in">dispatch_async</span>(queue, ^&#123;</span><br><span class="line">    [<span class="built_in">NSThread</span> sleepForTimeInterval:<span class="number">1</span>];</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"sleep async - %@"</span>, [<span class="built_in">NSThread</span> currentThread]);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 线程B</span></span><br><span class="line">dispatch_barrier_async(queue, ^&#123;</span><br><span class="line">    [<span class="built_in">NSThread</span> sleepForTimeInterval:<span class="number">3</span>];</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"sleep barrier2 - %@"</span>, [<span class="built_in">NSThread</span> currentThread]);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 线程C</span></span><br><span class="line"><span class="built_in">dispatch_async</span>(queue, ^&#123;</span><br><span class="line">    <span class="built_in">NSLog</span>(<span class="string">@"async"</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></p>
@@ -387,7 +387,7 @@
   <div class="comments" id="comments">
     
       <div class="ds-thread" data-thread-key="2016/03/26/oc-thread/"
-           data-title="多线程编程技术(Thread、Cocoa operations、GCG)" data-url="http://yoursite.com/2016/03/26/oc-thread/">
+           data-title="多线程编程技术(Thread、Cocoa operations、GCD)" data-url="http://yoursite.com/2016/03/26/oc-thread/">
       </div>
     
   </div>
