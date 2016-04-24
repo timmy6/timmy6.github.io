@@ -57,16 +57,16 @@
 
 
 
-<meta name="description" content="新的博客建好了，简约而不简单，博客这个地方，不需要建立的太奢华、绚丽夺目，简简单单就好。前两年，是在博客园写博客，说起来，不算是写博客，顶多算是记录自己职业生涯前进的脚印与所遇到的困难。这个时代是不断在变化的，沧海桑田，但，互联网所记录的东西，是可以一直保存下来的，从将日记写在本子上，发展到将日记记录在网上，这本身就是一个进步。搬到新博客，我会用心去记录，拒绝原封不动的“拿来主义”。不说自己写的东">
+<meta name="description" content="在Android中，有时候会遇到子控件和父控件都要滑动的情况，尤其是当子控件为listview的时候。这种情况较常见，典型的launcher，每个屏幕上放上listview就会出现这种情况。有两点需要注意：:    1.一般来说，view的onTouchEvent返回true，即消耗点击事件，viewgroup的onInterceptTouchEvent返回false，即不拦截点击事件，这一点从a">
 <meta property="og:type" content="article">
-<meta property="og:title" content="第一篇博客">
-<meta property="og:url" content="http://yoursite.com/2016/02/29/2016-02-29/index.html">
+<meta property="og:title" content="ListView 滑动冲突">
+<meta property="og:url" content="http://yoursite.com/2016/04/24/listview-scroll-conflict/index.html">
 <meta property="og:site_name" content="刘启明">
-<meta property="og:description" content="新的博客建好了，简约而不简单，博客这个地方，不需要建立的太奢华、绚丽夺目，简简单单就好。前两年，是在博客园写博客，说起来，不算是写博客，顶多算是记录自己职业生涯前进的脚印与所遇到的困难。这个时代是不断在变化的，沧海桑田，但，互联网所记录的东西，是可以一直保存下来的，从将日记写在本子上，发展到将日记记录在网上，这本身就是一个进步。搬到新博客，我会用心去记录，拒绝原封不动的“拿来主义”。不说自己写的东">
-<meta property="og:updated_time" content="2016-03-01T12:01:50.000Z">
+<meta property="og:description" content="在Android中，有时候会遇到子控件和父控件都要滑动的情况，尤其是当子控件为listview的时候。这种情况较常见，典型的launcher，每个屏幕上放上listview就会出现这种情况。有两点需要注意：:    1.一般来说，view的onTouchEvent返回true，即消耗点击事件，viewgroup的onInterceptTouchEvent返回false，即不拦截点击事件，这一点从a">
+<meta property="og:updated_time" content="2016-04-24T15:28:52.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="第一篇博客">
-<meta name="twitter:description" content="新的博客建好了，简约而不简单，博客这个地方，不需要建立的太奢华、绚丽夺目，简简单单就好。前两年，是在博客园写博客，说起来，不算是写博客，顶多算是记录自己职业生涯前进的脚印与所遇到的困难。这个时代是不断在变化的，沧海桑田，但，互联网所记录的东西，是可以一直保存下来的，从将日记写在本子上，发展到将日记记录在网上，这本身就是一个进步。搬到新博客，我会用心去记录，拒绝原封不动的“拿来主义”。不说自己写的东">
+<meta name="twitter:title" content="ListView 滑动冲突">
+<meta name="twitter:description" content="在Android中，有时候会遇到子控件和父控件都要滑动的情况，尤其是当子控件为listview的时候。这种情况较常见，典型的launcher，每个屏幕上放上listview就会出现这种情况。有两点需要注意：:    1.一般来说，view的onTouchEvent返回true，即消耗点击事件，viewgroup的onInterceptTouchEvent返回false，即不拦截点击事件，这一点从a">
 
 
 
@@ -84,7 +84,7 @@
   };
 </script>
 
-  <title> 第一篇博客 | 刘启明 </title>
+  <title> ListView 滑动冲突 | 刘启明 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -214,7 +214,7 @@
             
             
               
-                第一篇博客
+                ListView 滑动冲突
               
             
           </h1>
@@ -226,8 +226,8 @@
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-02-29T22:36:24+08:00" content="2016-02-29">
-              2016-02-29
+            <time itemprop="dateCreated" datetime="2016-04-24T23:25:22+08:00" content="2016-04-24">
+              2016-04-24
             </time>
           </span>
 	
@@ -242,8 +242,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/生活杂谈/" itemprop="url" rel="index">
-                    <span itemprop="name">生活杂谈</span>
+                  <a href="/categories/Android-进阶/" itemprop="url" rel="index">
+                    <span itemprop="name">Android 进阶</span>
                   </a>
                 </span>
 
@@ -258,8 +258,8 @@
             
               <span class="post-comments-count">
                 &nbsp; | &nbsp;
-                <a href="/2016/02/29/2016-02-29/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/02/29/2016-02-29/" itemprop="commentsCount"></span>
+                <a href="/2016/04/24/listview-scroll-conflict/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/04/24/listview-scroll-conflict/" itemprop="commentsCount"></span>
                 </a>
               </span>
             
@@ -280,10 +280,10 @@
       
 
       
-        <blockquote>
-<p> 新的博客建好了，简约而不简单，博客这个地方，不需要建立的太奢华、绚丽夺目，简简单单就好。前两年，是在<a href="http://www.cnblogs.com/lomomiao/" target="_blank" rel="external">博客园</a>写博客，说起来，不算是写博客，顶多算是记录自己职业生涯前进的脚印与所遇到的困难。这个时代是不断在变化的，沧海桑田，但，互联网所记录的东西，是可以一直保存下来的，从将日记写在本子上，发展到将日记记录在网上，这本身就是一个进步。搬到新博客，我会用心去记录，拒绝原封不动的“拿来主义”。不说自己写的东西，对他人能带来多少实质性的帮助，只希望，三年、五年、甚至十年二十年之后，自己重新看自己曾经写过的东西，能让自己觉得，虽然时光流逝，青春不返，但却将青春的故事，记录在了互联网上。<br>    刚毕业的时候，有幸认识了蚂蚁金服某程序员，暂且就称他为罗吧，罗给了我一个内推的机会，让我能够参加阿里的校招面试，并给了我一个月面试准备时间。虽然最终这个事还是黄了，但是在这一个月里，对我的心态成长和技术成长的好处，让我受益匪浅。也就是在这个时候，在我心里埋下了一个走进BAT的种子，虽然知道自己距BAT的要求，还有一段距离。付出总有收获，我相信有一天我可以做到。<br>      今年是和苗苗在一起的第三年。<br>    加油！</p>
-</blockquote>
-
+        <p>在Android中，有时候会遇到子控件和父控件都要滑动的情况，尤其是当子控件为listview的时候。这种情况较常见，典型的launcher，每个屏幕上放上listview就会出现这种情况。<br>有两点需要注意：<br>:    1.一般来说，view的onTouchEvent返回true，即消耗点击事件，viewgroup的onInterceptTouchEvent返回false，即不拦截点击事件，这一点从android源码中可以看出来。但是listview的父类AbsListView重写了onInterceptTouchEvent，返回了true，注意这里不是一定返回true，但是我觉得这一点可以先忽略。</p>
+<p>:    2.onTouchEvent和onInterceptTouchEvent的调用顺序。点击事件从父控件向子控件传递，如果父控件不拦截，则交由子控件拦截，如果父控件拦截了，则交由父控件的onTouchEvent处理，如果最终处理点击事件的控件的onTouchEvent返回了false，则将会直接调用其父控件的onTouchEvent，如此向上类推。</p>
+<p>其实解决方法也很简单：重写父控件的onInterceptTouchEvent函数，在move的时候根据需要返回true，比如左右滑动返回true，其他情况均返回false。这样，当左右滑动的时候，由于onInterceptTouchEvent返回了true，父控件就能处理，其他情况，事件将传递到listview中，listview自身可以处理上下滑动。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="annotation">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">onInterceptTouchEvent</span><span class="params">(MotionEvent ev)</span> </span><br><span class="line"></span>&#123;</span><br><span class="line">Log.d(TAG, <span class="string">"onInterceptTouchEvent-slop:"</span>+mTouchSlop);</span><br><span class="line"></span><br><span class="line"><span class="keyword">final</span> <span class="keyword">int</span> action = ev.getAction();</span><br><span class="line"><span class="keyword">if</span> ((action == MotionEvent.ACTION_MOVE) &amp;&amp; (mTouchState != TOUCH_STATE_REST))</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">final</span> <span class="keyword">float</span> x = ev.getX();</span><br><span class="line"><span class="keyword">final</span> <span class="keyword">float</span> y = ev.getY();</span><br><span class="line"></span><br><span class="line"><span class="keyword">switch</span> (action)</span><br><span class="line">&#123;</span><br><span class="line"><span class="keyword">case</span> MotionEvent.ACTION_MOVE:</span><br><span class="line"><span class="keyword">final</span> <span class="keyword">int</span> xDiff = (<span class="keyword">int</span>)Math.abs(mLastMotionX-x);</span><br><span class="line"><span class="keyword">if</span> (xDiff&gt;mTouchSlop)</span><br><span class="line">&#123;</span><br><span class="line">mTouchState = TOUCH_STATE_SCROLLING;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">case</span> MotionEvent.ACTION_DOWN:</span><br><span class="line">mLastMotionX = x;</span><br><span class="line">mLastMotionY = y;</span><br><span class="line">mTouchState = mScroller.isFinished()? TOUCH_STATE_REST : TOUCH_STATE_SCROLLING;</span><br><span class="line"><span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">case</span> MotionEvent.ACTION_CANCEL:</span><br><span class="line"><span class="keyword">case</span> MotionEvent.ACTION_UP:</span><br><span class="line">mTouchState = TOUCH_STATE_REST;</span><br><span class="line"><span class="keyword">break</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">return</span> mTouchState != TOUCH_STATE_REST;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
       
     </div>
 
@@ -294,17 +294,13 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2016/02/28/hello-world/" rel="next" title="Hello World">
-                <i class="fa fa-chevron-left"></i> Hello World
+              <a href="/2016/04/23/resume/" rel="next" title="刘启明个人简历">
+                <i class="fa fa-chevron-left"></i> 刘启明个人简历
               </a>
             
           </div>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2016/03/06/2016-03-06/" rel="prev" title="书单 (持续更新)">
-                书单 (持续更新) <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -330,8 +326,8 @@
           
   <div class="comments" id="comments">
     
-      <div class="ds-thread" data-thread-key="2016/02/29/2016-02-29/"
-           data-title="第一篇博客" data-url="http://yoursite.com/2016/02/29/2016-02-29/">
+      <div class="ds-thread" data-thread-key="2016/04/24/listview-scroll-conflict/"
+           data-title="ListView 滑动冲突" data-url="http://yoursite.com/2016/04/24/listview-scroll-conflict/">
       </div>
     
   </div>
