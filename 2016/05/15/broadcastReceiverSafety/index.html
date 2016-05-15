@@ -57,28 +57,22 @@
 
 
 
-<meta name="description" content="此文章专门用来记录学习过程中所看的书籍，长期更新。
+<meta name="description" content="BroadcastReceiver设计的初衷是从全局考虑可以方便应用程序和系统、应用程序之间、应用程序内的通信，所以对单个应用程序而言BroadcastReceiver是存在安全性问题的(恶意程序脚本不断的去发送你所接收的广播)
 
-Android书单：1.《Android 疯狂讲义》2.《Android 开发艺术探索》  
-Java书单:1.《Think in Java》2.《Effective Java》  
-编程思想类书单:1.《C++ 面向对象高效编程》2.《设计模式》">
+保证发送的广播要发送给指定的对象  当应用程序发送某个广播时系统会将发送的Intent与系统中所有注册的BroadcastReceiver的IntentFilter进行">
 <meta property="og:type" content="article">
-<meta property="og:title" content="书单 (持续更新)">
-<meta property="og:url" content="http://yoursite.com/2016/03/06/2016-03-06/index.html">
+<meta property="og:title" content="BroadcastReceiver安全问题">
+<meta property="og:url" content="http://yoursite.com/2016/05/15/broadcastReceiverSafety/index.html">
 <meta property="og:site_name" content="刘启明">
-<meta property="og:description" content="此文章专门用来记录学习过程中所看的书籍，长期更新。
+<meta property="og:description" content="BroadcastReceiver设计的初衷是从全局考虑可以方便应用程序和系统、应用程序之间、应用程序内的通信，所以对单个应用程序而言BroadcastReceiver是存在安全性问题的(恶意程序脚本不断的去发送你所接收的广播)
 
-Android书单：1.《Android 疯狂讲义》2.《Android 开发艺术探索》  
-Java书单:1.《Think in Java》2.《Effective Java》  
-编程思想类书单:1.《C++ 面向对象高效编程》2.《设计模式》">
-<meta property="og:updated_time" content="2016-04-29T16:18:57.000Z">
+保证发送的广播要发送给指定的对象  当应用程序发送某个广播时系统会将发送的Intent与系统中所有注册的BroadcastReceiver的IntentFilter进行">
+<meta property="og:updated_time" content="2016-05-15T02:59:38.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="书单 (持续更新)">
-<meta name="twitter:description" content="此文章专门用来记录学习过程中所看的书籍，长期更新。
+<meta name="twitter:title" content="BroadcastReceiver安全问题">
+<meta name="twitter:description" content="BroadcastReceiver设计的初衷是从全局考虑可以方便应用程序和系统、应用程序之间、应用程序内的通信，所以对单个应用程序而言BroadcastReceiver是存在安全性问题的(恶意程序脚本不断的去发送你所接收的广播)
 
-Android书单：1.《Android 疯狂讲义》2.《Android 开发艺术探索》  
-Java书单:1.《Think in Java》2.《Effective Java》  
-编程思想类书单:1.《C++ 面向对象高效编程》2.《设计模式》">
+保证发送的广播要发送给指定的对象  当应用程序发送某个广播时系统会将发送的Intent与系统中所有注册的BroadcastReceiver的IntentFilter进行">
 
 
 
@@ -96,7 +90,7 @@ Java书单:1.《Think in Java》2.《Effective Java》
   };
 </script>
 
-  <title> 书单 (持续更新) | 刘启明 </title>
+  <title> BroadcastReceiver安全问题 | 刘启明 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -226,7 +220,7 @@ Java书单:1.《Think in Java》2.《Effective Java》
             
             
               
-                书单 (持续更新)
+                BroadcastReceiver安全问题
               
             
           </h1>
@@ -238,8 +232,8 @@ Java书单:1.《Think in Java》2.《Effective Java》
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-03-06T14:31:58+08:00" content="2016-03-06">
-              2016-03-06
+            <time itemprop="dateCreated" datetime="2016-05-15T10:57:01+08:00" content="2016-05-15">
+              2016-05-15
             </time>
           </span>
 	
@@ -254,8 +248,8 @@ Java书单:1.《Think in Java》2.《Effective Java》
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/书单/" itemprop="url" rel="index">
-                    <span itemprop="name">书单</span>
+                  <a href="/categories/Android-进阶/" itemprop="url" rel="index">
+                    <span itemprop="name">Android 进阶</span>
                   </a>
                 </span>
 
@@ -270,8 +264,8 @@ Java书单:1.《Think in Java》2.《Effective Java》
             
               <span class="post-comments-count">
                 &nbsp; | &nbsp;
-                <a href="/2016/03/06/2016-03-06/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/03/06/2016-03-06/" itemprop="commentsCount"></span>
+                <a href="/2016/05/15/broadcastReceiverSafety/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/05/15/broadcastReceiverSafety/" itemprop="commentsCount"></span>
                 </a>
               </span>
             
@@ -292,13 +286,20 @@ Java书单:1.《Think in Java》2.《Effective Java》
       
 
       
-        <pre><code>此文章专门用来记录学习过程中所看的书籍，长期更新。
-</code></pre><blockquote>
-<h3 id="Android书单："><a href="#Android书单：" class="headerlink" title="Android书单："></a>Android书单：</h3><p>1.《Android 疯狂讲义》<br>2.《Android 开发艺术探索》  </p>
-<h3 id="Java书单"><a href="#Java书单" class="headerlink" title="Java书单:"></a>Java书单:</h3><p>1.《Think in Java》<br>2.《Effective Java》  </p>
-<h3 id="编程思想类书单"><a href="#编程思想类书单" class="headerlink" title="编程思想类书单:"></a>编程思想类书单:</h3><p>1.《C++ 面向对象高效编程》<br>2.《设计模式》 </p>
-</blockquote>
-
+        <p><code>BroadcastReceiver</code>设计的初衷是从全局考虑可以方便应用程序和系统、应用程序之间、应用程序内的通信，所以对单个应用程序而言<code>BroadcastReceiver</code>是存在安全性问题的(恶意程序脚本不断的去发送你所接收的广播)</p>
+<ul>
+<li><p>保证发送的广播要发送给指定的对象<br>  当应用程序发送某个广播时系统会将发送的<code>Intent</code>与系统中所有注册的<code>BroadcastReceiver</code>的<code>IntentFilter</code>进行匹配，若匹配成功则执行相应的<code>onReceive</code>函数。可以通过类似<code>sendBroadcast(Intent, String)</code>的接口在发送广播时指定接收者必须具备的<code>permission</code>或通过<code>Intent.setPackage</code>设置广播仅对某个程序有效。</p>
+</li>
+<li><p>保证我接收到的广播室指定对象发送过来的<br>  当应用程序注册了某个广播时，即便设置了<code>IntentFilter</code>还是会接收到来自其他应用程序的广播进行匹配判断。对于动态注册的广播可以通过类似<code>registerReceiver(BroadcastReceiver, IntentFilter, String, android.os.Handler)</code>的接口指定发送者必须具备的<code>permission</code>，对于静态注册的广播可以通过<code>android:exported=&quot;false&quot;</code>属性表示接收者对外部应用程序不可用，即不接受来自外部的广播。</p>
+</li>
+</ul>
+<p><code>android.support.v4.content.LocalBroadcastManager</code>工具类，可以实现在自己的进程内进行局部广播发送与注册，使用它比直接通过sendBroadcast(Intent)发送系统全局广播有以下几个好处：</p>
+<ul>
+<li>因广播数据在本应用范围内传播，你不用担心隐私数据泄露的问题。</li>
+<li>不用担心别的应用伪造广播，造成安全隐患。</li>
+<li>相比在系统内发送全局广播，它更高效。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"> LocalBroadcastManager mLocalBroadcastManager;  </span><br><span class="line"> BroadcastReceiver mReceiver;  </span><br><span class="line"></span><br><span class="line"><span class="annotation">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">super</span>.onCreate(savedInstanceState);</span><br><span class="line">	 IntentFilter filter = <span class="keyword">new</span> IntentFilter();  </span><br><span class="line">	 filter.addAction(<span class="string">"test"</span>);  </span><br><span class="line"></span><br><span class="line">	 mReceiver = <span class="keyword">new</span> BroadcastReceiver() &#123;  </span><br><span class="line">		<span class="annotation">@Override</span>  </span><br><span class="line">		<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onReceive</span><span class="params">(Context context, Intent intent)</span> </span>&#123;  </span><br><span class="line">			<span class="keyword">if</span> (intent.getAction().equals(<span class="string">"test"</span>)) &#123;  </span><br><span class="line">				<span class="comment">//Do Something</span></span><br><span class="line">			&#125; </span><br><span class="line">		&#125;  </span><br><span class="line">	&#125;;  </span><br><span class="line">	mLocalBroadcastManager = LocalBroadcastManager.getInstance(<span class="keyword">this</span>);</span><br><span class="line">	mLocalBroadcastManager.registerReceiver(mReceiver, filter);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="annotation">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onDestroy</span><span class="params">()</span> </span>&#123;</span><br><span class="line">   mLocalBroadcastManager.unregisterReceiver(mReceiver);</span><br><span class="line">   <span class="keyword">super</span>.onDestroy();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
       
     </div>
 
@@ -309,17 +310,13 @@ Java书单:1.《Think in Java》2.《Effective Java》
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2016/02/29/2016-02-29/" rel="next" title="第一篇博客">
-                <i class="fa fa-chevron-left"></i> 第一篇博客
+              <a href="/2016/05/15/initActivity/" rel="next" title="Activity界面绘制过程">
+                <i class="fa fa-chevron-left"></i> Activity界面绘制过程
               </a>
             
           </div>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2016/03/06/2016-03-06-2/" rel="prev" title="Activity 的生命周期深入理解 ">
-                Activity 的生命周期深入理解  <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -345,8 +342,8 @@ Java书单:1.《Think in Java》2.《Effective Java》
           
   <div class="comments" id="comments">
     
-      <div class="ds-thread" data-thread-key="2016/03/06/2016-03-06/"
-           data-title="书单 (持续更新)" data-url="http://yoursite.com/2016/03/06/2016-03-06/">
+      <div class="ds-thread" data-thread-key="2016/05/15/broadcastReceiverSafety/"
+           data-title="BroadcastReceiver安全问题" data-url="http://yoursite.com/2016/05/15/broadcastReceiverSafety/">
       </div>
     
   </div>
@@ -460,7 +457,7 @@ Java书单:1.《Think in Java》2.《Effective Java》
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Android书单："><span class="nav-number">1.</span> <span class="nav-text">Android书单：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Java书单"><span class="nav-number">2.</span> <span class="nav-text">Java书单:</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#编程思想类书单"><span class="nav-number">3.</span> <span class="nav-text">编程思想类书单:</span></a></li></ol></div>
+              <p class="post-toc-empty">此文章未包含目录</p>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator">
