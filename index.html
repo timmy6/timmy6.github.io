@@ -222,6 +222,123 @@
             
               
                 
+                <a class="post-title-link" href="/2016/05/22/ram-divulge/" itemprop="url">
+                  Android内存泄露
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-05-22T10:45:19+08:00" content="2016-05-22">
+              2016-05-22
+            </time>
+          </span>
+	
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Android-进阶/" itemprop="url" rel="index">
+                    <span itemprop="name">Android 进阶</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/05/22/ram-divulge/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/05/22/ram-divulge/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+          定义内存泄露是指无用对象(不再使用的对象)持续占有内存或无用对象的内存得不到及时释放，从而造成的内存空间的浪费称为内存泄露。
+原因长生命周期的对象持有短生命周期对象的引用就很可能发生内存泄露，尽管短生命周期对象已经不再需要，但是因为长生命周期对象持有它的引用而导致不能被回收，这就是java中内存泄露的发生场景。
+危害只有一个，那就是虚拟机占用内存过高，导致OOM(内存溢出)。对于Android应
+          ...
+
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2016/05/22/ram-divulge/" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
                 <a class="post-title-link" href="/2016/05/15/broadcastReceiverSafety/" itemprop="url">
                   BroadcastReceiver安全问题
                 </a>
@@ -1253,121 +1370,6 @@ Email:liuqiminggood@gmail.com
 
 
     
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2016/03/06/2016-03-06-2/" itemprop="url">
-                  Activity 的生命周期深入理解 
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-03-06T15:03:38+08:00" content="2016-03-06">
-              2016-03-06
-            </time>
-          </span>
-	
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/Android-进阶/" itemprop="url" rel="index">
-                    <span itemprop="name">Android 进阶</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2016/03/06/2016-03-06-2/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/03/06/2016-03-06-2/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-          
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-          Activity 生命周期分为两部分内容，一部分是典型情况下的生命周期，另一部分是异常情况下的声明周期。所谓典型情况下的生命周期，是指在有用户参与的情况下，Activity 所经过的生命周期的改变；而异常情况下的生命周期是指Activity 被系统回收或者由于当前设备的Confituration 发生改变从而导致 Activity 被销毁重建，异常异常情况下的生命周期的关注点和典型情况下略有不同
-          ...
-
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2016/03/06/2016-03-06-2/" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
 
   </section>
 
@@ -1414,7 +1416,7 @@ Email:liuqiminggood@gmail.com
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">13</span>
+              <span class="site-state-item-count">14</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
