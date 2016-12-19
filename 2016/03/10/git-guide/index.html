@@ -71,7 +71,7 @@
 （三）工作流你的本地仓库由git维护的三棵“树”组成。第一个是你的工作">
 <meta property="og:image" content="http://yoursite.com/uploads/gitguide.png">
 <meta property="og:image" content="http://yoursite.com/uploads/git-branch.png">
-<meta property="og:updated_time" content="2016-03-10T14:21:40.000Z">
+<meta property="og:updated_time" content="2016-09-09T15:02:23.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="git快速入门">
 <meta name="twitter:description" content="（一）创建新仓库创建新文件夹，打开，然后执行以下命令:1git init
@@ -307,6 +307,7 @@
 <p>在合并改动之前，你可以使用如下命令预览差异:<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git diff &#60;source_branch&#62; &#60;target_branh&#62;</span><br></pre></td></tr></table></figure></p>
 <h3 id="（八）替换本地改动"><a href="#（八）替换本地改动" class="headerlink" title="（八）替换本地改动"></a>（八）替换本地改动</h3><p>假如你操作失误（当然，希望这种情况永远不会发生)你可以使用如下命令替换掉本地改动:<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git checkout &#8212;-&#60;filename&#62;</span><br></pre></td></tr></table></figure></p>
 <p>假如你想丢弃你在本地的所有改动与提交，可以到服务器上获取最新的版本历时，并将你本地分支指向它:<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git fetch origin&#10;git reset &#8212;hard origin/master</span><br></pre></td></tr></table></figure></p>
+<h3 id="（九）合并多个commit"><a href="#（九）合并多个commit" class="headerlink" title="（九）合并多个commit"></a>（九）合并多个commit</h3><p>有的时候我们可能由于各种原因提交了许多临时的commit，而这些commit拼接起来才是完整的任务。那么我们为了避免太多的commit而造成版本控制混乱，通常我们推荐将这些commit合并成同一个。<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git rebase -i hash</span><br></pre></td></tr></table></figure></p>
 <p><strong>参考指南和手册:</strong><br><a href="http://marklodato.github.io/visual-git-guide/index-zh-cn.html" target="_blank" rel="external">图解git</a><br><a href="http://git-scm.com/book/en/v2" target="_blank" rel="external">git社区参考书</a></p>
 
       
@@ -401,7 +402,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">16</span>
+              <span class="site-state-item-count">17</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -415,6 +416,13 @@
             </div>
           
 
+          
+            <div class="site-state-item site-state-tags">
+              
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">标签</span>
+              
+            </div>
           
 
         </nav>
@@ -470,7 +478,7 @@
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#（一）创建新仓库"><span class="nav-number">1.</span> <span class="nav-text">（一）创建新仓库</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#（二）检出仓库"><span class="nav-number">2.</span> <span class="nav-text">（二）检出仓库</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#（三）工作流"><span class="nav-number">3.</span> <span class="nav-text">（三）工作流</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#（四）添加和提交"><span class="nav-number">4.</span> <span class="nav-text">（四）添加和提交</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#（五）推送改动"><span class="nav-number">5.</span> <span class="nav-text">（五）推送改动</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#（六）分支"><span class="nav-number">6.</span> <span class="nav-text">（六）分支</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#（七）更新与合并"><span class="nav-number">7.</span> <span class="nav-text">（七）更新与合并</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#（八）替换本地改动"><span class="nav-number">8.</span> <span class="nav-text">（八）替换本地改动</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#（一）创建新仓库"><span class="nav-number">1.</span> <span class="nav-text">（一）创建新仓库</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#（二）检出仓库"><span class="nav-number">2.</span> <span class="nav-text">（二）检出仓库</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#（三）工作流"><span class="nav-number">3.</span> <span class="nav-text">（三）工作流</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#（四）添加和提交"><span class="nav-number">4.</span> <span class="nav-text">（四）添加和提交</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#（五）推送改动"><span class="nav-number">5.</span> <span class="nav-text">（五）推送改动</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#（六）分支"><span class="nav-number">6.</span> <span class="nav-text">（六）分支</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#（七）更新与合并"><span class="nav-number">7.</span> <span class="nav-text">（七）更新与合并</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#（八）替换本地改动"><span class="nav-number">8.</span> <span class="nav-text">（八）替换本地改动</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#（九）合并多个commit"><span class="nav-number">9.</span> <span class="nav-text">（九）合并多个commit</span></a></li></ol></div>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator">

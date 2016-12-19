@@ -65,7 +65,7 @@
 <meta property="og:site_name" content="刘启明">
 <meta property="og:description" content="1.初始化一个与屏幕大小相同的View(1)12self.view = [[UIView alloc] initWithFrame:[UIScreen mainScreen].bounds];//[UIScreen mainScreen].bounds是整个屏幕的大小，初始化时将window大小设置为整个屏幕;
 (2)12self.webView = [[View alloc] initWithF">
-<meta property="og:updated_time" content="2016-06-10T13:37:03.000Z">
+<meta property="og:updated_time" content="2016-08-24T15:15:40.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="iOS 个人实际开发知识点集锦(长久更新)">
 <meta name="twitter:description" content="1.初始化一个与屏幕大小相同的View(1)12self.view = [[UIView alloc] initWithFrame:[UIScreen mainScreen].bounds];//[UIScreen mainScreen].bounds是整个屏幕的大小，初始化时将window大小设置为整个屏幕;
@@ -291,6 +291,9 @@
 <p>将edgesForExtendedLayout属性设置为UIRectEdgeNone，这样布局就是从导航栏下面开始了。<br><strong>解决方法二:导航栏半透明属性设置为No</strong><br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">@property</span>(<span class="keyword">nonatomic</span>,<span class="keyword">assign</span>,getter=isTranslucent) <span class="built_in">BOOL</span> translucent <span class="built_in">NS_AVAILABLE_IOS</span>(<span class="number">3</span>_0) <span class="built_in">UI_APPEARANCE_SELECTOR</span>; <span class="comment">//Default is NO on iOS 6 and earlier.</span></span><br></pre></td></tr></table></figure></p>
 <p>在iOS 6之前(包括iOS 6)translucent默认就是NO，在iOS 7默认就是YES了。<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">self</span><span class="variable">.navigationController</span><span class="variable">.navigationBar</span><span class="variable">.translucent</span> = <span class="literal">NO</span>;</span><br><span class="line"><span class="keyword">self</span><span class="variable">.automaticallyAdjustsScrollViewInsets</span> = <span class="literal">NO</span>;</span><br></pre></td></tr></table></figure></p>
 <p>将导航栏的半透明属性关闭掉，布局也是从导航栏下面开始了。</p>
+<h4 id="4-加载本地plist文件"><a href="#4-加载本地plist文件" class="headerlink" title="4.加载本地plist文件"></a>4.加载本地plist文件</h4><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[<span class="built_in">NSArray</span> arrayWithContentOfFile:[[<span class="built_in">NSBundle</span> mainBundle] pathForResource:@“文件名<span class="variable">.plist</span>” ofType:<span class="literal">nil</span>]]</span><br></pre></td></tr></table></figure>
+<h4 id="5-视图控制对象声明周期"><a href="#5-视图控制对象声明周期" class="headerlink" title="5.视图控制对象声明周期"></a>5.视图控制对象声明周期</h4><p><strong>init</strong>    初始化程序<br><strong>viewDidLoad</strong>     加载视图<br><strong>viewWillAppear</strong>    UIViewController对象的视图即将加入窗口时调用;<br><strong>viewDidApper</strong>    UIViewController对象的视图已经加入到窗口时调用;<br><strong>viewDidDisappear</strong>    UIViewController对象的视图已经消失、被覆盖或是隐藏时调用；<br><strong>viewVillUnload</strong>    当内存过低时，需要释放一些不需要使用的视图时，即将释放时调用;<br><strong>viewDidUnload</strong>    当内存过低，释放一些不需要的视图时调用。<br>视图控制对象通过alloc和init来创建，但是视图控制对象不会在创建的那一刻就马上创建相应的视图，而是等到需要使用的时候才通过调用loadView来创建，这样的做法能提高内存的使用率。比如，当某个标签有很多UIViewController对象，那么对于任何一个UIViewController对象的视图，只有相应的标签被选中时才会被创建出来。<br>比如下面代码:<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">- (<span class="keyword">id</span>)initWithNibName:(<span class="built_in">NSString</span> *)nibNameOrNil bundle:(<span class="built_in">NSBundle</span> *)nibBundleOrNil  </span><br><span class="line">&#123;  </span><br><span class="line">    <span class="keyword">self</span> = [<span class="keyword">super</span> initWithNibName:nibNameOrNil bundle:nibBundleOrNil];  </span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">self</span>) &#123;  </span><br><span class="line">        <span class="comment">// Custom initialization  </span></span><br><span class="line">        <span class="built_in">UITabBarItem</span> *tbi = [<span class="keyword">self</span> tabBarItem];  </span><br><span class="line">        [tbi setTitle:<span class="string">@"CurrentTime"</span>];  </span><br><span class="line">        [[<span class="keyword">self</span> view ] setBackgroundColor:[<span class="built_in">UIColor</span> yellowColor]];  </span><br><span class="line">        &#125;  </span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">self</span>;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>我们将UIViewController的init方法中访问的实例变量view在init中将背景设置为黄色，运行程序，我们能发现背景的确变成了黄色，但是，在我们还没有需要使用视图的时候，该视图已经加载好了，在UIViewController的初始方法中访问实例变量view，会导致延迟载入机制失效，这个问题看上去不是很严重，但是如果考虑到内存过低警告，那么问题就大了。。。<br>运行程序，选择模拟器中的硬件－&gt;模拟内存过低警告，我们会发现，原本设置的黄色背景不见了，这是因为，内存过低，视图控制对象会在发出内存过低警告时收到didReceiveMemoryWarning消息，该方法默认实现，检查视图控制对象的视图是否可见，如果不可见，则释放掉，下次在加载该视图时就不会执行init方法，而是只执行viewDidLoad方法，所以需要将[[selfview ] setBackgroundColor:[UIColoryellowColor]];放到viewDidLoad中，这样如果视图因为内存过低被释放掉了，下次需要使用到该视图的时候，程序会默认取执行该视图的viewDidLoad方法，这样背景颜色就又出来了。</p>
 
       
     </div>
@@ -384,7 +387,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">16</span>
+              <span class="site-state-item-count">17</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -398,6 +401,13 @@
             </div>
           
 
+          
+            <div class="site-state-item site-state-tags">
+              
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">标签</span>
+              
+            </div>
           
 
         </nav>
@@ -453,7 +463,7 @@
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-初始化一个与屏幕大小相同的View"><span class="nav-number">1.</span> <span class="nav-text">1.初始化一个与屏幕大小相同的View</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-跳转界面"><span class="nav-number">2.</span> <span class="nav-text">2.跳转界面</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-设置默认布局开始位置-UIViewController-的-edgeForExtendedLayout属性"><span class="nav-number">3.</span> <span class="nav-text">3.设置默认布局开始位置(UIViewController 的 edgeForExtendedLayout属性)</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-初始化一个与屏幕大小相同的View"><span class="nav-number">1.</span> <span class="nav-text">1.初始化一个与屏幕大小相同的View</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-跳转界面"><span class="nav-number">2.</span> <span class="nav-text">2.跳转界面</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-设置默认布局开始位置-UIViewController-的-edgeForExtendedLayout属性"><span class="nav-number">3.</span> <span class="nav-text">3.设置默认布局开始位置(UIViewController 的 edgeForExtendedLayout属性)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-加载本地plist文件"><span class="nav-number">4.</span> <span class="nav-text">4.加载本地plist文件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-视图控制对象声明周期"><span class="nav-number">5.</span> <span class="nav-text">5.视图控制对象声明周期</span></a></li></ol></div>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator">
