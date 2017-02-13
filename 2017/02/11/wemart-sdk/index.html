@@ -41,7 +41,7 @@
 <link href="/css/main.css?v=0.5.0" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="Android 进阶," />
 
 
 
@@ -57,28 +57,26 @@
 
 
 
-<meta name="description" content="此文章专门用来记录学习过程中所看的书籍，长期更新。
-
-Android书单：1.《Android 疯狂讲义》2.《Android 开发艺术探索》  
-Java书单:1.《Think in Java》2.《Effective Java》  
-编程思想类书单:1.《C++ 面向对象高效编程》2.《设计模式》">
+<meta name="description" content="(一)导入wemartSDK aar和alipaySDK.jar(支付宝SDK)文件在library/androidSDK中找到wemartSDK.aar文件，将wemartSDK加入项目中的lib文件夹；下载alipaySDK.jar(支付宝SDK)或者在library/androidSDK里拷贝alipaySDK.jar.注意:如果APP项目已经包含了支付宝SDK，请确认支付宝SDK文件名是否">
 <meta property="og:type" content="article">
-<meta property="og:title" content="书单 (持续更新)">
-<meta property="og:url" content="http://yoursite.com/2016/03/06/2016-03-06/index.html">
+<meta property="og:title" content="wemartSDK 集成文档">
+<meta property="og:url" content="http://yoursite.com/2017/02/11/wemart-sdk/index.html">
 <meta property="og:site_name" content="刘启明">
-<meta property="og:description" content="此文章专门用来记录学习过程中所看的书籍，长期更新。
-
-Android书单：1.《Android 疯狂讲义》2.《Android 开发艺术探索》  
-Java书单:1.《Think in Java》2.《Effective Java》  
-编程思想类书单:1.《C++ 面向对象高效编程》2.《设计模式》">
-<meta property="og:updated_time" content="2016-04-29T16:18:57.000Z">
+<meta property="og:description" content="(一)导入wemartSDK aar和alipaySDK.jar(支付宝SDK)文件在library/androidSDK中找到wemartSDK.aar文件，将wemartSDK加入项目中的lib文件夹；下载alipaySDK.jar(支付宝SDK)或者在library/androidSDK里拷贝alipaySDK.jar.注意:如果APP项目已经包含了支付宝SDK，请确认支付宝SDK文件名是否">
+<meta property="og:image" content="http://yoursite.com/uploads/wemart_build_gradle.png">
+<meta property="og:image" content="http://yoursite.com/uploads/wemart_sdk1.png">
+<meta property="og:image" content="http://yoursite.com/uploads/wemart_sdk3.png">
+<meta property="og:image" content="http://yoursite.com/uploads/wemart_sdk4.png">
+<meta property="og:image" content="http://yoursite.com/uploads/wemart_sdk5.png">
+<meta property="og:image" content="http://yoursite.com/uploads/wemart_sdk6.png">
+<meta property="og:image" content="http://yoursite.com/uploads/wemart_sdk9.png">
+<meta property="og:image" content="http://yoursite.com/uploads/wemart_sdk8.png">
+<meta property="og:image" content="http://yoursite.com/uploads/wemart_sdk10.png">
+<meta property="og:image" content="http://yoursite.com/uploads/wemart_sdk11.png">
+<meta property="og:updated_time" content="2017-02-13T12:53:54.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="书单 (持续更新)">
-<meta name="twitter:description" content="此文章专门用来记录学习过程中所看的书籍，长期更新。
-
-Android书单：1.《Android 疯狂讲义》2.《Android 开发艺术探索》  
-Java书单:1.《Think in Java》2.《Effective Java》  
-编程思想类书单:1.《C++ 面向对象高效编程》2.《设计模式》">
+<meta name="twitter:title" content="wemartSDK 集成文档">
+<meta name="twitter:description" content="(一)导入wemartSDK aar和alipaySDK.jar(支付宝SDK)文件在library/androidSDK中找到wemartSDK.aar文件，将wemartSDK加入项目中的lib文件夹；下载alipaySDK.jar(支付宝SDK)或者在library/androidSDK里拷贝alipaySDK.jar.注意:如果APP项目已经包含了支付宝SDK，请确认支付宝SDK文件名是否">
 
 
 
@@ -96,7 +94,7 @@ Java书单:1.《Think in Java》2.《Effective Java》
   };
 </script>
 
-  <title> 书单 (持续更新) | 刘启明 </title>
+  <title> wemartSDK 集成文档 | 刘启明 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -226,7 +224,7 @@ Java书单:1.《Think in Java》2.《Effective Java》
             
             
               
-                书单 (持续更新)
+                wemartSDK 集成文档
               
             
           </h1>
@@ -238,40 +236,21 @@ Java书单:1.《Think in Java》2.《Effective Java》
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-03-06T14:31:58+08:00" content="2016-03-06">
-              2016-03-06
+            <time itemprop="dateCreated" datetime="2017-02-11T16:18:43+08:00" content="2017-02-11">
+              2017-02-11
             </time>
           </span>
 	
           <span id="busuanzi_container_page_pv">  |  阅读量 <span id="busuanzi_value_page_pv"></span> 次</span>
         
           
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/书单/" itemprop="url" rel="index">
-                    <span itemprop="name">书单</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
 
           
             
               <span class="post-comments-count">
                 &nbsp; | &nbsp;
-                <a href="/2016/03/06/2016-03-06/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/03/06/2016-03-06/" itemprop="commentsCount"></span>
+                <a href="/2017/02/11/wemart-sdk/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/02/11/wemart-sdk/" itemprop="commentsCount"></span>
                 </a>
               </span>
             
@@ -292,34 +271,50 @@ Java书单:1.《Think in Java》2.《Effective Java》
       
 
       
-        <pre><code>此文章专门用来记录学习过程中所看的书籍，长期更新。
-</code></pre><blockquote>
-<h3 id="Android书单："><a href="#Android书单：" class="headerlink" title="Android书单："></a>Android书单：</h3><p>1.《Android 疯狂讲义》<br>2.《Android 开发艺术探索》  </p>
-<h3 id="Java书单"><a href="#Java书单" class="headerlink" title="Java书单:"></a>Java书单:</h3><p>1.《Think in Java》<br>2.《Effective Java》  </p>
-<h3 id="编程思想类书单"><a href="#编程思想类书单" class="headerlink" title="编程思想类书单:"></a>编程思想类书单:</h3><p>1.《C++ 面向对象高效编程》<br>2.《设计模式》 </p>
-</blockquote>
-
+        <h3 id="一-导入wemartSDK-aar和alipaySDK-jar-支付宝SDK-文件"><a href="#一-导入wemartSDK-aar和alipaySDK-jar-支付宝SDK-文件" class="headerlink" title="(一)导入wemartSDK aar和alipaySDK.jar(支付宝SDK)文件"></a>(一)导入wemartSDK aar和alipaySDK.jar(支付宝SDK)文件</h3><p>在library/androidSDK中找到wemartSDK.aar文件，将wemartSDK加入项目中的lib文件夹；下载alipaySDK.jar(支付宝SDK)或者在library/androidSDK里拷贝alipaySDK.jar.<br><strong>注意:如果APP项目已经包含了支付宝SDK，请确认支付宝SDK文件名是否是alipaySDK.jar，如果不是，请将文件名修改成alipaySDK.jar，否则调起支付宝支付时，会报找不到alipaySDK文件的错误</strong></p>
+<h3 id="二-Android-Studio导入wemart-aar文件配置"><a href="#二-Android-Studio导入wemart-aar文件配置" class="headerlink" title="(二)Android Studio导入wemart.aar文件配置"></a>(二)Android Studio导入wemart.aar文件配置</h3><p>在app的build.gradle文件中，添加：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">repositories &#123;</span><br><span class="line">    flatDir &#123;</span><br><span class="line">        dirs <span class="string">'libs'</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>在dependencies中，添加：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">compile <span class="title">files</span><span class="params">(<span class="string">'libs/alipaySdk.jar'</span>)</span></span><br><span class="line"><span class="title">compile</span><span class="params">(name: <span class="string">'wemartSDK'</span>, ext: <span class="string">'aar'</span>)</span></span></span><br></pre></td></tr></table></figure></p>
+<p>配置之后的app build.gradle内容如下图<br><img src="/uploads/wemart_build_gradle.png" alt="app_build_gradle"></p>
+<h3 id="三-权限配置"><a href="#三-权限配置" class="headerlink" title="(三)权限配置"></a>(三)权限配置</h3><p>在AndroidMainifest.xml文件中，加入如下权限：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;uses-permission android:name=<span class="string">"android.permission.INTERNET"</span> /&gt;</span><br><span class="line">&lt;uses-permission android:name=<span class="string">"android.permission.ACCESS_WIFI_STATE"</span> /&gt;</span><br></pre></td></tr></table></figure></p>
+<h3 id="四-配置商城入口url"><a href="#四-配置商城入口url" class="headerlink" title="(四)配置商城入口url"></a>(四)配置商城入口url</h3><ol>
+<li><p><strong>获取店铺主页</strong>。登陆微猫后台————&gt;店铺————&gt;预览。预览后，点击右侧蓝色“复制链接按钮”，存下来。如下图<br><img src="/uploads/wemart_sdk1.png" alt="wemart_sdk2"><br><img src="/uploads/wemart_sdk3.png" alt="wemart_sdk3"><br>获取到店铺主页链接:<a href="http://www.wemart.cn/mobile/?chanId=110&amp;shelfNo=xxx&amp;sellerId=xxx&amp;a=shelf&amp;m=index" target="_blank" rel="external">http://www.wemart.cn/mobile/?chanId=110&amp;shelfNo=xxx&amp;sellerId=xxx&amp;a=shelf&amp;m=index</a></p>
+</li>
+<li><p><strong>获取店铺App Id</strong>。点击左上方“店铺设置”或者“平台设置”————&gt;点击左侧“场景“————&gt;点击蓝色按钮“创建APP“并输入APP名字，保存，保存成功后，即可看到APPID<br><img src="/uploads/wemart_sdk4.png" alt="wemart_sdk4"><br><img src="/uploads/wemart_sdk5.png" alt="wemart_sdk5"><br><img src="/uploads/wemart_sdk6.png" alt="wemart_sdk6"></p>
+</li>
+<li><p><strong>添加url参数</strong>。在主页链接后面，添加必需的url参数：scenType=1&amp;appId=xxx&amp;userId=xxx&amp;sign=xxx&amp;native=false&amp;payNative=true。<br>其中，userId为应用对应用户的唯一标识；sign参数为对字符串“appId = xxx&amp;userId=xxx”进行RSA-SHA1签名，签名需要的私钥（即AppSecret）在AppId下方，获取方法参考上方<strong>获取店铺App Id</strong>步骤。<br><strong>完整的商城入口url为：<a href="http://www.wemart.cn/mobile/?chanId=&amp;shelfNo=xxx&amp;sellerId=xxx&amp;a=shelf&amp;m=index&amp;native=false&amp;payNative=true&amp;scenType=1&amp;appId=xxx&amp;userId=xxx&amp;sign=xxx" target="_blank" rel="external">http://www.wemart.cn/mobile/?chanId=&amp;shelfNo=xxx&amp;sellerId=xxx&amp;a=shelf&amp;m=index&amp;native=false&amp;payNative=true&amp;scenType=1&amp;appId=xxx&amp;userId=xxx&amp;sign=xxx</a></strong><br><strong>注意：上方“xxx”需用相应的值替换</strong></p>
+</li>
+</ol>
+<h3 id="五-注册接收微信支付和分享的广播"><a href="#五-注册接收微信支付和分享的广播" class="headerlink" title="(五)注册接收微信支付和分享的广播"></a>(五)注册接收<strong>微信支付和分享的广播</strong></h3><ol>
+<li><p><strong>微信支付参数获取</strong>。创建一个继承BroadcastReceiver的子类，且在AndroidManifest.xml注册该广播，action为:”cn.wemart.sdk.share”。<br><img src="/uploads/wemart_sdk9.png" alt="wemart_sdk7"><br>获取微信支付参数的示例代码如下：<br><img src="/uploads/wemart_sdk8.png" alt="wemart_sdk8"></p>
+</li>
+<li><p><strong>分享</strong>。 创建一个继承BroadcastReceiver的子类，且在AndroidManifest.xml注册该广播，action为:”cn.wemart.sdk.share”。<br><img src="/uploads/wemart_sdk10.png" alt="wemart_sdk9"><br>获取分享参数的示例代码如下：<br><img src="/uploads/wemart_sdk11.png" alt="wemart_sdk10"></p>
+</li>
+</ol>
+<p><strong>注意事项:微信支付和分享SDK只提供内容.获取到微信支付参数后，需要APP自己调起微信支付；分享也是需要APP自己调起分享，wemartSDK只提供支付参数和分享内容</strong></p>
+<h3 id="六-使用SDK"><a href="#六-使用SDK" class="headerlink" title="(六)使用SDK"></a>(六)使用SDK</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Intent intent = <span class="keyword">new</span> Intent(context,MallActivity.class);</span><br><span class="line">intent.putExtra(“url”,xxx);	<span class="comment">//xxx为商城入口url</span></span><br><span class="line">startActivity(intent);</span><br></pre></td></tr></table></figure>
       
     </div>
 
     <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android-进阶/" rel="tag">#Android 进阶</a>
+          
+        </div>
       
 
       
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2016/02/29/2016-02-29/" rel="next" title="第一篇博客">
-                <i class="fa fa-chevron-left"></i> 第一篇博客
+              <a href="/2016/12/14/ormlite/" rel="next" title="OrmLite 快速入门">
+                <i class="fa fa-chevron-left"></i> OrmLite 快速入门
               </a>
             
           </div>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2016/03/06/2016-03-06-2/" rel="prev" title="Activity 的生命周期深入理解 ">
-                Activity 的生命周期深入理解  <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -345,8 +340,8 @@ Java书单:1.《Think in Java》2.《Effective Java》
           
   <div class="comments" id="comments">
     
-      <div class="ds-thread" data-thread-key="2016/03/06/2016-03-06/"
-           data-title="书单 (持续更新)" data-url="http://yoursite.com/2016/03/06/2016-03-06/">
+      <div class="ds-thread" data-thread-key="2017/02/11/wemart-sdk/"
+           data-title="wemartSDK 集成文档" data-url="http://yoursite.com/2017/02/11/wemart-sdk/">
       </div>
     
   </div>
@@ -467,7 +462,7 @@ Java书单:1.《Think in Java》2.《Effective Java》
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Android书单："><span class="nav-number">1.</span> <span class="nav-text">Android书单：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Java书单"><span class="nav-number">2.</span> <span class="nav-text">Java书单:</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#编程思想类书单"><span class="nav-number">3.</span> <span class="nav-text">编程思想类书单:</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#一-导入wemartSDK-aar和alipaySDK-jar-支付宝SDK-文件"><span class="nav-number">1.</span> <span class="nav-text">(一)导入wemartSDK aar和alipaySDK.jar(支付宝SDK)文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#二-Android-Studio导入wemart-aar文件配置"><span class="nav-number">2.</span> <span class="nav-text">(二)Android Studio导入wemart.aar文件配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#三-权限配置"><span class="nav-number">3.</span> <span class="nav-text">(三)权限配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#四-配置商城入口url"><span class="nav-number">4.</span> <span class="nav-text">(四)配置商城入口url</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#五-注册接收微信支付和分享的广播"><span class="nav-number">5.</span> <span class="nav-text">(五)注册接收微信支付和分享的广播</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#六-使用SDK"><span class="nav-number">6.</span> <span class="nav-text">(六)使用SDK</span></a></li></ol></div>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator">
