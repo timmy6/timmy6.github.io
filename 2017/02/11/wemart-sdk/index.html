@@ -41,7 +41,7 @@
 <link href="/css/main.css?v=0.5.0" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Android 进阶," />
+  <meta name="keywords" content="Hexo, NexT" />
 
 
 
@@ -73,7 +73,7 @@
 <meta property="og:image" content="http://yoursite.com/uploads/wemart_sdk8.png">
 <meta property="og:image" content="http://yoursite.com/uploads/wemart_sdk10.png">
 <meta property="og:image" content="http://yoursite.com/uploads/wemart_sdk11.png">
-<meta property="og:updated_time" content="2017-02-13T12:53:54.000Z">
+<meta property="og:updated_time" content="2017-02-13T12:58:17.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="wemartSDK 集成文档">
 <meta name="twitter:description" content="(一)导入wemartSDK aar和alipaySDK.jar(支付宝SDK)文件在library/androidSDK中找到wemartSDK.aar文件，将wemartSDK加入项目中的lib文件夹；下载alipaySDK.jar(支付宝SDK)或者在library/androidSDK里拷贝alipaySDK.jar.注意:如果APP项目已经包含了支付宝SDK，请确认支付宝SDK文件名是否">
@@ -244,6 +244,25 @@
           <span id="busuanzi_container_page_pv">  |  阅读量 <span id="busuanzi_value_page_pv"></span> 次</span>
         
           
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Android-进阶/" itemprop="url" rel="index">
+                    <span itemprop="name">Android 进阶</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
 
           
             
@@ -277,8 +296,10 @@
 <p>配置之后的app build.gradle内容如下图<br><img src="/uploads/wemart_build_gradle.png" alt="app_build_gradle"></p>
 <h3 id="三-权限配置"><a href="#三-权限配置" class="headerlink" title="(三)权限配置"></a>(三)权限配置</h3><p>在AndroidMainifest.xml文件中，加入如下权限：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;uses-permission android:name=<span class="string">"android.permission.INTERNET"</span> /&gt;</span><br><span class="line">&lt;uses-permission android:name=<span class="string">"android.permission.ACCESS_WIFI_STATE"</span> /&gt;</span><br></pre></td></tr></table></figure></p>
 <h3 id="四-配置商城入口url"><a href="#四-配置商城入口url" class="headerlink" title="(四)配置商城入口url"></a>(四)配置商城入口url</h3><ol>
-<li><p><strong>获取店铺主页</strong>。登陆微猫后台————&gt;店铺————&gt;预览。预览后，点击右侧蓝色“复制链接按钮”，存下来。如下图<br><img src="/uploads/wemart_sdk1.png" alt="wemart_sdk2"><br><img src="/uploads/wemart_sdk3.png" alt="wemart_sdk3"><br>获取到店铺主页链接:<a href="http://www.wemart.cn/mobile/?chanId=110&amp;shelfNo=xxx&amp;sellerId=xxx&amp;a=shelf&amp;m=index" target="_blank" rel="external">http://www.wemart.cn/mobile/?chanId=110&amp;shelfNo=xxx&amp;sellerId=xxx&amp;a=shelf&amp;m=index</a></p>
-</li>
+<li><strong>获取店铺主页</strong>。登陆微猫后台————&gt;店铺————&gt;预览。预览后，点击右侧蓝色“复制链接按钮”，存下来。如下图<br><img src="/uploads/wemart_sdk1.png" alt="wemart_sdk2"><br><img src="/uploads/wemart_sdk3.png" alt="wemart_sdk3"></li>
+</ol>
+<p>获取到店铺主页链接: <a href="http://www.wemart.cn/mobile/?chanId=110&amp;shelfNo=xxx&amp;sellerId=xxx&amp;a=shelf&amp;m=index" target="_blank" rel="external">http://www.wemart.cn/mobile/?chanId=110&amp;shelfNo=xxx&amp;sellerId=xxx&amp;a=shelf&amp;m=index</a></p>
+<ol>
 <li><p><strong>获取店铺App Id</strong>。点击左上方“店铺设置”或者“平台设置”————&gt;点击左侧“场景“————&gt;点击蓝色按钮“创建APP“并输入APP名字，保存，保存成功后，即可看到APPID<br><img src="/uploads/wemart_sdk4.png" alt="wemart_sdk4"><br><img src="/uploads/wemart_sdk5.png" alt="wemart_sdk5"><br><img src="/uploads/wemart_sdk6.png" alt="wemart_sdk6"></p>
 </li>
 <li><p><strong>添加url参数</strong>。在主页链接后面，添加必需的url参数：scenType=1&amp;appId=xxx&amp;userId=xxx&amp;sign=xxx&amp;native=false&amp;payNative=true。<br>其中，userId为应用对应用户的唯一标识；sign参数为对字符串“appId = xxx&amp;userId=xxx”进行RSA-SHA1签名，签名需要的私钥（即AppSecret）在AppId下方，获取方法参考上方<strong>获取店铺App Id</strong>步骤。<br><strong>完整的商城入口url为：<a href="http://www.wemart.cn/mobile/?chanId=&amp;shelfNo=xxx&amp;sellerId=xxx&amp;a=shelf&amp;m=index&amp;native=false&amp;payNative=true&amp;scenType=1&amp;appId=xxx&amp;userId=xxx&amp;sign=xxx" target="_blank" rel="external">http://www.wemart.cn/mobile/?chanId=&amp;shelfNo=xxx&amp;sellerId=xxx&amp;a=shelf&amp;m=index&amp;native=false&amp;payNative=true&amp;scenType=1&amp;appId=xxx&amp;userId=xxx&amp;sign=xxx</a></strong><br><strong>注意：上方“xxx”需用相应的值替换</strong></p>
@@ -290,18 +311,12 @@
 <li><p><strong>分享</strong>。 创建一个继承BroadcastReceiver的子类，且在AndroidManifest.xml注册该广播，action为:”cn.wemart.sdk.share”。<br><img src="/uploads/wemart_sdk10.png" alt="wemart_sdk9"><br>获取分享参数的示例代码如下：<br><img src="/uploads/wemart_sdk11.png" alt="wemart_sdk10"></p>
 </li>
 </ol>
-<p><strong>注意事项:微信支付和分享SDK只提供内容.获取到微信支付参数后，需要APP自己调起微信支付；分享也是需要APP自己调起分享，wemartSDK只提供支付参数和分享内容</strong></p>
+<p><strong>注意:微信支付和分享SDK只提供内容.获取到微信支付参数后，需要APP自己调起微信支付；分享也是需要APP自己调起分享，wemartSDK只提供支付参数和分享内容</strong></p>
 <h3 id="六-使用SDK"><a href="#六-使用SDK" class="headerlink" title="(六)使用SDK"></a>(六)使用SDK</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Intent intent = <span class="keyword">new</span> Intent(context,MallActivity.class);</span><br><span class="line">intent.putExtra(“url”,xxx);	<span class="comment">//xxx为商城入口url</span></span><br><span class="line">startActivity(intent);</span><br></pre></td></tr></table></figure>
       
     </div>
 
     <footer class="post-footer">
-      
-        <div class="post-tags">
-          
-            <a href="/tags/Android-进阶/" rel="tag">#Android 进阶</a>
-          
-        </div>
       
 
       
@@ -400,13 +415,6 @@
             </div>
           
 
-          
-            <div class="site-state-item site-state-tags">
-              
-                <span class="site-state-item-count">1</span>
-                <span class="site-state-item-name">标签</span>
-              
-            </div>
           
 
         </nav>
