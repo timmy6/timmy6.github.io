@@ -1,0 +1,809 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.5.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.5.0" />
+
+
+
+
+
+
+<meta name="description" content="android 和iOS配置商城入口url方法相同.
+
+配置商城入口url
+获取店铺主页。登陆微猫后台————&amp;gt;店铺————&amp;gt;预览。预览后，点击右侧蓝色“复制链接按钮”，存下来。如下图
+
+获取到店铺主页链接: http://www.wemart.cn/mobile/?chanId=110&amp;amp;shelfNo=xxx&amp;amp;sellerId=xxx&amp;amp;a=shelf&amp;amp;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="wemartSDK 集成文档">
+<meta property="og:url" content="http://yoursite.com/2017/03/11/wemart-sdk/index.html">
+<meta property="og:site_name" content="刘启明">
+<meta property="og:description" content="android 和iOS配置商城入口url方法相同.
+
+配置商城入口url
+获取店铺主页。登陆微猫后台————&amp;gt;店铺————&amp;gt;预览。预览后，点击右侧蓝色“复制链接按钮”，存下来。如下图
+
+获取到店铺主页链接: http://www.wemart.cn/mobile/?chanId=110&amp;amp;shelfNo=xxx&amp;amp;sellerId=xxx&amp;amp;a=shelf&amp;amp;">
+<meta property="og:image" content="http://yoursite.com/uploads/wemart_sdk1.png">
+<meta property="og:image" content="http://yoursite.com/uploads/wemart_sdk3.png">
+<meta property="og:image" content="http://yoursite.com/uploads/wemart_sdk4.png">
+<meta property="og:image" content="http://yoursite.com/uploads/wemart_sdk5.png">
+<meta property="og:image" content="http://yoursite.com/uploads/wemart_sdk6.png">
+<meta property="og:image" content="http://yoursite.com/uploads/wemart_build_gradle.png">
+<meta property="og:image" content="http://yoursite.com/uploads/wemart_sdk9.png">
+<meta property="og:image" content="http://yoursite.com/uploads/wemart_sdk8.png">
+<meta property="og:image" content="http://yoursite.com/uploads/wemart_sdk10.png">
+<meta property="og:image" content="http://yoursite.com/uploads/wemart_sdk11.png">
+<meta property="og:image" content="http://yoursite.com/uploads/wemart_ios_sdk1.png">
+<meta property="og:image" content="http://yoursite.com/uploads/wemart_ios_sdk2.png">
+<meta property="og:image" content="http://yoursite.com/uploads/wemart_ios_sdk3.png">
+<meta property="og:image" content="http://yoursite.com/uploads/wemart_ios_sdk4.png">
+<meta property="og:image" content="http://yoursite.com/uploads/wemart_ios_sdk5.png">
+<meta property="og:image" content="http://yoursite.com/uploads/wemart_ios-sdk8.png">
+<meta property="og:image" content="http://yoursite.com/uploads/wemart_ios_sdk6.png">
+<meta property="og:image" content="http://yoursite.com/uploads/wemart_ios_sdk7.png">
+<meta property="og:updated_time" content="2017-05-25T15:18:03.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="wemartSDK 集成文档">
+<meta name="twitter:description" content="android 和iOS配置商城入口url方法相同.
+
+配置商城入口url
+获取店铺主页。登陆微猫后台————&amp;gt;店铺————&amp;gt;预览。预览后，点击右侧蓝色“复制链接按钮”，存下来。如下图
+
+获取到店铺主页链接: http://www.wemart.cn/mobile/?chanId=110&amp;amp;shelfNo=xxx&amp;amp;sellerId=xxx&amp;amp;a=shelf&amp;amp;">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"hide"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: '博主'
+    }
+  };
+</script>
+
+  <title> wemartSDK 集成文档 | 刘启明 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">刘启明</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu ">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-th fa-fw"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            时间轴
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-user fa-fw"></i> <br />
+            
+            留言板
+          </a>
+        </li>
+      
+
+      
+      
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                wemartSDK 集成文档
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2017-03-11T21:18:43+08:00" content="2017-03-11">
+              2017-03-11
+            </time>
+          </span>
+	
+          <span id="busuanzi_container_page_pv">  |  阅读量 <span id="busuanzi_value_page_pv"></span> 次</span>
+        
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Android-进阶/" itemprop="url" rel="index">
+                    <span itemprop="name">Android 进阶</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2017/03/11/wemart-sdk/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/03/11/wemart-sdk/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>android 和iOS配置商城入口url方法相同.</p>
+</blockquote>
+<h2 id="配置商城入口url"><a href="#配置商城入口url" class="headerlink" title="配置商城入口url"></a>配置商城入口url</h2><ul>
+<li><strong>获取店铺主页</strong>。登陆微猫后台————&gt;店铺————&gt;预览。预览后，点击右侧蓝色“复制链接按钮”，存下来。如下图<br><img src="/uploads/wemart_sdk1.png" alt="wemart_sdk2"><br><img src="/uploads/wemart_sdk3.png" alt="wemart_sdk3"></li>
+</ul>
+<p>获取到店铺主页链接: <a href="http://www.wemart.cn/mobile/?chanId=110&amp;shelfNo=xxx&amp;sellerId=xxx&amp;a=shelf&amp;m=index" target="_blank" rel="external">http://www.wemart.cn/mobile/?chanId=110&amp;shelfNo=xxx&amp;sellerId=xxx&amp;a=shelf&amp;m=index</a></p>
+<ul>
+<li><p><strong>获取店铺App Id</strong>。点击左上方“店铺设置”或者“平台设置”————&gt;点击左侧“场景“————&gt;点击蓝色按钮“创建APP“并输入APP名字，保存，保存成功后，即可看到APPID<br><img src="/uploads/wemart_sdk4.png" alt="wemart_sdk4"><br><img src="/uploads/wemart_sdk5.png" alt="wemart_sdk5"><br><img src="/uploads/wemart_sdk6.png" alt="wemart_sdk6"></p>
+</li>
+<li><p><strong>添加url参数</strong>。在主页链接后面，添加必需的url参数：scenType=1&amp;appId=xxx&amp;userId=xxx&amp;sign=xxx&amp;native=false&amp;payNative=true。<br>其中，userId为应用对应用户的唯一标识；sign参数为对字符串“appId = xxx&amp;userId=xxx”进行RSA-SHA1签名，签名需要的私钥（即AppSecret）在AppId下方，获取方法参考上方<strong>获取店铺App Id</strong>步骤。<br><strong>完整的商城入口url为：<a href="http://www.wemart.cn/mobile/?chanId=110&amp;shelfNo=xxx&amp;sellerId=xxx&amp;a=shelf&amp;m=index&amp;native=false&amp;payNative=true&amp;scenType=1&amp;appId=xxx&amp;userId=xxx&amp;sign=xxx" target="_blank" rel="external">http://www.wemart.cn/mobile/?chanId=110&amp;shelfNo=xxx&amp;sellerId=xxx&amp;a=shelf&amp;m=index&amp;native=false&amp;payNative=true&amp;scenType=1&amp;appId=xxx&amp;userId=xxx&amp;sign=xxx</a></strong></p>
+</li>
+</ul>
+<p><strong>注意：上方“xxx”需用相应的值替换</strong></p>
+<h2 id="wemart-Android-SDK-集成"><a href="#wemart-Android-SDK-集成" class="headerlink" title="wemart Android SDK 集成"></a>wemart Android SDK 集成</h2><h3 id="1-导入wemartSDK-aar和alipaySDK-jar-支付宝SDK-文件"><a href="#1-导入wemartSDK-aar和alipaySDK-jar-支付宝SDK-文件" class="headerlink" title="(1)导入wemartSDK aar和alipaySDK.jar(支付宝SDK)文件"></a>(1)导入wemartSDK aar和alipaySDK.jar(支付宝SDK)文件</h3><p>在library/androidSDK中找到wemartSDK.aar文件，将wemartSDK加入项目中的lib文件夹；在<a href="https://doc.open.alipay.com/doc2/detail.htm?treeId=54&amp;articleId=104509&amp;docType=1" target="_blank" rel="external">支付宝官网</a>下载支付宝SDK或者在library/androidSDK里拷贝alipaySDK.jar.</p>
+<h3 id="2-Android-Studio导入wemart-aar文件配置"><a href="#2-Android-Studio导入wemart-aar文件配置" class="headerlink" title="(2)Android Studio导入wemart.aar文件配置"></a>(2)Android Studio导入wemart.aar文件配置</h3><p>在app的build.gradle文件中，添加：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">repositories &#123;</span><br><span class="line">    flatDir &#123;</span><br><span class="line">        dirs <span class="string">'libs'</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>在dependencies中，添加：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">compile <span class="title">files</span><span class="params">(<span class="string">'libs/alipaySdk.jar'</span>)</span></span><br><span class="line"><span class="title">compile</span><span class="params">(name: <span class="string">'wemartSDK'</span>, ext: <span class="string">'aar'</span>)</span></span></span><br></pre></td></tr></table></figure></p>
+<p>配置之后的app build.gradle内容如下图<br><img src="/uploads/wemart_build_gradle.png" alt="app_build_gradle"></p>
+<h3 id="3-权限配置"><a href="#3-权限配置" class="headerlink" title="(3)权限配置"></a>(3)权限配置</h3><p>在AndroidMainifest.xml文件中，加入如下权限：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;uses-permission android:name=<span class="string">"android.permission.INTERNET"</span> /&gt;</span><br><span class="line">&lt;uses-permission android:name=<span class="string">"android.permission.ACCESS_WIFI_STATE"</span> /&gt;</span><br></pre></td></tr></table></figure></p>
+<h3 id="4-注册接收微信支付和分享的广播"><a href="#4-注册接收微信支付和分享的广播" class="headerlink" title="(4)注册接收微信支付和分享的广播"></a>(4)注册接收<strong>微信支付和分享的广播</strong></h3><ul>
+<li><strong>微信支付参数获取</strong>。创建一个继承BroadcastReceiver的子类，且在AndroidManifest.xml注册该广播，action为:”cn.wemart.sdk.share”。<br><img src="/uploads/wemart_sdk9.png" alt="wemart_sdk7"></li>
+</ul>
+<p>获取微信支付参数的示例代码如下：<br><img src="/uploads/wemart_sdk8.png" alt="wemart_sdk8"></p>
+<ul>
+<li><strong>分享</strong>。 创建一个继承BroadcastReceiver的子类，且在AndroidManifest.xml注册该广播，action为:”cn.wemart.sdk.share”。<br><img src="/uploads/wemart_sdk10.png" alt="wemart_sdk9"></li>
+</ul>
+<p>获取分享参数的示例代码如下：<br><img src="/uploads/wemart_sdk11.png" alt="wemart_sdk10"></p>
+<p><strong>注意:微信支付和分享SDK只提供内容.获取到微信支付参数后，需要APP自己调起微信支付；分享也是需要APP自己调起分享，wemartSDK只提供支付参数和分享内容</strong></p>
+<h3 id="5-使用SDK"><a href="#5-使用SDK" class="headerlink" title="(5)使用SDK"></a>(5)使用SDK</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Intent intent = <span class="keyword">new</span> Intent(context,MallActivity.class);</span><br><span class="line">intent.putExtra(“url”,xxx);	<span class="comment">//xxx为商城入口url</span></span><br><span class="line">startActivity(intent);</span><br></pre></td></tr></table></figure>
+<h2 id="wemart-iOS-SDK集成（SDK仅支持iOS-8-0及以上）"><a href="#wemart-iOS-SDK集成（SDK仅支持iOS-8-0及以上）" class="headerlink" title="wemart iOS SDK集成（SDK仅支持iOS 8.0及以上）"></a>wemart iOS SDK集成（SDK仅支持iOS 8.0及以上）</h2><p>说明：1）如您的App工程中已含有支付宝以及微信SDK，则按照集成步骤操作；<br> 2）如您的App工程中仅含有支付宝或微信SDK之一，请加入您缺少的<strong>AliPay-o</strong>文件夹中的文件或<strong>WeChat-o</strong>文件夹中的文件，然后按照集成步骤操作；<br> 3）如您的App工程中支付宝和微信SDK均无，则请先加入您缺少的<strong>AliPay-o</strong>文件夹中的文件以及<strong>WeChat-o</strong>文件夹中的文件，然后按照集成步骤操作；</p>
+<h3 id="1-导入WemartSDK-framework和Wemart-bundle"><a href="#1-导入WemartSDK-framework和Wemart-bundle" class="headerlink" title="(1)导入WemartSDK.framework和Wemart.bundle"></a>(1)导入WemartSDK.framework和Wemart.bundle</h3><p> 在APP工程中导入<strong>WemartSDK.framework</strong>（静态库）（<strong>注意：区分Debug环境下 和 Release环境下的.framework，保证对应环境使用</strong>）以及<strong>Wemart.bundle</strong>（bundle资源文件），添加时记得勾选 <strong>Copy items if needed</strong>，然后参照下图，选中工程 <strong>Targat —&gt; General —&gt; Linked Frameworks and Libraries —&gt;  +</strong>，在输入框中，输入下图中需要的框架，选中并添加</p>
+<p><img src="/uploads/wemart_ios_sdk1.png" alt="wemart_ios_sdk1"></p>
+<h3 id="2-设置起始控制器以及支付宝、微信的相关参数"><a href="#2-设置起始控制器以及支付宝、微信的相关参数" class="headerlink" title="(2)设置起始控制器以及支付宝、微信的相关参数"></a>(2)设置起始控制器以及支付宝、微信的相关参数</h3><p>以导航控制器为起始控制器，设置<strong>appScheme</strong>、<strong>wechatAppId</strong>（微信appId，<strong>注意：自收，则传从微信申请获得的微信AppId；平台代收，不用传值</strong>），如图（示例<strong>Demo</strong>中的<strong>AppDelegate.m</strong>文件中可查看代码）。另外，在<strong>WemartViewController</strong>中，保留了商城分享信息，请注意需在界面加载完成后，才可使用分享数据。</p>
+<p><img src="/uploads/wemart_ios_sdk2.png" alt="wemart_ios_sdk2"></p>
+<p><img src="/uploads/wemart_ios_sdk3.png" alt="wemart_ios_sdk3"></p>
+<h3 id="3-支付宝的appScheme配置"><a href="#3-支付宝的appScheme配置" class="headerlink" title="(3)支付宝的appScheme配置"></a>(3)支付宝的appScheme配置</h3><p>需要配置支付宝的<strong>appScheme</strong>，在 <strong>Target —&gt; Info —&gt; URL Type —&gt;</strong>  + ，添加URL Schemes 名称（<strong>注意：要与赋值给WemartViewController的appScheme保持一致</strong>），以确保支付后能回调回自己的App（<strong>尽量保持唯一，避免与其他App的标识混淆</strong>），如下图</p>
+<p><img src="/uploads/wemart_ios_sdk4.png" alt="wemart_ios_sdk4"></p>
+<h3 id="4-微信的scheme配置"><a href="#4-微信的scheme配置" class="headerlink" title="(4)微信的scheme配置"></a>(4)微信的scheme配置</h3><p>选中 <strong>Info.plist</strong> 右键 —&gt; <strong>Open As</strong> —&gt; <strong>Source Code</strong>，增加如下代码，打开权限：<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;key&gt;LSApplicationQueriesSchemes&lt;/key&gt;</span><br><span class="line">&lt;array&gt;</span><br><span class="line">    &lt;string&gt;wechat&lt;/string&gt;</span><br><span class="line">    &lt;string&gt;weixin&lt;/string&gt;</span><br><span class="line">&lt;/array&gt;</span><br></pre></td></tr></table></figure></p>
+<p><img src="/uploads/wemart_ios_sdk5.png" alt="wemart_ios_sdk5"></p>
+<h3 id="6-微信支付成功后回调SDK设置"><a href="#6-微信支付成功后回调SDK设置" class="headerlink" title="(6)微信支付成功后回调SDK设置"></a>(6)微信支付成功后回调SDK设置</h3><p>当微信支付成功之后，返回到App，需要通过WXApi通知SDK.代码如下：<br><img src="/uploads/wemart_ios-sdk8.png" alt="wemart_ios-sdk8"></p>
+<h3 id="7-赋值商城店铺url入口"><a href="#7-赋值商城店铺url入口" class="headerlink" title="(7)赋值商城店铺url入口"></a>(7)赋值商城店铺url入口</h3><p>将按照文档要求配置好的，商城入口url赋值给Demo中wemartVc的<strong>shopUrl</strong>（<strong>注意必填</strong>），将跳转微猫商城的事件写在App工程想要实现的事件中，目标控制器即要显示商城的控制器，如若App工程有全局隐藏导航栏的需求，可设置wemartVc的<strong>hidStatus</strong>属性为YES，<strong>WHHidden</strong>可以隐藏主页返回按钮如下图：</p>
+<p><img src="/uploads/wemart_ios_sdk6.png" alt="wemart_ios_sdk6"></p>
+<h3 id="8-注意事项"><a href="#8-注意事项" class="headerlink" title="(8)注意事项"></a>(8)<strong>注意事项</strong></h3><p>1)若使用支付宝原生支付，需在<strong>AppDelegate.m</strong>中参照Demo，实现以下两个方法（配合支付宝客户端回调）</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 9.0之前的API接口</span></span><br><span class="line">- (<span class="built_in">BOOL</span>)application:(<span class="built_in">UIApplication</span> *)application  openURL:(<span class="built_in">NSURL</span> *)url  sourceApplication:(<span class="built_in">NSString</span> *)sourceApplication   annotation:(<span class="keyword">id</span>)annotation；</span><br><span class="line"><span class="comment">// 9.0以后使用新API接口</span></span><br><span class="line">(<span class="built_in">BOOL</span>)application:(<span class="built_in">UIApplication</span> *)app openURL:(<span class="built_in">NSURL</span> *)url options:(<span class="built_in">NSDictionary</span>&lt;<span class="built_in">NSString</span>*, <span class="keyword">id</span>&gt; *)options；</span><br></pre></td></tr></table></figure>
+<p>2) 若工程接入SDK后界面空白，可在App工程下的“<strong>Info.plist</strong>”中，下检查是否已将要使用的<strong>URL Schemes</strong>列为白名单。若无，可直接添加：先添加 <strong>App Transport Security Settings</strong> 字典，再在字典下添加键值对 <strong>Allow Arbitrary Loads</strong> ：<strong>YES</strong> ,效果如图：</p>
+<p><img src="/uploads/wemart_ios_sdk7.png" alt="wemart_ios_sdk7"></p>
+<p>也可以选中 <strong>Info.plist</strong> 右键 —&gt; <strong>Open As</strong> —&gt; <strong>Source Code</strong> ，增加如下代码：<br><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;key&gt;NSAppTransportSecurity&lt;/key&gt;</span><br><span class="line">&lt;dict&gt;</span><br><span class="line">&lt;key&gt;NSAllowsArbitraryLoads&lt;/key&gt;</span><br><span class="line">&lt;true/&gt;</span><br><span class="line">&lt;/dict&gt;</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/12/14/ormlite/" rel="next" title="OrmLite 快速入门">
+                <i class="fa fa-chevron-left"></i> OrmLite 快速入门
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2017/03/11/wemart-sdk/"
+           data-title="wemartSDK 集成文档" data-url="http://yoursite.com/2017/03/11/wemart-sdk/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/uploads/avatar.png"
+               alt="刘启明" />
+          <p class="site-author-name" itemprop="name">刘启明</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">18</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+          
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://www.github.com/timmy6" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> github
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.cnblogs.com/lomomiao/" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> 博客旧址(博客园)
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.weibo.com/u/3917867123" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> 新浪微博
+                  
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator">
+            <i class="fa fa-angle-double-up"></i>
+          </div>
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#配置商城入口url"><span class="nav-number">1.</span> <span class="nav-text">配置商城入口url</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#wemart-Android-SDK-集成"><span class="nav-number">2.</span> <span class="nav-text">wemart Android SDK 集成</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-导入wemartSDK-aar和alipaySDK-jar-支付宝SDK-文件"><span class="nav-number">2.1.</span> <span class="nav-text">(1)导入wemartSDK aar和alipaySDK.jar(支付宝SDK)文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-Android-Studio导入wemart-aar文件配置"><span class="nav-number">2.2.</span> <span class="nav-text">(2)Android Studio导入wemart.aar文件配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-权限配置"><span class="nav-number">2.3.</span> <span class="nav-text">(3)权限配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-注册接收微信支付和分享的广播"><span class="nav-number">2.4.</span> <span class="nav-text">(4)注册接收微信支付和分享的广播</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-使用SDK"><span class="nav-number">2.5.</span> <span class="nav-text">(5)使用SDK</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#wemart-iOS-SDK集成（SDK仅支持iOS-8-0及以上）"><span class="nav-number">3.</span> <span class="nav-text">wemart iOS SDK集成（SDK仅支持iOS 8.0及以上）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-导入WemartSDK-framework和Wemart-bundle"><span class="nav-number">3.1.</span> <span class="nav-text">(1)导入WemartSDK.framework和Wemart.bundle</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-设置起始控制器以及支付宝、微信的相关参数"><span class="nav-number">3.2.</span> <span class="nav-text">(2)设置起始控制器以及支付宝、微信的相关参数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-支付宝的appScheme配置"><span class="nav-number">3.3.</span> <span class="nav-text">(3)支付宝的appScheme配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-微信的scheme配置"><span class="nav-number">3.4.</span> <span class="nav-text">(4)微信的scheme配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-微信支付成功后回调SDK设置"><span class="nav-number">3.5.</span> <span class="nav-text">(6)微信支付成功后回调SDK设置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-赋值商城店铺url入口"><span class="nav-number">3.6.</span> <span class="nav-text">(7)赋值商城店铺url入口</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-注意事项"><span class="nav-number">3.7.</span> <span class="nav-text">(8)注意事项</span></a></li></ol></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator">
+            <i class="fa fa-angle-double-down"></i>
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">刘启明</span>
+</div>
+
+
+
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<span id="busuanzi_container_site_pv">
+    本站总访问量<span id="busuanzi_value_site_pv"></span>次
+</span>
+
+<script>
+var birthDay = new Date("11/20/2014");
+var now = new Date();
+var duration = now.getTime() - birthDay.getTime();
+var total= Math.floor(duration / (1000 * 60 * 60 * 24));
+document.getElementById("showDays").innerHTML = "本站已运行 "+total+" 天";
+</script>
+<span id="showDays"></span>
+      </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  
+
+
+  
+
+
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=0.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=0.5.0"></script>
+
+
+
+  
+  
+
+  
+  
+<script type="text/javascript" src="/js/src/scrollspy.js?v=0.5.0"></script>
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 1 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = NexT.utils.escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    NexT.motion.middleWares.sidebar = function () {
+      var $tocContent = $('.post-toc-content');
+
+      if (CONFIG.scheme !== 'Pisces' && (CONFIG.sidebar.display === 'post' || CONFIG.sidebar.display === 'always')) {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          NexT.utils.displaySidebar();
+        }
+      }
+    };
+  });
+</script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=0.5.0"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"timmy"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+  
+
+
+
+
+
+  
+  
+
+  
+  
+
+
+</body>
+</html>
