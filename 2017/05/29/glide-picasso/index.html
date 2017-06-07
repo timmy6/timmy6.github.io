@@ -1,0 +1,789 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.5.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Android 进阶," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.5.0" />
+
+
+
+
+
+
+<meta name="description" content="Glide 和 Picasso 可以说是目前 Android 上最流行的图片加载库了。大部分安卓应用开发人员都有使用过这两个库在他们的开发工作中。这两个库也都确实提供了大量图片加载的功能，而且也都经过了很多应用的检验，是可靠可信的。表面看上去似乎两者工作原理很相似，但是实际上是有着很大差别的，主要体现在下面几个方面：
+
+下载图片的方式
+图片的缓存机制
+加载到内存的机制
+
+本文主要会围绕这几个方面来">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Glide 和 Picasso 对比.">
+<meta property="og:url" content="http://yoursite.com/2017/05/29/glide-picasso/index.html">
+<meta property="og:site_name" content="刘启明">
+<meta property="og:description" content="Glide 和 Picasso 可以说是目前 Android 上最流行的图片加载库了。大部分安卓应用开发人员都有使用过这两个库在他们的开发工作中。这两个库也都确实提供了大量图片加载的功能，而且也都经过了很多应用的检验，是可靠可信的。表面看上去似乎两者工作原理很相似，但是实际上是有着很大差别的，主要体现在下面几个方面：
+
+下载图片的方式
+图片的缓存机制
+加载到内存的机制
+
+本文主要会围绕这几个方面来">
+<meta property="og:image" content="http://yoursite.com/uploads/glide1.png">
+<meta property="og:image" content="http://yoursite.com/uploads/glide2.png">
+<meta property="og:image" content="http://yoursite.com/uploads/glide3.png">
+<meta property="og:image" content="http://yoursite.com/uploads/glide4.png">
+<meta property="og:image" content="http://yoursite.com/uploads/glide5.gif">
+<meta property="og:image" content="http://yoursite.com/uploads/glide6.gif">
+<meta property="og:updated_time" content="2017-05-29T02:37:11.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Glide 和 Picasso 对比.">
+<meta name="twitter:description" content="Glide 和 Picasso 可以说是目前 Android 上最流行的图片加载库了。大部分安卓应用开发人员都有使用过这两个库在他们的开发工作中。这两个库也都确实提供了大量图片加载的功能，而且也都经过了很多应用的检验，是可靠可信的。表面看上去似乎两者工作原理很相似，但是实际上是有着很大差别的，主要体现在下面几个方面：
+
+下载图片的方式
+图片的缓存机制
+加载到内存的机制
+
+本文主要会围绕这几个方面来">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"hide"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: '博主'
+    }
+  };
+</script>
+
+  <title> Glide 和 Picasso 对比. | 刘启明 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">刘启明</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu ">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-th fa-fw"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            时间轴
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-user fa-fw"></i> <br />
+            
+            留言板
+          </a>
+        </li>
+      
+
+      
+      
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Glide 和 Picasso 对比.
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2017-05-29T10:16:47+08:00" content="2017-05-29">
+              2017-05-29
+            </time>
+          </span>
+	
+          <span id="busuanzi_container_page_pv">  |  阅读量 <span id="busuanzi_value_page_pv"></span> 次</span>
+        
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2017/05/29/glide-picasso/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2017/05/29/glide-picasso/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Glide 和 Picasso 可以说是目前 Android 上最流行的图片加载库了。大部分安卓应用开发人员都有使用过这两个库在他们的开发工作中。这两个库也都确实提供了大量图片加载的功能，而且也都经过了很多应用的检验，是可靠可信的。表面看上去似乎两者工作原理很相似，但是实际上是有着很大差别的，主要体现在下面几个方面：</p>
+<ul>
+<li>下载图片的方式</li>
+<li>图片的缓存机制</li>
+<li>加载到内存的机制</li>
+</ul>
+<p>本文主要会围绕这几个方面来深入研究和对比两个库的差异，从而给开发者们提供参考。</p>
+<blockquote>
+<p>对比的版本是 Glide v3.7.0 和 Picasso v2.5.2 的版本。</p>
+</blockquote>
+<h3 id="导入库到项目中"><a href="#导入库到项目中" class="headerlink" title="导入库到项目中"></a>导入库到项目中</h3><p>Picasso 和 Glide 都在 Jcenter 上有建立库，所以只需要简单的在添加dependency 即可</p>
+<h4 id="Picasso"><a href="#Picasso" class="headerlink" title="Picasso"></a>Picasso</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">dependencies &#123;</span><br><span class="line">    compile <span class="string">'com.squareup.picasso:picasso:2.5.1'</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="Glide"><a href="#Glide" class="headerlink" title="Glide"></a>Glide</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">dependencies &#123;</span><br><span class="line">    compile <span class="string">'com.github.bumptech.glide:glide:3.5.2'</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="库的大小和方法"><a href="#库的大小和方法" class="headerlink" title="库的大小和方法"></a>库的大小和方法</h3><p>对比两个.jar 库的大小，Glide 要比 Picasso 大很多，基本上是 Picasso 的3.5倍：<br><img src="/uploads/glide1.png" alt="glide"><br>从库的大小，我们就可以预见，Glide 的方法必然是要大于Picasso 的，Picasso 的方法 总共有849个，而 Glide 的有2678个：<br><img src="/uploads/glide2.png" alt="glide"></p>
+<h3 id="使用方式"><a href="#使用方式" class="headerlink" title="使用方式"></a>使用方式</h3><p>如果只是简单的从一个 URL 中下载图片，然后显示到 imageView 中，那么两个库的使用方式基本相似，也都非常的简单。同时两个库也都支持动画和大小的剪切，也可以设置加载时候的预设图片等功能：</p>
+<h4 id="Picasso-1"><a href="#Picasso-1" class="headerlink" title="Picasso:"></a>Picasso:</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Picasso.with(myFragment)</span><br><span class="line">.load(url)</span><br><span class="line">.centerCrop()</span><br><span class="line">.placeholder(R.drawable.loading_spinner)</span><br><span class="line">.into(myImageView);</span><br></pre></td></tr></table></figure>
+<h4 id="Glide-1"><a href="#Glide-1" class="headerlink" title="Glide"></a>Glide</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Glide.with(myFragment)</span><br><span class="line">.load(url)</span><br><span class="line">.centerCrop()</span><br><span class="line">.placeholder(R.drawable.loading_spinner)</span><br><span class="line">.crossFade()</span><br><span class="line">.into(myImageView);</span><br></pre></td></tr></table></figure>
+<p>但是，Glide 这里有一个非常招人喜欢的地方，就是 Glide 在设计的时候，就有 Activity 和 Fragment 的生命周期。什么意思呢？ 就是说你可以传递 Activity 或者 Fragment 的 context 给 Glide.with()， 然后 Glide 就会非常智能的同 Activity 的生命周期集成， 比如 OnResume 或者 onPause():<br><img src="/uploads/glide3.png" alt="glide"></p>
+<h3 id="缓存大小"><a href="#缓存大小" class="headerlink" title="缓存大小"></a>缓存大小</h3><p>两个库也都支持缓存图片，都通过下载图片后，缓存到本地。但是这里对于缓存本地的机制，两个库是完全不同的做法。</p>
+<p><strong> Picasso </strong>是下载图片然后缓存完整的大小到本地，比如说图片的大小是1080p的，之后如果我需要同一张图片，就会返回这张 full size 的，如果我需要resize，也是对这种 full size 的做 resize。</p>
+<p><strong> Glide </strong> 则是完全不一样的做法。Glide 是会先下载图片，然后改变图片的大小，以适应 imageView 的要求，然后缓存到本地。 所以如果你是下载同一张图片，但是设定两个不一样大小的 imageView, 那么Glide 实际上是会缓存两份。<br>换个角度来看，这里不仅仅是缓存的问题，比如一个 ImageView 要改变它的大小，PIcasso 就只需要下载一次 full size 的图片，但是 Glide 实际上就不仅仅是下载一次了，它需要去单独下载然后改变大小适配 imageView，因为对于 Glide 来讲，需要缓存不同大小的同一张图片。</p>
+<p>从这点来看，似乎 Glide 的这种设计很有问题了？当然不是，这种做法也会带来一定的好处，在下面的memory中就会展示。</p>
+<h3 id="内存使用"><a href="#内存使用" class="headerlink" title="内存使用"></a>内存使用</h3><p>Glide 默认是用的 RGB_555 的设定，PIcasso 则是用的 ARGB _8888的设定。为了公平起见，我这里修改了 GlideModule，让 Glide 也使用 ARGB _8888的格式，做法也很简单，新建一个类然后继承 GlideModule</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;meta-data android:name=<span class="string">"example.com.myanimation.GlideConfiguration"</span> android:value=<span class="string">"GlideModule"</span>/&gt;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">GlideConfiguration</span> <span class="keyword">implements</span> <span class="title">GlideModule</span> </span>&#123;</span><br><span class="line">    <span class="annotation">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">applyOptions</span><span class="params">(Context context, GlideBuilder builder)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// Apply options to the builder here.</span></span><br><span class="line">        builder.setDecodeFormat(DecodeFormat.PREFER_ARGB_8888);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="annotation">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">registerComponents</span><span class="params">(Context context, Glide glide)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// register ModelLoaders here.</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="下面是两者加载的对比"><a href="#下面是两者加载的对比" class="headerlink" title="下面是两者加载的对比:"></a>下面是两者加载的对比:</h4><p><img src="/uploads/glide4.png" alt="glide"></p>
+<h3 id="加载图片的时间"><a href="#加载图片的时间" class="headerlink" title="加载图片的时间"></a>加载图片的时间</h3><p>这里先说明下，当尝试加载一个图片的时候，两个库都会采用先从缓存中读取，如果缓存中没有，再去下载的做法。<br>实际试验中，Picasso 会比 Glide 快一点。猜测可能的原因还是因为之前讲到的缓存机制导致，因为Picasso 是直接把图加载到内存中，而 Glide 则需要改变图片大小再加载到内存中去。这个应该是会耗费一定的时间。</p>
+<p><img src="/uploads/glide5.gif" alt="glide"></p>
+<p>但是，当加载图片从内存中的时候，Glide 则比 Picasso 要快。其原理还是因为缓存机制的区别。因为Picasso 从缓存中拿到的图片，还要先去 resize 后，然后设定给 imageView，但是 Glide 则不需要这样。</p>
+<p><img src="/uploads/glide6.gif" alt="glide"></p>
+<h3 id="其他功能的对比"><a href="#其他功能的对比" class="headerlink" title="其他功能的对比"></a>其他功能的对比</h3><ul>
+<li><p>GIF 支持：Glide 支持 GIF。 对于加载 GIF 来说，Glide 只需要简单使用 Glide.with(…).load(…)。 但是 Picasso 是不支持的，因此如果你的应用中是需要加载 GIF 的话，那就只能用 Glide 了。</p>
+</li>
+<li><p>灵活性：Glide 提供了非常多的配置，你可以非常灵活的根据你的需求来客制化，从而缩减 Glide 库的大小等。</p>
+</li>
+</ul>
+<h3 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h3><p>正所谓人无完人，经过一番对比，Picasso 和 Glide 各有千秋，那么到底我们应该用哪个库呢？这个还是回到应用的需求来看，比如你想要你的 app 小一些，没有那么多的额外功能，那么 Picasso 是你的首选。反之，比如你的应用中需要加载 GIF，或者对于内存的大小比较在意，那么 Glide 应该是不错的选择。<br>实际上，就我个人来看，Glide 要略优于 Picasso. 特别是支持 GIF，这个杀手锏啊！</p>
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android-进阶/" rel="tag">#Android 进阶</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/03/11/wemart-sdk/" rel="next" title="wemartSDK 集成文档">
+                <i class="fa fa-chevron-left"></i> wemartSDK 集成文档
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/uploads/avatar.png"
+               alt="刘启明" />
+          <p class="site-author-name" itemprop="name">刘启明</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">20</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+          
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              
+                <span class="site-state-item-count">1</span>
+                <span class="site-state-item-name">标签</span>
+              
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://www.github.com/timmy6" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> github
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.cnblogs.com/lomomiao/" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> 博客旧址(博客园)
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.weibo.com/u/3917867123" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> 新浪微博
+                  
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator">
+            <i class="fa fa-angle-double-up"></i>
+          </div>
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#导入库到项目中"><span class="nav-number">1.</span> <span class="nav-text">导入库到项目中</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Picasso"><span class="nav-number">1.1.</span> <span class="nav-text">Picasso</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Glide"><span class="nav-number">1.2.</span> <span class="nav-text">Glide</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#库的大小和方法"><span class="nav-number">2.</span> <span class="nav-text">库的大小和方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用方式"><span class="nav-number">3.</span> <span class="nav-text">使用方式</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Picasso-1"><span class="nav-number">3.1.</span> <span class="nav-text">Picasso:</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Glide-1"><span class="nav-number">3.2.</span> <span class="nav-text">Glide</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#缓存大小"><span class="nav-number">4.</span> <span class="nav-text">缓存大小</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#内存使用"><span class="nav-number">5.</span> <span class="nav-text">内存使用</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#下面是两者加载的对比"><span class="nav-number">5.1.</span> <span class="nav-text">下面是两者加载的对比:</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#加载图片的时间"><span class="nav-number">6.</span> <span class="nav-text">加载图片的时间</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#其他功能的对比"><span class="nav-number">7.</span> <span class="nav-text">其他功能的对比</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#结论"><span class="nav-number">8.</span> <span class="nav-text">结论</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator">
+            <i class="fa fa-angle-double-down"></i>
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">刘启明</span>
+</div>
+
+
+
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<span id="busuanzi_container_site_pv">
+    本站总访问量<span id="busuanzi_value_site_pv"></span>次
+</span>
+
+<script>
+var birthDay = new Date("11/20/2014");
+var now = new Date();
+var duration = now.getTime() - birthDay.getTime();
+var total= Math.floor(duration / (1000 * 60 * 60 * 24));
+document.getElementById("showDays").innerHTML = "本站已运行 "+total+" 天";
+</script>
+<span id="showDays"></span>
+      </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  
+
+
+  
+
+
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=0.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=0.5.0"></script>
+
+
+
+  
+  
+
+  
+  
+<script type="text/javascript" src="/js/src/scrollspy.js?v=0.5.0"></script>
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 1 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = NexT.utils.escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    NexT.motion.middleWares.sidebar = function () {
+      var $tocContent = $('.post-toc-content');
+
+      if (CONFIG.scheme !== 'Pisces' && (CONFIG.sidebar.display === 'post' || CONFIG.sidebar.display === 'always')) {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          NexT.utils.displaySidebar();
+        }
+      }
+    };
+  });
+</script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=0.5.0"></script>
+
+
+
+  
+
+
+
+  
+
+    <script type="text/javascript">
+      var disqus_shortname = 'liuqiming';
+      var disqus_identifier = '2017/05/29/glide-picasso/';
+      var disqus_title = 'Glide 和 Picasso 对比.';
+      var disqus_url = 'http://yoursite.com/2017/05/29/glide-picasso/';
+
+      function run_disqus_script(disqus_script){
+        var dsq = document.createElement('script');
+        dsq.type = 'text/javascript';
+        dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      }
+
+      run_disqus_script('count.js');
+      
+        run_disqus_script('embed.js');
+      
+    </script>
+  
+
+
+
+  
+  
+
+  
+  
+
+
+</body>
+</html>
