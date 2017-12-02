@@ -1,0 +1,787 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.5.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.5.0" />
+
+
+
+
+
+
+<meta name="description" content="移动开发本质上就是手机和服务器之间进行通信，需要从服务端获取数据。反复通过网络获取数据是比较耗时的，特别是访问比较多的时候，会极大影响了性能，Android中可通过缓存机制来减少频繁的网络操作，减少流量、提升性能。
+
+实现原理　　把不需要实时更新的数据缓存下来，通过时间或者其他因素　来判别是读缓存还是网络请求，这样可以缓解服务器压力，一定程度上提高应用响应速度，并且支持离线阅读。
+　　
+Bitma">
+<meta property="og:type" content="article">
+<meta property="og:title" content="图片缓存原理">
+<meta property="og:url" content="http://yoursite.com/2017/12/02/图片缓存原理/index.html">
+<meta property="og:site_name" content="刘启明">
+<meta property="og:description" content="移动开发本质上就是手机和服务器之间进行通信，需要从服务端获取数据。反复通过网络获取数据是比较耗时的，特别是访问比较多的时候，会极大影响了性能，Android中可通过缓存机制来减少频繁的网络操作，减少流量、提升性能。
+
+实现原理　　把不需要实时更新的数据缓存下来，通过时间或者其他因素　来判别是读缓存还是网络请求，这样可以缓解服务器压力，一定程度上提高应用响应速度，并且支持离线阅读。
+　　
+Bitma">
+<meta property="og:updated_time" content="2017-12-02T06:41:19.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="图片缓存原理">
+<meta name="twitter:description" content="移动开发本质上就是手机和服务器之间进行通信，需要从服务端获取数据。反复通过网络获取数据是比较耗时的，特别是访问比较多的时候，会极大影响了性能，Android中可通过缓存机制来减少频繁的网络操作，减少流量、提升性能。
+
+实现原理　　把不需要实时更新的数据缓存下来，通过时间或者其他因素　来判别是读缓存还是网络请求，这样可以缓解服务器压力，一定程度上提高应用响应速度，并且支持离线阅读。
+　　
+Bitma">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"hide"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: '博主'
+    }
+  };
+</script>
+
+  <title> 图片缓存原理 | 刘启明 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">刘启明</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu ">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-th fa-fw"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            时间轴
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-user fa-fw"></i> <br />
+            
+            留言板
+          </a>
+        </li>
+      
+
+      
+      
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                图片缓存原理
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2017-12-02T14:37:08+08:00" content="2017-12-02">
+              2017-12-02
+            </time>
+          </span>
+	
+          <span id="busuanzi_container_page_pv">  |  阅读量 <span id="busuanzi_value_page_pv"></span> 次</span>
+        
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Android-进阶/" itemprop="url" rel="index">
+                    <span itemprop="name">Android 进阶</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2017/12/02/图片缓存原理/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2017/12/02/图片缓存原理/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>　　移动开发本质上就是手机和服务器之间进行通信，需要从服务端获取数据。反复通过网络获取数据是比较耗时的，特别是访问比较多的时候，会极大影响了性能，Android中可通过缓存机制来减少频繁的网络操作，减少流量、提升性能。</p>
+</blockquote>
+<h1 id="实现原理"><a href="#实现原理" class="headerlink" title="实现原理"></a>实现原理</h1><p>　　把不需要实时更新的数据缓存下来，通过时间或者其他因素　来判别是读缓存还是网络请求，这样可以缓解服务器压力，一定程度上提高应用响应速度，并且支持离线阅读。
+　　</p>
+<h1 id="Bitmap的缓存"><a href="#Bitmap的缓存" class="headerlink" title="Bitmap的缓存"></a>Bitmap的缓存</h1><p>　　在许多的情况下(像 ListView, GridView 或 ViewPager 之类的组件 )我们需要一次性加载大量的图片，在屏幕上显示的图片和所有待显示的图片有可能需要马上就在屏幕上无限制的进行滚动、切换。</p>
+<p>  　　像ListView, GridView 这类组件，它们的子项当不可见时，所占用的内存会被回收以供正在前台显示子项使用。垃圾回收器也会释放你已经加载了的图片占用的内存。如果你想让你的UI运行流畅的话，就不应该每次显示时都去重新加载图片。保持一些内存和文件缓存就变得很有必要了。</p>
+<h2 id="使用内存缓存"><a href="#使用内存缓存" class="headerlink" title="使用内存缓存"></a>使用内存缓存</h2><p>　　通过预先消耗应用的一点内存来存储数据，便可快速的为应用中的组件提供数据，是一种典型的以<strong>空间换时间</strong>的策略。<br>　　LruCache  类（Android v4 Support Library 类库中开始提供）非常适合来做图片缓存任务 ，它可以使用一个LinkedHashMap  的强引用来保存最近使用的对象，并且当它保存的对象占用的内存总和超出了为它设计的最大内存时会把<strong>不经常使用</strong>的对象成员踢出以供垃圾回收器回收。</p>
+<p>　　给LruCache 设置一个合适的内存大小，需考虑如下因素：</p>
+<ul>
+<li>还剩余多少内存给你的activity或应用使用</li>
+<li>屏幕上需要一次性显示多少张图片和多少图片在等待显示</li>
+<li>手机的大小和密度是多少（密度越高的设备需要越大的 缓存）</li>
+<li>图片的尺寸（决定了所占用的内存大小）</li>
+<li>图片的访问频率（频率高的在内存中一直保存）</li>
+<li>保存图片的质量（不同像素的在不同情况下显示）</li>
+</ul>
+<p>具体的要根据应用图片使用的具体情况来找到一个合适的解决办法，一个设置 LruCache 例子：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">private LruCache&#60;String, Bitmap&#62; mMemoryCache;&#10;&#10;@Override&#10;protected void onCreate(Bundle savedInstanceState) &#123;&#10;    ...&#10;    // &#33719;&#24471;&#34394;&#25311;&#26426;&#33021;&#25552;&#20379;&#30340;&#26368;&#22823;&#20869;&#23384;&#65292;&#36229;&#36807;&#36825;&#20010;&#22823;&#23567;&#20250;&#25243;&#20986;OutOfMemory&#30340;&#24322;&#24120;&#10;    final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);&#10;&#10;    // &#29992;&#65297;&#65295;&#65304;&#30340;&#20869;&#23384;&#22823;&#23567;&#20316;&#20026;&#20869;&#23384;&#32531;&#23384;&#10;    final int cacheSize = maxMemory / 8;&#10;&#10;    mMemoryCache = new LruCache&#60;String, Bitmap&#62;(cacheSize) &#123;&#10;        @Override&#10;        protected int sizeOf(String key, Bitmap bitmap) &#123;&#10;            // &#36825;&#37324;&#36820;&#22238;&#30340;&#19981;&#26159;item&#30340;&#20010;&#25968;&#65292;&#26159;cache&#30340;size&#65288;&#21333;&#20301;1024&#20010;&#23383;&#33410;&#65289;&#10;            return bitmap.getByteCount() / 1024;&#10;        &#125;&#10;    &#125;;&#10;    ...&#10;&#125;&#10;&#10;public void addBitmapToMemoryCache(String key, Bitmap bitmap) &#123;&#10;    if (getBitmapFromMemCache(key) == null) &#123;&#10;        mMemoryCache.put(key, bitmap);&#10;    &#125;&#10;&#125;&#10;&#10;public Bitmap getBitmapFromMemCache(String key) &#123;&#10;    return mMemoryCache.get(key);&#10;&#125;</span><br></pre></td></tr></table></figure>
+<p>　　当为ImageView加载一张图片时，会先在LruCache 中看看有没有缓存这张图片，如果有的话直接更新到ImageView中，如果没有的话，一个后台线程会被触发来加载这张图片。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">public void loadBitmap(int resId, ImageView imageView) &#123;&#10;    final String imageKey = String.valueOf(resId);&#10;&#10;    // &#26597;&#30475;&#19979;&#20869;&#23384;&#32531;&#23384;&#20013;&#26159;&#21542;&#32531;&#23384;&#20102;&#36825;&#24352;&#22270;&#29255;&#10;    final Bitmap bitmap = getBitmapFromMemCache(imageKey);&#10;    if (bitmap != null) &#123;&#10;        mImageView.setImageBitmap(bitmap);&#10;    &#125; else &#123;&#10;        mImageView.setImageResource(R.drawable.image_placeholder);&#10;BitmapWorkerTask task = new BitmapWorkerTask(mImageView);&#10;        task.execute(resId);&#10;    &#125;&#10;&#125;</span><br></pre></td></tr></table></figure>
+<p>   在图片加载的Task中，需要把加载好的图片加入到内存缓存中。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">class BitmapWorkerTask extends AsyncTask&#60;Integer, Void, Bitmap&#62; &#123;&#10;    ...&#10;    // &#22312;&#21518;&#21488;&#23436;&#25104;&#10;    @Override&#10;    protected Bitmap doInBackground(Integer... params) &#123;&#10;        final Bitmap bitmap = decodeSampledBitmapFromResource(&#10;                getResources(), params[0], 100, 100));&#10;    addBitmapToMemoryCache(String.valueOf(params[0]), bitmap);&#10;        return bitmap;&#10;    &#125;&#10;    ...&#10;&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="使用磁盘缓存"><a href="#使用磁盘缓存" class="headerlink" title="使用磁盘缓存"></a>使用磁盘缓存</h2><p>　　内存缓存能够快速的获取到最近显示的图片，但不一定就能够获取到。当数据集过大时很容易把内存缓存填满（如GridView ）。你的应用也有可能被其它的任务（比如来电）中断进入到后台，后台应用有可能会被杀死，那么相应的内存缓存对象也会被销毁。 当你的应用重新回到前台显示时，你的应用又需要一张一张的去加载图片了。</p>
+<p>   　磁盘文件缓存能够用来处理这些情况，保存处理好的图片，当内存缓存不可用的时候，直接读取在硬盘中保存好的图片，这样可以有效的减少图片加载的次数。读取磁盘文件要比直接从内存缓存中读取要慢一些，而且需要在一个UI主线程外的线程中进行，因为磁盘的读取速度是不能够保证的，磁盘文件缓存显然也是一种以<strong>空间换时间</strong>的策略。</p>
+<p>　　如果图片使用非常频繁的话，一个 ContentProvider 可能更适合代替去存储缓存图片，比如图片gallery 应用。</p>
+<p>　　下面是一个DiskLruCache的部分代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">private DiskLruCache mDiskLruCache;&#10;private final Object mDiskCacheLock = new Object();&#10;private boolean mDiskCacheStarting = true;&#10;private static final int DISK_CACHE_SIZE = 1024 * 1024 * 10; // 10MB&#10;private static final String DISK_CACHE_SUBDIR = &#34;thumbnails&#34;;&#10;&#10;@Override&#10;protected void onCreate(Bundle savedInstanceState) &#123;&#10;    ...&#10;    // &#21021;&#22987;&#21270;&#20869;&#23384;&#32531;&#23384;&#10;    ...&#10;    // &#22312;&#21518;&#21488;&#32447;&#31243;&#20013;&#21021;&#22987;&#21270;&#30913;&#30424;&#32531;&#23384;&#10;    File cacheDir = getDiskCacheDir(this, DISK_CACHE_SUBDIR);&#10;    new InitDiskCacheTask().execute(cacheDir);&#10;    ...&#10;&#125;&#10;&#10;class InitDiskCacheTask extends AsyncTask&#60;File, Void, Void&#62; &#123;&#10;    @Override&#10;    protected Void doInBackground(File... params) &#123;&#10;        synchronized (mDiskCacheLock) &#123;&#10;            File cacheDir = params[0];&#10;  mDiskLruCache = DiskLruCache.open(cacheDir, DISK_CACHE_SIZE);&#10;&#12288; mDiskCacheStarting = false; // &#32467;&#26463;&#21021;&#22987;&#21270;&#10;&#12288; mDiskCacheLock.notifyAll(); // &#21796;&#37266;&#31561;&#24453;&#32447;&#31243;&#10;        &#125;&#10;        return null;&#10;    &#125;&#10;&#125;&#10;&#10;class BitmapWorkerTask extends AsyncTask&#60;Integer, Void, Bitmap&#62; &#123;&#10;    ...&#10;    // &#22312;&#21518;&#21488;&#35299;&#26512;&#22270;&#29255;&#10;    @Override&#10;    protected Bitmap doInBackground(Integer... params) &#123;&#10;        final String imageKey = String.valueOf(params[0]);&#10;&#10;        // &#22312;&#21518;&#21488;&#32447;&#31243;&#20013;&#26816;&#27979;&#30913;&#30424;&#32531;&#23384;&#10;        Bitmap bitmap = getBitmapFromDiskCache(imageKey);&#10;&#10;        if (bitmap == null) &#123; // &#27809;&#26377;&#22312;&#30913;&#30424;&#32531;&#23384;&#20013;&#25214;&#21040;&#22270;&#29255;&#10; final Bitmap bitmap = decodeSampledBitmapFromResource(&#10;                    getResources(), params[0], 100, 100));&#10;        &#125;&#10;&#10;        // &#25226;&#36825;&#20010;final&#31867;&#22411;&#30340;bitmap&#21152;&#21040;&#32531;&#23384;&#20013;&#10;        addBitmapToCache(imageKey, bitmap);&#10;&#10;        return bitmap;&#10;    &#125;&#10;    ...&#10;&#125;&#10;&#10;public void addBitmapToCache(String key, Bitmap bitmap) &#123;&#10;    // &#20808;&#21152;&#21040;&#20869;&#23384;&#32531;&#23384;&#10;    if (getBitmapFromMemCache(key) == null) &#123;&#10;        mMemoryCache.put(key, bitmap);&#10;    &#125;&#10;&#10;    //&#20877;&#21152;&#21040;&#30913;&#30424;&#32531;&#23384;&#10;    synchronized (mDiskCacheLock) &#123;&#10;        if (mDiskLruCache != null &#38;&#38; mDiskLruCache.get(key) == null) &#123;&#10;            mDiskLruCache.put(key, bitmap);&#10;        &#125;&#10;    &#125;&#10;&#125;&#10;&#10;public Bitmap getBitmapFromDiskCache(String key) &#123;&#10;    synchronized (mDiskCacheLock) &#123;&#10;        // &#31561;&#24453;&#30913;&#30424;&#32531;&#23384;&#20174;&#21518;&#21488;&#32447;&#31243;&#25171;&#24320;&#10;        while (mDiskCacheStarting) &#123;&#10;            try &#123;&#10;                mDiskCacheLock.wait();&#10;            &#125; catch (InterruptedException e) &#123;&#125;&#10;        &#125;&#10;        if (mDiskLruCache != null) &#123;&#10;            return mDiskLruCache.get(key);&#10;        &#125;&#10;    &#125;&#10;    return null;&#10;&#125;&#10;&#10;public static File getDiskCacheDir(Context context, String uniqueName) &#123;&#10;    // &#20248;&#20808;&#20351;&#29992;&#22806;&#32531;&#23384;&#36335;&#24452;&#65292;&#22914;&#26524;&#27809;&#26377;&#25346;&#36733;&#22806;&#23384;&#20648;&#65292;&#23601;&#20351;&#29992;&#20869;&#32531;&#23384;&#36335;&#24452;&#10;final String cachePath =&#10;            Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState()) ||&#10;!isExternalStorageRemovable() ?getExternalCacheDir(context).getPath():context.getCacheDir().getPath();&#10;&#10;    return new File(cachePath + File.separator + uniqueName);&#10;&#125;</span><br></pre></td></tr></table></figure>
+<p>　　不能在UI主线程中进行这项操作，因为初始化磁盘缓存也需要对磁盘进行操作。上面的程序片段中，一个锁对象确保了磁盘缓存没有初始化完成之前不能够对磁盘缓存进行访问。</p>
+<p>　　 内存缓存在UI线程中进行检测，磁盘缓存在UI主线程外的线程中进行检测，当图片处理完成之后，分别存储到内存缓存和磁盘缓存中。</p>
+<h2 id="设备配置参数改变时加载问题"><a href="#设备配置参数改变时加载问题" class="headerlink" title="设备配置参数改变时加载问题"></a>设备配置参数改变时加载问题</h2><p>　　由于应用在运行的时候设备配置参数可能会发生改变，比如设备朝向改变，会导致Android销毁你的Activity然后按照新的配置重启，这种情况下，我们要避免重新去加载处理所有的图片，让用户能有一个流畅的体验。   </p>
+<p>   　使用Fragment 能够把内存缓存对象传递到新的activity实例中，调用setRetainInstance(true)) 方法来保留Fragment实例。当activity重新创建好后， 被保留的Fragment依附于activity而存在，通过Fragment就可以获取到已经存在的内存缓存对象了，这样就可以快速的获取到图片，并设置到ImageView上，给用户一个流畅的体验。</p>
+<p>下面是一个示例程序片段：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">private LruCache&#60;String, Bitmap&#62; mMemoryCache;&#10;&#10;@Override&#10;protected void onCreate(Bundle savedInstanceState) &#123;&#10;    ...&#10;RetainFragment mRetainFragment =            RetainFragment.findOrCreateRetainFragment(getFragmentManager());&#10;    mMemoryCache = RetainFragment.mRetainedCache;&#10;    if (mMemoryCache == null) &#123;&#10;        mMemoryCache = new LruCache&#60;String, Bitmap&#62;(cacheSize) &#123;&#10;            ... //&#20687;&#19978;&#38754;&#20363;&#23376;&#20013;&#37027;&#26679;&#21021;&#22987;&#21270;&#32531;&#23384;&#10;        &#125;&#10;        mRetainFragment.mRetainedCache = mMemoryCache;&#10;    &#125;&#10;    ...&#10;&#125;&#10;&#10;class RetainFragment extends Fragment &#123;&#10;    private static final String TAG = &#34;RetainFragment&#34;;&#10;    public LruCache&#60;String, Bitmap&#62; mRetainedCache;&#10;&#10;    public RetainFragment() &#123;&#125;&#10;&#10;    public static RetainFragment findOrCreateRetainFragment(FragmentManager fm) &#123;&#10;        RetainFragment fragment = (RetainFragment) fm.findFragmentByTag(TAG);&#10;        if (fragment == null) &#123;&#10;            fragment = new RetainFragment();&#10;        &#125;&#10;        return fragment;&#10;    &#125;&#10;&#10;    @Override&#10;    public void onCreate(Bundle savedInstanceState) &#123;&#10;        super.onCreate(savedInstanceState);&#10;        // &#20351;&#24471;Fragment&#22312;Activity&#38144;&#27585;&#21518;&#36824;&#33021;&#22815;&#20445;&#30041;&#19979;&#26469;&#10;        setRetainInstance(true);&#10;    &#125;&#10;&#125;</span><br></pre></td></tr></table></figure>
+<p>　　可以在不适用Fragment（没有界面的服务类Fragment）的情况下旋转设备屏幕。在保留缓存的情况下，你应该能发现填充图片到Activity中几乎是瞬间从内存中取出而没有任何延迟的感觉。任何图片优先从内存缓存获取，没有的话再到硬盘缓存中找，如果都没有，那就以普通方式加载图片。<br>　　<br>参考：</p>
+<p><a href="http://developer.android.com/training/displaying-bitmaps/cache-bitmap.html" target="_blank" rel="external">Caching Bitmaps</a></p>
+<p><a href="http://developer.android.com/reference/android/util/LruCache.html" target="_blank" rel="external">LruCache</a></p>
+<h1 id="使用SQLite进行缓存"><a href="#使用SQLite进行缓存" class="headerlink" title="使用SQLite进行缓存"></a>使用SQLite进行缓存</h1><p>　　网络请求数据完成后，把文件的相关信息（如url（一般作为唯一标示），下载时间，过期时间）等存放到数据库。下次加载的时候根据url先从数据库中查询，如果查询到并且时间未过期，就根据路径读取本地文件，从而实现缓存的效果。</p>
+<p>　　注意：缓存的数据库是存放在/data/data/<package>/databases/目录下，是占用内存空间的，如果缓存累计，容易浪费内存，需要及时清理缓存。</package></p>
+<h1 id="文件缓存"><a href="#文件缓存" class="headerlink" title="文件缓存"></a>文件缓存</h1><p>　　思路和一般缓存一样，把需要的数据存储在文件中，下次加载时判断文件是否存在和过期（使用File.lastModified()方法得到文件的最后修改时间，与当前时间判断），存在并未过期就加载文件中的数据，否则请求服务器重新下载。</p>
+<p>　　注意，无网络环境下就默认读取文件缓存中的。</p>
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/05/29/glide-picasso/" rel="next" title="Glide 和 Picasso 对比.">
+                <i class="fa fa-chevron-left"></i> Glide 和 Picasso 对比.
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/uploads/avatar.png"
+               alt="刘启明" />
+          <p class="site-author-name" itemprop="name">刘启明</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">21</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+          
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://www.github.com/timmy6" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> github
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.cnblogs.com/lomomiao/" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> 博客旧址(博客园)
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.weibo.com/u/3917867123" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> 新浪微博
+                  
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator">
+            <i class="fa fa-angle-double-up"></i>
+          </div>
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#实现原理"><span class="nav-number">1.</span> <span class="nav-text">实现原理</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Bitmap的缓存"><span class="nav-number">2.</span> <span class="nav-text">Bitmap的缓存</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#使用内存缓存"><span class="nav-number">2.1.</span> <span class="nav-text">使用内存缓存</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用磁盘缓存"><span class="nav-number">2.2.</span> <span class="nav-text">使用磁盘缓存</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#设备配置参数改变时加载问题"><span class="nav-number">2.3.</span> <span class="nav-text">设备配置参数改变时加载问题</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#使用SQLite进行缓存"><span class="nav-number">3.</span> <span class="nav-text">使用SQLite进行缓存</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#文件缓存"><span class="nav-number">4.</span> <span class="nav-text">文件缓存</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator">
+            <i class="fa fa-angle-double-down"></i>
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">刘启明</span>
+</div>
+
+
+
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<span id="busuanzi_container_site_pv">
+    本站总访问量<span id="busuanzi_value_site_pv"></span>次
+</span>
+
+<script>
+var birthDay = new Date("11/20/2014");
+var now = new Date();
+var duration = now.getTime() - birthDay.getTime();
+var total= Math.floor(duration / (1000 * 60 * 60 * 24));
+document.getElementById("showDays").innerHTML = "本站已运行 "+total+" 天";
+</script>
+<span id="showDays"></span>
+      </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  
+
+
+  
+
+
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=0.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=0.5.0"></script>
+
+
+
+  
+  
+
+  
+  
+<script type="text/javascript" src="/js/src/scrollspy.js?v=0.5.0"></script>
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 1 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = NexT.utils.escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    NexT.motion.middleWares.sidebar = function () {
+      var $tocContent = $('.post-toc-content');
+
+      if (CONFIG.scheme !== 'Pisces' && (CONFIG.sidebar.display === 'post' || CONFIG.sidebar.display === 'always')) {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          NexT.utils.displaySidebar();
+        }
+      }
+    };
+  });
+</script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=0.5.0"></script>
+
+
+
+  
+
+
+
+  
+
+    <script type="text/javascript">
+      var disqus_shortname = 'liuqiming';
+      var disqus_identifier = '2017/12/02/图片缓存原理/';
+      var disqus_title = '图片缓存原理';
+      var disqus_url = 'http://yoursite.com/2017/12/02/图片缓存原理/';
+
+      function run_disqus_script(disqus_script){
+        var dsq = document.createElement('script');
+        dsq.type = 'text/javascript';
+        dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      }
+
+      run_disqus_script('count.js');
+      
+        run_disqus_script('embed.js');
+      
+    </script>
+  
+
+
+
+  
+  
+
+  
+  
+
+
+</body>
+</html>
