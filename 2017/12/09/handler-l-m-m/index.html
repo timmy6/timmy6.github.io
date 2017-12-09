@@ -1,0 +1,869 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.5.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.5.0" />
+
+
+
+
+
+
+<meta name="description" content="1、Handler的由来 　　当程序第一次启动的时候，Android会同时启动一条主线程（ Main Thread）来负责处理与UI相关的事件，我们叫做UI线程。
+　　Android的UI操作并不是线程安全的（出于性能优化考虑），意味着如果多个线程并发操作UI线程，可能导致线程安全问题。 
+　　为了解决Android应用多线程问题—Android平台只允许UI线程修改Activity里的UI组建，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Handler,Looper,MessageQueue 关系">
+<meta property="og:url" content="http://yoursite.com/2017/12/09/handler-l-m-m/index.html">
+<meta property="og:site_name" content="刘启明">
+<meta property="og:description" content="1、Handler的由来 　　当程序第一次启动的时候，Android会同时启动一条主线程（ Main Thread）来负责处理与UI相关的事件，我们叫做UI线程。
+　　Android的UI操作并不是线程安全的（出于性能优化考虑），意味着如果多个线程并发操作UI线程，可能导致线程安全问题。 
+　　为了解决Android应用多线程问题—Android平台只允许UI线程修改Activity里的UI组建，">
+<meta property="og:image" content="http://img.blog.csdn.net/20160516125245477">
+<meta property="og:updated_time" content="2017-12-09T09:05:38.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Handler,Looper,MessageQueue 关系">
+<meta name="twitter:description" content="1、Handler的由来 　　当程序第一次启动的时候，Android会同时启动一条主线程（ Main Thread）来负责处理与UI相关的事件，我们叫做UI线程。
+　　Android的UI操作并不是线程安全的（出于性能优化考虑），意味着如果多个线程并发操作UI线程，可能导致线程安全问题。 
+　　为了解决Android应用多线程问题—Android平台只允许UI线程修改Activity里的UI组建，">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"hide"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: '博主'
+    }
+  };
+</script>
+
+  <title> Handler,Looper,MessageQueue 关系 | 刘启明 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">刘启明</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu ">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-th fa-fw"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            时间轴
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-user fa-fw"></i> <br />
+            
+            留言板
+          </a>
+        </li>
+      
+
+      
+      
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Handler,Looper,MessageQueue 关系
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2017-12-09T17:02:33+08:00" content="2017-12-09">
+              2017-12-09
+            </time>
+          </span>
+	
+          <span id="busuanzi_container_page_pv">  |  阅读量 <span id="busuanzi_value_page_pv"></span> 次</span>
+        
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Android-进阶/" itemprop="url" rel="index">
+                    <span itemprop="name">Android 进阶</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2017/12/09/handler-l-m-m/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2017/12/09/handler-l-m-m/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="1、Handler的由来"><a href="#1、Handler的由来" class="headerlink" title="1、Handler的由来"></a>1、Handler的由来</h1><p> 　　当程序第一次启动的时候，Android会同时启动一条主线程（ Main Thread）来负责处理与UI相关的事件，我们叫做UI线程。</p>
+<p>　　Android的UI操作并不是线程安全的（出于性能优化考虑），意味着如果多个线程并发操作UI线程，可能导致线程安全问题。 </p>
+<p>　　为了解决Android应用多线程问题—Android平台只允许UI线程修改Activity里的UI组建，就会导致新启动的线程无法改变界面组建的属性值。</p>
+<p>　　<strong>简单的说：</strong>当主线程队列处理一个消息超过5秒,android 就会抛出一个 ANP(无响应)的异常,所以,我们需要把一些要处理比较长的消息,放在一个单独线程里面处理,把处理以后的结果,返回给主线程运行,就需要用的Handler来进行线程建的通信。</p>
+<h1 id="２、Handler的作用"><a href="#２、Handler的作用" class="headerlink" title="２、Handler的作用"></a>２、Handler的作用</h1><p>２.１　让线程延时执行</p>
+<p>主要用到的两个方法：</p>
+<ul>
+<li><p><code>final boolean    postAtTime(Runnable r, long uptimeMillis)</code></p>
+</li>
+<li><p><code>final boolean    postDelayed(Runnable r, long delayMillis)</code></p>
+</li>
+</ul>
+<p>２.２　让任务在其他线程中执行并返回结果</p>
+<p>分为两个步骤：</p>
+<ul>
+<li>在新启动的线程中发送消息</li>
+</ul>
+<p>　　使用Handler对象的sendMessage()方法或者SendEmptyMessage()方法发送消息。</p>
+<ul>
+<li>在主线程中获取处理消息</li>
+</ul>
+<p>　　重写Handler类中处理消息的方法（void handleMessage(Message msg)），当新启动的线程发送消息时，消息发送到与之关联的MessageQueue。而Hanlder不断地从MessageQueue中获取并处理消息。</p>
+<h1 id="３、Handler更新UI线程一般使用"><a href="#３、Handler更新UI线程一般使用" class="headerlink" title="３、Handler更新UI线程一般使用"></a>３、Handler更新UI线程一般使用</h1><p>　　</p>
+<ul>
+<li>首先要进行Handler 申明，复写handleMessage方法( 放在主线程中)</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">private Handler handler = new Handler() &#123;&#10;&#10;&#9;&#9;@Override&#10;&#9;&#9;public void handleMessage(Message msg) &#123;&#10;&#9;&#9;&#9;// TODO &#25509;&#25910;&#28040;&#24687;&#24182;&#19988;&#21435;&#26356;&#26032;UI&#32447;&#31243;&#19978;&#30340;&#25511;&#20214;&#20869;&#23481;&#10;&#9;&#9;&#9;if (msg.what == UPDATE) &#123;&#10;&#9;&#9;&#9;&#9;// &#26356;&#26032;&#30028;&#38754;&#19978;&#30340;textview&#10;&#9;&#9;&#9;&#9;tv.setText(String.valueOf(msg.obj));&#10;&#9;&#9;&#9;&#125;&#10;&#9;&#9;&#9;super.handleMessage(msg);&#10;&#9;&#9;&#125;&#10;&#9;&#125;;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>子线程发送Message给ui线程表示自己任务已经执行完成，主线程可以做相应的操作了。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">new Thread() &#123;&#10;&#9;&#9;&#9;@Override&#10;&#9;&#9;&#9;public void run() &#123;&#10;&#9;&#9;&#9;&#9;// TODO &#23376;&#32447;&#31243;&#20013;&#36890;&#36807;handler&#21457;&#36865;&#28040;&#24687;&#32473;handler&#25509;&#25910;&#65292;&#30001;handler&#21435;&#26356;&#26032;TextView&#30340;&#20540;&#10;&#9;&#9;&#9;&#9;try &#123;&#10;&#9;&#9;&#9;&#9;&#9;   //do something&#10;&#9;&#9;&#9;&#9;&#9;&#9;&#10;&#9;&#9;&#9;&#9;&#9;&#9;Message msg = new Message();&#10;&#9;&#9;&#9;&#9;&#9;&#9;msg.what = UPDATE;&#9;&#9;&#9;&#9;&#9;&#10;&#9;&#9;&#9;&#9;&#9;&#9;msg.obj = &#34;&#26356;&#26032;&#21518;&#30340;&#20540;&#34; ;&#10;&#9;&#9;&#9;&#9;&#9;&#9;handler.sendMessage(msg);&#10;&#9;&#9;&#9;&#9;&#9;&#125;&#10;&#9;&#9;&#9;&#9;&#125; catch (InterruptedException e) &#123;&#10;&#9;&#9;&#9;&#9;&#9;e.printStackTrace();&#10;&#9;&#9;&#9;&#9;&#125;&#10;&#9;&#9;&#9;&#125;&#10;&#9;&#9;&#125;.start();</span><br></pre></td></tr></table></figure>
+<h1 id="4、Handler原理分析"><a href="#4、Handler原理分析" class="headerlink" title="4、Handler原理分析"></a>4、Handler原理分析</h1><p>4.1 　Handler的构造函数</p>
+<p>①　public　Handler()</p>
+<p>②　public　Handler(Callbackcallback)</p>
+<p>③　public　Handler(Looperlooper)</p>
+<p>④　public　Handler(Looperlooper, Callbackcallback) 　</p>
+<ul>
+<li>第①个和第②个构造函数都没有传递Looper，这两个构造函数都将通过调用Looper.myLooper()获取当前线程绑定的Looper对象，然后将该Looper对象保存到名为mLooper的成员字段中。 　<br>　　下面来看①②个函数源码：
+　　</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">113    public Handler() &#123;&#10;114        this(null, false);&#10;115    &#125;&#10;&#10;127    public Handler(Callback callback) &#123;&#10;128        this(callback, false);&#10;129    &#125;&#10;&#10;//&#20182;&#20204;&#20250;&#35843;&#29992;Handler&#30340;&#20869;&#37096;&#26500;&#36896;&#26041;&#27861;&#10;&#10;188    public Handler(Callback callback, boolean async) &#123;&#10;189        if (FIND_POTENTIAL_LEAKS) &#123;&#10;190      final Class&#60;? extends Handler&#62; klass = getClass();&#10;191      if ((klass.isAnonymousClass() ||klass.isMemberClass()&#10;         || klass.isLocalClass()) &#38;&#38;&#10;192                    (klass.getModifiers() &#38; Modifier.STATIC) == 0) &#123;&#10;193                Log.w(TAG, &#34;The following Handler class should be static or leaks might occur: &#34; +&#10;194                    klass.getCanonicalName());&#10;195            &#125;&#10;196        &#125;&#10;197//************************************&#10;198        mLooper = Looper.myLooper();&#10;199        if (mLooper == null) &#123;&#10;200            throw new RuntimeException(&#10;201                &#34;Can&#39;t create handler inside thread that has not called Looper.prepare()&#34;);&#10;202        &#125;&#10;203        mQueue = mLooper.mQueue;&#10;204        mCallback = callback;&#10;205        mAsynchronous = async;&#10;206    &#125;</span><br></pre></td></tr></table></figure>
+<p>  　　我们看到暗红色的重点部分：</p>
+<p>　　通过Looper.myLooper()获取了当前线程保存的Looper实例，又通过这个Looper实例获取了其中保存的MessageQueue（消息队列）。<strong>每个Handler 对应一个Looper对象，产生一个MessageQueue</strong>
+　　</p>
+<ul>
+<li>第③个和第④个构造函数传递了Looper对象，这两个构造函数会将该Looper保存到名为mLooper的成员字段中。<br>　　下面来看③④个函数源码：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">136    public Handler(Looper looper) &#123;&#10;137        this(looper, null, false);&#10;138    &#125;&#12288;&#10;&#10;147    public Handler(Looper looper, Callback callback) &#123;&#10;148        this(looper, callback, false);&#10;149    &#125;&#10;//&#20182;&#20204;&#20250;&#35843;&#29992;Handler&#30340;&#20869;&#37096;&#26500;&#36896;&#26041;&#27861;&#10;&#10;227    public Handler(Looper looper, Callback callback, boolean async) &#123;&#10;228        mLooper = looper;&#10;229        mQueue = looper.mQueue;&#10;230        mCallback = callback;&#10;231        mAsynchronous = async;&#10;232    &#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>第②个和第④个构造函数还传递了Callback对象，Callback是Handler中的内部接口，需要实现其内部的handleMessage方法，Callback代码如下:</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">80     public interface Callback &#123;&#10;81         public boolean More ...handleMessage(Message msg);&#10;82     &#125;</span><br></pre></td></tr></table></figure>
+<p>　　Handler.Callback是用来处理Message的一种手段，如果没有传递该参数，那么就应该重写Handler的handleMessage方法，也就是说为了使得Handler能够处理Message，我们有两种办法：<br>　　<br>　1. 向Hanlder的构造函数传入一个Handler.Callback对象，并实现Handler.Callback的handleMessage方法 　<br>　　<br>　2. 无需向Hanlder的构造函数传入Handler.Callback对象，但是需要重写Handler本身的handleMessage方法 　<br>　　　<br>　　　也就是说无论哪种方式，我们都得通过某种方式实现handleMessage方法，这点与Java中对Thread的设计有异曲同工之处。 </p>
+<p>4.2　Handle发送消息的几个方法源码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">public final boolean sendMessage(Message msg)&#10; &#123;&#10;     return sendMessageDelayed(msg, 0);&#10; &#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">public final boolean sendEmptyMessageDelayed(int what, long delayMillis) &#123;&#10;     Message msg = Message.obtain();&#10;     msg.what = what;&#10;     return sendMessageDelayed(msg, delayMillis);&#10; &#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">public final boolean sendMessageDelayed(Message msg, long delayMillis)&#10;   &#123;&#10;       if (delayMillis &#60; 0) &#123;&#10;           delayMillis = 0;&#10;       &#125;&#10;       return sendMessageAtTime(msg, SystemClock.uptimeMillis() + delayMillis);&#10;   &#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">public boolean sendMessageAtTime(Message msg, long uptimeMillis) &#123;&#10;       MessageQueue queue = mQueue;&#10;       if (queue == null) &#123;&#10;           RuntimeException e = new RuntimeException(&#10;                   this + &#34; sendMessageAtTime() called with no mQueue&#34;);&#10;           Log.w(&#34;Looper&#34;, e.getMessage(), e);&#10;           return false;&#10;       &#125;&#10;       return enqueueMessage(queue, msg, uptimeMillis);&#10;   &#125;</span><br></pre></td></tr></table></figure>
+<p>我们可以看出他们最后都调用了sendMessageAtTime（），然后返回了enqueueMessage方法，下面看一下此方法源码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">626    private boolean enqueueMessage(MessageQueue queue, Message msg, long uptimeMillis) &#123;&#10;&#12288;&#12288;&#12288;&#12288;&#12288;&#12288;//&#25226;&#24403;&#21069;&#30340;handler&#20316;&#20026;msg&#30340;target&#23646;&#24615;&#10;627        msg.target = this;&#10;628        if (mAsynchronous) &#123;&#10;629            msg.setAsynchronous(true);&#10;630        &#125;&#10;631        return queue.enqueueMessage(msg, uptimeMillis);&#10;632    &#125;</span><br></pre></td></tr></table></figure>
+<p>在该方法中有两件事需要注意：  </p>
+<ol>
+<li><p>msg.target = this </p>
+<p>　　该代码将Message的target绑定为当前的Handler</p>
+<p><br></p>
+</li>
+<li><p>queue.enqueueMessage<br>　　<br>　　变量queue表示的是Handler所绑定的消息队列MessageQueue，通过调用queue.enqueueMessage(msg, uptimeMillis)我们将Message放入到消息队列中。</p>
+</li>
+</ol>
+<p>过下图可以看到完整的方法调用顺序： </p>
+<p><img src="http://img.blog.csdn.net/20160516125245477" alt="流程图">　</p>
+<h1 id="５、Looper原理分析"><a href="#５、Looper原理分析" class="headerlink" title="５、Looper原理分析"></a>５、Looper原理分析</h1><p>　　我们一般在主线程申明Handler，有时我们需要继承Thread类实现自己的线程功能，当我们在里面申明Handler的时候会报错。其原因是主线程中已经实现了两个重要的Looper方法，下面看一看ActivityThread.java中main方法的源码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">public static void main(String[] args) &#123;&#10;            //......&#30465;&#30053;&#10;5205        Looper.prepareMainLooper();//&#62;&#10;5206&#10;5207        ActivityThread thread = new ActivityThread();&#10;5208        thread.attach(false);&#10;5209&#10;5210        if (sMainThreadHandler == null) &#123;&#10;5211            sMainThreadHandler = thread.getHandler();&#10;5212        &#125;&#10;5213&#10;5214        AsyncTask.init();&#10;5215&#10;5216        if (false) &#123;&#10;5217            Looper.myLooper().setMessageLogging(new&#10;5218   LogPrinter(Log.DEBUG, &#34;ActivityThread&#34;));&#10;5219        &#125;&#10;5220&#10;5221        Looper.loop();//&#62;&#10;5222&#10;5223        throw new RuntimeException(&#34;Main thread loop unexpectedly exited&#34;);&#10;5224    &#125;&#10;5225&#125;</span><br></pre></td></tr></table></figure>
+<p>5.1　首先看prepare()方法</p>
+<p>　　</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">70     public static void prepare() &#123;&#10;71         prepare(true);&#10;72     &#125;&#10;73 &#10;74     private static void prepare(boolean quitAllowed) &#123;&#10;&#12288;&#12288;&#12288;&#12288;&#12288;//&#35777;&#20102;&#19968;&#20010;&#32447;&#31243;&#20013;&#21482;&#26377;&#19968;&#20010;Looper&#23454;&#20363;&#10;75         if (sThreadLocal.get() != null) &#123;&#10;76             throw new RuntimeException(&#34;Only one Looper may be created per thread&#34;);&#10;77         &#125;&#10;78         sThreadLocal.set(new Looper(quitAllowed));&#10;79     &#125;</span><br></pre></td></tr></table></figure>
+<p>该方法会调用Looper构造函数同时实例化出MessageQueue和当前thread.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">186    private Looper(boolean quitAllowed) &#123;&#10;187        mQueue = new MessageQueue(quitAllowed);&#10;188        mThread = Thread.currentThread();&#10;189    &#125; &#10;&#10;182    public static MessageQueue myQueue() &#123;&#10;183        return myLooper().mQueue;&#10;184    &#125;</span><br></pre></td></tr></table></figure>
+<p>　　prepare()方法中通过ThreadLocal对象实现Looper实例与线程的绑定。（不清楚的可以查看　<a href="http://blog.csdn.net/amazing7/article/details/51313851" target="_blank" rel="external">ThreadLocal的使用规则和源码分析</a>）　</p>
+<p>５.2 　loop()方法　　</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">109    public static void loop() &#123;&#10;110        final Looper me = myLooper();&#10;111        if (me == null) &#123;&#10;112            throw new RuntimeException(&#34;No Looper; Looper.prepare() wasn&#39;t called on this thread.&#34;);&#10;113        &#125;&#10;114        final MessageQueue queue = me.mQueue;&#10;115&#10;118        Binder.clearCallingIdentity();&#10;119        final long ident = Binder.clearCallingIdentity();&#10;120&#10;121        for (;;) &#123;&#10;122            Message msg = queue.next(); // might block&#10;123            if (msg == null) &#123;&#10;124               &#10;125                return;&#10;126            &#125;&#10;127&#10;129            Printer logging = me.mLogging;&#10;130            if (logging != null) &#123;&#10;131                logging.println(&#34;&#62;&#62;&#62;&#62;&#62; Dispatching to &#34; + msg.target + &#34; &#34; +&#10;132                        msg.callback + &#34;: &#34; + msg.what);&#10;133            &#125;&#10;//&#37325;&#28857;****&#10;135            msg.target.dispatchMessage(msg);&#10;136&#10;137            if (logging != null) &#123;&#10;138                logging.println(&#34;&#60;&#60;&#60;&#60;&#60; Finished to &#34; + msg.target + &#34; &#34; + msg.callback);&#10;139            &#125;&#10;140&#10;142            // identity of the thread wasn&#39;t corrupted.&#10;143            final long newIdent = Binder.clearCallingIdentity();&#10;144            if (ident != newIdent) &#123;&#10;145                Log.wtf(TAG, &#34;Thread identity changed from 0x&#34;&#10;146                        + Long.toHexString(ident) + &#34; to 0x&#34;&#10;147                        + Long.toHexString(newIdent) + &#34; while dispatching to &#34;&#10;148                        + msg.target.getClass().getName() + &#34; &#34;&#10;149                        + msg.callback + &#34; what=&#34; + msg.what);&#10;150            &#125;&#10;151&#10;152            msg.recycleUnchecked();&#10;153        &#125;&#10;154    &#125;</span><br></pre></td></tr></table></figure>
+<p> 　　首先looper对象不能为空，就是说loop()方法调用必须在prepare()方法的后面。</p>
+<p>　Looper一直在不断的从消息队列中通过MessageQueue的next方法获取Message，然后通过代码msg.target.dispatchMessage(msg)让该msg所绑定的Handler（Message.target）执行dispatchMessage方法以实现对Message的处理。 </p>
+<p>Handler的dispatchMessage的源码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">93     public void dispatchMessage(Message msg) &#123;&#10;94         if (msg.callback != null) &#123;&#10;95             handleCallback(msg);&#10;96         &#125; else &#123;&#10;97             if (mCallback != null) &#123;&#10;98                 if (mCallback.handleMessage(msg)) &#123;&#10;99                     return;&#10;100                &#125;&#10;101            &#125;&#10;102            handleMessage(msg);&#10;103        &#125;&#10;104    &#125;</span><br></pre></td></tr></table></figure>
+<p> 　　我们可以看到Handler提供了三种途径处理Message，而且处理有前后优先级之分：首先尝试让postXXX中传递的Runnable执行，其次尝试让Handler构造函数中传入的Callback的handleMessage方法处理，最后才是让Handler自身的handleMessage方法处理Message。</p>
+<h1 id="６、如何在子线程中使用Handler"><a href="#６、如何在子线程中使用Handler" class="headerlink" title="６、如何在子线程中使用Handler"></a>６、如何在子线程中使用Handler</h1><p>  　　Handler本质是从当前的线程中获取到Looper来监听和操作MessageQueue，当其他线程执行完成后回调当前线程。</p>
+<p>　　子线程需要先prepare（）才能获取到Looper的，是因为在子线程只是一个普通的线程，其ThreadLoacl中没有设置过Looper，所以会抛出异常，而在Looper的prepare（）方法中sThreadLocal.set(new Looper())是设置了Looper的。</p>
+<p>６.1　实例代码</p>
+<p>　定义一个类实现Runnable接口或继承Thread类（一般不继承）。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">class Rub implements Runnable &#123;  &#10;  &#10;    public Handler myHandler;  &#10;    // &#23454;&#29616;Runnable&#25509;&#21475;&#30340;&#32447;&#31243;&#20307; &#10;    @Override  &#10;    public void run() &#123;  &#10;    &#9;&#10;     /*&#9312;&#12289;&#35843;&#29992;Looper&#30340;prepare()&#26041;&#27861;&#20026;&#24403;&#21069;&#32447;&#31243;&#21019;&#24314;Looper&#23545;&#35937;&#24182;&#65292;&#10;      &#21019;&#24314;Looper&#23545;&#35937;&#26102;&#65292;&#23427;&#30340;&#26500;&#36896;&#22120;&#20250;&#33258;&#21160;&#30340;&#21019;&#24314;&#30456;&#23545;&#24212;&#30340;MessageQueue*/&#10;        Looper.prepare();  &#10;        &#10;        /*.&#9313;&#12289;&#21019;&#24314;Handler&#23376;&#31867;&#30340;&#23454;&#20363;&#65292;&#37325;&#20889;HandleMessage()&#26041;&#27861;&#65292;&#35813;&#26041;&#27861;&#22788;&#29702;&#38500;&#24403;&#21069;&#32447;&#31243;&#20197;&#22806;&#32447;&#31243;&#30340;&#28040;&#24687;*/&#10;         myHandler = new Handler() &#123;  &#10;            @Override  &#10;            public void handleMessage(Message msg) &#123;  &#10;                String ms = &#34;&#34;;  &#10;                if (msg.what == 0x777) &#123;  &#10;                 &#10;                &#125;  &#10;            &#125;  &#10;  &#10;        &#125;;  &#10;        //&#9314;&#12289;&#35843;&#29992;Looper&#30340;loop()&#26041;&#27861;&#26469;&#21551;&#21160;Looper&#35753;&#28040;&#24687;&#38431;&#21015;&#36716;&#21160;&#36215;&#26469;&#10;        Looper.loop();  &#10;    &#125;&#10;&#125;</span><br></pre></td></tr></table></figure>
+<p>注意分成三步：　</p>
+<p>１．调用Looper的prepare()方法为当前线程创建Looper对象，创建Looper对象时，它的构造器会创建与之配套的MessageQueue。 　</p>
+<p>２．有了Looper之后，创建Handler子类实例，重写HanderMessage()方法，该方法负责处理来自于其他线程的消息。 　</p>
+<p>３．调用Looper的looper()方法启动Looper。</p>
+<p>　　然后使用这个handler实例在任何其他线程中发送消息，最终处理消息的代码都会在你创建Handler实例的线程中运行。</p>
+<h1 id="７、总结"><a href="#７、总结" class="headerlink" title="７、总结  　　"></a>７、总结  　　</h1><p><strong>Handler</strong>:</p>
+<ul>
+<li><p>发送消息，它能把消息发送给Looper管理的MessageQueue。 </p>
+</li>
+<li><p>处理消息，并负责处理Looper分给它的消息。</p>
+</li>
+<li><p>Handler的构造方法，会首先得到当前线程中保存的Looper实例，进而与Looper实例中的MessageQueue想关联。　</p>
+</li>
+<li><p>Handler的sendMessage方法，会给msg的target赋值为handler自身，然后加入MessageQueue中。　　
+　　　</p>
+</li>
+</ul>
+<p><strong>Looper</strong>:</p>
+<ul>
+<li>每个线程只有一个Looper，它负责管理对应的MessageQueue，会不断地从MessageQueue取出消息，并将消息分给对应的Hanlder处理。 　</li>
+</ul>
+<ul>
+<li><p>主线程中，系统已经初始化了一个Looper对象，因此可以直接创建Handler即可，就可以通过Handler来发送消息、处理消息。 程序自己启动的子线程，程序必须自己创建一个Looper对象，并启动它，调用<code>Looper.prepare()</code>方法。 </p>
+</li>
+<li><p>prapare()方法：保证每个线程最多只有一个Looper对象。 　</p>
+</li>
+<li><p>looper()方法：启动Looper，使用一个死循环不断取出MessageQueue中的消息，并将取出的消息分给对应的Handler进行处理。 　</p>
+</li>
+</ul>
+<p><strong>MessageQueue</strong>:</p>
+<ul>
+<li>由Looper负责管理，它采用先进先出的方式来管理Message。　</li>
+</ul>
+<p><strong>Message</strong>:</p>
+<ul>
+<li>Handler接收和处理的消息对象。 　　</li>
+</ul>
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/12/02/图片缓存原理/" rel="next" title="图片缓存原理">
+                <i class="fa fa-chevron-left"></i> 图片缓存原理
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/uploads/avatar.png"
+               alt="刘启明" />
+          <p class="site-author-name" itemprop="name">刘启明</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">22</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+          
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://www.github.com/timmy6" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> github
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.cnblogs.com/lomomiao/" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> 博客旧址(博客园)
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.weibo.com/u/3917867123" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> 新浪微博
+                  
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator">
+            <i class="fa fa-angle-double-up"></i>
+          </div>
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1、Handler的由来"><span class="nav-number">1.</span> <span class="nav-text">1、Handler的由来</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#２、Handler的作用"><span class="nav-number">2.</span> <span class="nav-text">２、Handler的作用</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#３、Handler更新UI线程一般使用"><span class="nav-number">3.</span> <span class="nav-text">３、Handler更新UI线程一般使用</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4、Handler原理分析"><span class="nav-number">4.</span> <span class="nav-text">4、Handler原理分析</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#５、Looper原理分析"><span class="nav-number">5.</span> <span class="nav-text">５、Looper原理分析</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#６、如何在子线程中使用Handler"><span class="nav-number">6.</span> <span class="nav-text">６、如何在子线程中使用Handler</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#７、总结"><span class="nav-number">7.</span> <span class="nav-text">７、总结  　　</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator">
+            <i class="fa fa-angle-double-down"></i>
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">刘启明</span>
+</div>
+
+
+
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<span id="busuanzi_container_site_pv">
+    本站总访问量<span id="busuanzi_value_site_pv"></span>次
+</span>
+
+<script>
+var birthDay = new Date("11/20/2014");
+var now = new Date();
+var duration = now.getTime() - birthDay.getTime();
+var total= Math.floor(duration / (1000 * 60 * 60 * 24));
+document.getElementById("showDays").innerHTML = "本站已运行 "+total+" 天";
+</script>
+<span id="showDays"></span>
+      </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  
+
+
+  
+
+
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=0.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=0.5.0"></script>
+
+
+
+  
+  
+
+  
+  
+<script type="text/javascript" src="/js/src/scrollspy.js?v=0.5.0"></script>
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 1 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = NexT.utils.escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    NexT.motion.middleWares.sidebar = function () {
+      var $tocContent = $('.post-toc-content');
+
+      if (CONFIG.scheme !== 'Pisces' && (CONFIG.sidebar.display === 'post' || CONFIG.sidebar.display === 'always')) {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          NexT.utils.displaySidebar();
+        }
+      }
+    };
+  });
+</script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=0.5.0"></script>
+
+
+
+  
+
+
+
+  
+
+    <script type="text/javascript">
+      var disqus_shortname = 'liuqiming';
+      var disqus_identifier = '2017/12/09/handler-l-m-m/';
+      var disqus_title = 'Handler,Looper,MessageQueue 关系';
+      var disqus_url = 'http://yoursite.com/2017/12/09/handler-l-m-m/';
+
+      function run_disqus_script(disqus_script){
+        var dsq = document.createElement('script');
+        dsq.type = 'text/javascript';
+        dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      }
+
+      run_disqus_script('count.js');
+      
+        run_disqus_script('embed.js');
+      
+    </script>
+  
+
+
+
+  
+  
+
+  
+  
+
+
+</body>
+</html>
