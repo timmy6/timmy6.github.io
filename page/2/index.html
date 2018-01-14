@@ -222,6 +222,122 @@
             
               
                 
+                <a class="post-title-link" href="/2016/05/22/bitmap-optimization/" itemprop="url">
+                  Android Bitmap优化
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-05-22T17:04:38+08:00" content="2016-05-22">
+              2016-05-22
+            </time>
+          </span>
+	
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Android-进阶/" itemprop="url" rel="index">
+                    <span itemprop="name">Android 进阶</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/05/22/bitmap-optimization/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2016/05/22/bitmap-optimization/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+          
+一个进程的内存可以由2个部分组成：native和dalvik dalvik就是我们平常说的java堆，我们创建的对象是在这里面分配的，而bitmap是直接在native上分配的。 一旦内存分配给Java后，以后这块内存即使释放后，也只能给Java的使用，所以如果Java突然占用了一个大块内存， 即使很快释放了,C能用的内存也是16M减去Java最大占用的内存数。 而Bitmap的生成是通过ma
+          ...
+
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2016/05/22/bitmap-optimization/" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
                 <a class="post-title-link" href="/2016/05/22/ram-divulge/" itemprop="url">
                   Android内存泄露
                 </a>
@@ -1248,122 +1364,6 @@
 
 
     
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2016/03/06/2016-03-06-2/" itemprop="url">
-                  Activity 的生命周期深入理解 
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-03-06T15:03:38+08:00" content="2016-03-06">
-              2016-03-06
-            </time>
-          </span>
-	
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/Android-进阶/" itemprop="url" rel="index">
-                    <span itemprop="name">Android 进阶</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2016/03/06/2016-03-06-2/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2016/03/06/2016-03-06-2/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-          
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-          Demo 源码地址https://github.com/timmy6/ActivityLifeCycleDemo
-Activity 生命周期分为两部分内容，一部分是典型情况下的生命周期，另一部分是异常情况下的声明周期。所谓典型情况下的生命周期，是指在有用户参与的情况下，Activity 所经过的生命周期的改变；而异常情况下的生命周期是指Activity 被系统回收或者由于当前设备的Confitu
-          ...
-
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2016/03/06/2016-03-06-2/" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
 
   </section>
 
@@ -1410,7 +1410,7 @@ Activity 生命周期分为两部分内容，一部分是典型情况下的生�
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">23</span>
+              <span class="site-state-item-count">24</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -1418,7 +1418,7 @@ Activity 生命周期分为两部分内容，一部分是典型情况下的生�
           
             <div class="site-state-item site-state-categories">
               <a href="/categories">
-                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-count">8</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
