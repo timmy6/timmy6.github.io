@@ -57,19 +57,17 @@
 
 
 
-<meta name="description" content="View 基本知识(1)view的层次结构: ViewGroup 也是View;
-(2)view的位置参数: top、left、right、bottom，分别对应View的左上角和右下角相对于父容器的横纵坐标值。从Android3.0开始,view增加了x、y、translationX、translationY四个参数，这几个参数也是相对于父容器的坐标。x和y是左上角的坐标，而translatio">
+<meta name="description" content="View 基本知识(1)view的层次结构: ViewGroup 也是View; (2)view的位置参数: top、left、right、bottom，分别对应View的左上角和右下角相对于父容器的横纵坐标值。从Android3.0开始,view增加了x、y、translationX、translationY四个参数，这几个参数也是相对于父容器的坐标。x和y是左上角的坐标，而translatio">
 <meta property="og:type" content="article">
 <meta property="og:title" content="View 事件体系">
 <meta property="og:url" content="http://yoursite.com/2016/04/03/view/index.html">
 <meta property="og:site_name" content="刘启明">
-<meta property="og:description" content="View 基本知识(1)view的层次结构: ViewGroup 也是View;
-(2)view的位置参数: top、left、right、bottom，分别对应View的左上角和右下角相对于父容器的横纵坐标值。从Android3.0开始,view增加了x、y、translationX、translationY四个参数，这几个参数也是相对于父容器的坐标。x和y是左上角的坐标，而translatio">
+<meta property="og:description" content="View 基本知识(1)view的层次结构: ViewGroup 也是View; (2)view的位置参数: top、left、right、bottom，分别对应View的左上角和右下角相对于父容器的横纵坐标值。从Android3.0开始,view增加了x、y、translationX、translationY四个参数，这几个参数也是相对于父容器的坐标。x和y是左上角的坐标，而translatio">
+<meta property="og:locale" content="zh-Hans">
 <meta property="og:updated_time" content="2016-04-03T16:01:40.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="View 事件体系">
-<meta name="twitter:description" content="View 基本知识(1)view的层次结构: ViewGroup 也是View;
-(2)view的位置参数: top、left、right、bottom，分别对应View的左上角和右下角相对于父容器的横纵坐标值。从Android3.0开始,view增加了x、y、translationX、translationY四个参数，这几个参数也是相对于父容器的坐标。x和y是左上角的坐标，而translatio">
+<meta name="twitter:description" content="View 基本知识(1)view的层次结构: ViewGroup 也是View; (2)view的位置参数: top、left、right、bottom，分别对应View的左上角和右下角相对于父容器的横纵坐标值。从Android3.0开始,view增加了x、y、translationX、translationY四个参数，这几个参数也是相对于父容器的坐标。x和y是左上角的坐标，而translatio">
 
 
 
@@ -289,7 +287,7 @@
 <p><strong>(4)</strong>TouchSlope是系统能识别出的可以被认为是滑动的最小距离，获取方式是ViewConfiguration.get(context).getScaledTouchSlope();</p>
 <p><strong>(5)</strong>VelocityTracker用于追踪手指在滑动过程的速度，包括水平和垂直向上的速度。<br>速度计算公式：速度 = (终点位置 - 起点位置) / 时间段 速度可能为负值，例如当手指从屏幕右边往左边滑动的时候。此外，速度是单位时间内移动的像素数，单位时间不一定是1秒钟，可以使用方法 computeCurrentVelocity()指定单位时间是多少，单位是ms。例如通过computeCurrentVelocity(1000)来获取速度，手指在1s中滑动了100个像素，那么速度是100，及100(像素/1000ms)。如果computeCurrentVelocity(100)来获取速度，在100ms内手指只是滑动了10个像素，那么速度是10，即10(像素/100ms)。<br><strong>VelocityTracker的使用方式</strong><br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//初始化</span></span><br><span class="line">VelocityTracker mVelocityTracker = VelocityTracker.obtain();</span><br><span class="line"><span class="comment">//在onTouchEvent方法中</span></span><br><span class="line">mVelocityTracker.addMovement(event);</span><br><span class="line"><span class="comment">//获取速度</span></span><br><span class="line">mVelocityTracker.computeCurrentVelocity(<span class="number">1000</span>);</span><br><span class="line"><span class="keyword">float</span> xVelocity = mVelocityTracker.getXVelocity();</span><br><span class="line"><span class="comment">//重置和回收</span></span><br><span class="line">mVelocityTracker.clear();<span class="comment">//一般在MotionEvent.ACTION_UP的时候调用</span></span><br><span class="line">mVelocityTracker.recycle();<span class="comment">//一般在onDetachedFromWindow中调用</span></span><br></pre></td></tr></table></figure></p>
 <p><strong>(6)</strong>GestureDetector 用于辅助检测用户的单击、滑动、长按、双击等行为。GestureDetector的使用比较简单，主要也是辅助检测常见的触屏时间。作者建议：如果只是监听滑动相关的事件在onTouchEvent中实现；如果要监听双击这种行为的话，那么就使用GestureDetector。</p>
-<p><strong>(7)</strong>Scroller分析：参考<a href="http://mrfu.me/2015/12/27/scroll_analyse/" target="_blank" rel="external">http://mrfu.me/2015/12/27/scroll_analyse/</a></p>
+<p><strong>(7)</strong>Scroller分析：参考<a href="http://mrfu.me/2015/12/27/scroll_analyse/" target="_blank" rel="noopener">http://mrfu.me/2015/12/27/scroll_analyse/</a></p>
 <h2 id="View的滑动"><a href="#View的滑动" class="headerlink" title="View的滑动"></a>View的滑动</h2><p><strong>(1)</strong>常见的实现view的滑动的方式有三种<br>第一种是通过view本身提供的scrollTo和scrollBy方法：操作简单，适合对view内容的滑动；</p>
 <p>第二种是通过动画给view施加平移效果来实现滑动：操作简单，适用于没有交互的view和实现复杂的动画效果；</p>
 <p>第三种是通过改变view的LayoutParams使得view重新布局从而实现滑动：操作稍微复杂，适用于有交互的view。</p>
@@ -414,7 +412,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">25</span>
+              <span class="site-state-item-count">26</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>

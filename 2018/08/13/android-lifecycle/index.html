@@ -1,0 +1,788 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.5.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.5.0" />
+
+
+
+
+
+
+<meta name="description" content="概述在过去的谷歌IO大会上，Google官方向我们推出了 Android Architecture Components,其中谈到Android组件处理生命周期的问题，向我们介绍了 Handling Lifecycles。同时，如何利用 android.arch.lifecycle 包提供的类来控制数据、监听器等的 lifecycle。同时，LiveData 与 ViewModel 的 lifec">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android官方架构组件：Lifecycle介绍及原理分析">
+<meta property="og:url" content="http://yoursite.com/2018/08/13/android-lifecycle/index.html">
+<meta property="og:site_name" content="刘启明">
+<meta property="og:description" content="概述在过去的谷歌IO大会上，Google官方向我们推出了 Android Architecture Components,其中谈到Android组件处理生命周期的问题，向我们介绍了 Handling Lifecycles。同时，如何利用 android.arch.lifecycle 包提供的类来控制数据、监听器等的 lifecycle。同时，LiveData 与 ViewModel 的 lifec">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://yoursite.com/uploads/7293029-e8b3a15d2ed0a6ee.png">
+<meta property="og:image" content="http://yoursite.com/uploads/7293029-a125ace9440970e6.png">
+<meta property="og:updated_time" content="2018-08-13T09:45:17.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Android官方架构组件：Lifecycle介绍及原理分析">
+<meta name="twitter:description" content="概述在过去的谷歌IO大会上，Google官方向我们推出了 Android Architecture Components,其中谈到Android组件处理生命周期的问题，向我们介绍了 Handling Lifecycles。同时，如何利用 android.arch.lifecycle 包提供的类来控制数据、监听器等的 lifecycle。同时，LiveData 与 ViewModel 的 lifec">
+<meta name="twitter:image" content="http://yoursite.com/uploads/7293029-e8b3a15d2ed0a6ee.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"hide"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: '博主'
+    }
+  };
+</script>
+
+  <title> Android官方架构组件：Lifecycle介绍及原理分析 | 刘启明 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">刘启明</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu ">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-th fa-fw"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            时间轴
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-user fa-fw"></i> <br />
+            
+            留言板
+          </a>
+        </li>
+      
+
+      
+      
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Android官方架构组件：Lifecycle介绍及原理分析
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2018-08-13T16:25:46+08:00" content="2018-08-13">
+              2018-08-13
+            </time>
+          </span>
+	
+          <span id="busuanzi_container_page_pv">  |  阅读量 <span id="busuanzi_value_page_pv"></span> 次</span>
+        
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Android-进阶/" itemprop="url" rel="index">
+                    <span itemprop="name">Android 进阶</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2018/08/13/android-lifecycle/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2018/08/13/android-lifecycle/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h4 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h4><p>在过去的谷歌IO大会上，Google官方向我们推出了 <strong><a href="https://developer.android.com/topic/libraries/architecture/index.html" target="_blank" rel="noopener">Android Architecture Components</a></strong>,其中谈到Android组件处理生命周期的问题，向我们介绍了 <strong><a href="https://developer.android.com/topic/libraries/architecture/lifecycle.html" target="_blank" rel="noopener">Handling Lifecycles</a></strong>。同时，如何利用 <code>android.arch.lifecycle</code> 包提供的类来控制数据、监听器等的 lifecycle。同时，LiveData 与 ViewModel 的 lifecycle 也依赖于<code>Lifecycle</code>框架。不久前， Android Architecture Components 正式Release，<code>Lifecycle</code>也正式植入进了<code>SupportActivity（AppCompatActivity的基类）</code>和<code>Fragment</code>中。</p>
+<h4 id="Lifecycle简介及基础使用"><a href="#Lifecycle简介及基础使用" class="headerlink" title="Lifecycle简介及基础使用"></a>Lifecycle简介及基础使用</h4><h5 id="为什么要引进Lifecycle？"><a href="#为什么要引进Lifecycle？" class="headerlink" title="为什么要引进Lifecycle？"></a>为什么要引进Lifecycle？</h5><p>我们在处理Activity或者Fragment组件的生命周期相关时，不可避免会遇到这样的问题：我们在<strong>Activity</strong>的<code>onCreate()</code>中初始化某些成员（比如MVP架构中的Presenter，或者AudioManager、MediaPlayer等），然后在onStop中对这些成员进行对应处理，在onDestroy中释放这些资源，这样导致我们的代码也许会像这样：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyPresenter</span></span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">MyPresenter</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">create</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">//do something</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">destroy</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">//do something</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyActivity</span> <span class="keyword">extends</span> <span class="title">AppCompatActivity</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> MyPresenter presenter;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(...)</span> </span>&#123;</span><br><span class="line">        presenter= <span class="keyword">new</span> MyPresenter ();</span><br><span class="line">        presenter.create();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onDestroy</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.onDestroy();</span><br><span class="line">        presenter.destory();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>代码没有问题，关键问题是，实际生产环境中 ，这样的代码会非常复杂，你最终会有太多的类似调用并且会导致<code>onCreate()</code> 和<code>onDestroy()</code>方法变的非常臃肿。</p>
+<h5 id="如何集成LifeCycle"><a href="#如何集成LifeCycle" class="headerlink" title="如何集成LifeCycle"></a>如何集成LifeCycle</h5><h6 id="1-Prestener继承LifecycleObserver接口"><a href="#1-Prestener继承LifecycleObserver接口" class="headerlink" title="1.Prestener继承LifecycleObserver接口"></a>1.Prestener继承LifecycleObserver接口</h6><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">IPresenter</span> <span class="keyword">extends</span> <span class="title">LifecycleObserver</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@OnLifecycleEvent</span>(Lifecycle.Event.ON_CREATE)</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(@NotNull LifecycleOwner owner)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@OnLifecycleEvent</span>(Lifecycle.Event.ON_DESTROY)</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">onDestroy</span><span class="params">(@NotNull LifecycleOwner owner)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@OnLifecycleEvent</span>(Lifecycle.Event.ON_ANY)</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">onLifecycleChanged</span><span class="params">(@NotNull LifecycleOwner owner,</span></span></span><br><span class="line"><span class="function"><span class="params">                            @NotNull Lifecycle.Event event)</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">BasePresenter</span> <span class="keyword">implements</span> <span class="title">IPresenter</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String TAG = <span class="string">"BasePresenter"</span>;    </span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onLifecycleChanged</span><span class="params">(@NotNull LifecycleOwner owner, @NotNull Lifecycle.Event event)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(@NotNull LifecycleOwner owner)</span> </span>&#123;</span><br><span class="line">        Log.d(<span class="string">"tag"</span>, <span class="string">"BasePresenter.onCreate"</span> + <span class="keyword">this</span>.getClass().toString());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onDestroy</span><span class="params">(@NotNull LifecycleOwner owner)</span> </span>&#123;</span><br><span class="line">        Log.d(<span class="string">"tag"</span>, <span class="string">"BasePresenter.onDestroy"</span> + <span class="keyword">this</span>.getClass().toString());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里我直接将我想要观察到<code>Presenter</code>的生命周期事件都列了出来，然后封装到<code>BasePresenter</code>中，这样每一个<code>BasePresenter</code> 的子类都能感知到Activity容器对应的生命周期事件，并在子类重写的方法中，对应相应行为。</p>
+<h6 id="2-在Activity-Fragment容器中添加Observer"><a href="#2-在Activity-Fragment容器中添加Observer" class="headerlink" title="2.在Activity/Fragment容器中添加Observer"></a>2.在Activity/Fragment容器中添加Observer</h6><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MainActivity</span> <span class="keyword">extends</span> <span class="title">AppCompatActivity</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> IPresenter mPresenter;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.onCreate(savedInstanceState);</span><br><span class="line">        Log.d(<span class="string">"tag"</span>, <span class="string">"onCreate"</span> + <span class="keyword">this</span>.getClass().toString());</span><br><span class="line">        setContentView(R.layout.activity_main);</span><br><span class="line">        mPresenter = <span class="keyword">new</span> MainPresenter(<span class="keyword">this</span>);</span><br><span class="line">        getLifecycle().addObserver(mPresenter);<span class="comment">//添加LifecycleObserver</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onDestroy</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        Log.d(<span class="string">"tag"</span>, <span class="string">"onDestroy"</span> + <span class="keyword">this</span>.getClass().toString());</span><br><span class="line">        <span class="keyword">super</span>.onDestroy();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如此，每当Activity发生了对应生命周期改变，Presenter就会执行对应事件注解的方法，只要通过注解进行声明，就能够使LifecycleObserver观察到对应的生命周期事件。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">enum</span> Event &#123;</span><br><span class="line">        <span class="comment">/**</span></span><br><span class="line"><span class="comment">         * Constant for onCreate event of the &#123;<span class="doctag">@link</span> LifecycleOwner&#125;.</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        ON_CREATE,</span><br><span class="line">        <span class="comment">/**</span></span><br><span class="line"><span class="comment">         * Constant for onStart event of the &#123;<span class="doctag">@link</span> LifecycleOwner&#125;.</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        ON_START,</span><br><span class="line">        <span class="comment">/**</span></span><br><span class="line"><span class="comment">         * Constant for onResume event of the &#123;<span class="doctag">@link</span> LifecycleOwner&#125;.</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        ON_RESUME,</span><br><span class="line">        <span class="comment">/**</span></span><br><span class="line"><span class="comment">         * Constant for onPause event of the &#123;<span class="doctag">@link</span> LifecycleOwner&#125;.</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        ON_PAUSE,</span><br><span class="line">        <span class="comment">/**</span></span><br><span class="line"><span class="comment">         * Constant for onStop event of the &#123;<span class="doctag">@link</span> LifecycleOwner&#125;.</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        ON_STOP,</span><br><span class="line">        <span class="comment">/**</span></span><br><span class="line"><span class="comment">         * Constant for onDestroy event of the &#123;<span class="doctag">@link</span> LifecycleOwner&#125;.</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        ON_DESTROY,</span><br><span class="line">        <span class="comment">/**</span></span><br><span class="line"><span class="comment">         * An &#123;<span class="doctag">@link</span> Event Event&#125; constant that can be used to match all events.</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        ON_ANY</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<h4 id="原理分析："><a href="#原理分析：" class="headerlink" title="原理分析："></a>原理分析：</h4><p>借鉴Android架构组件(一)————Lifecycle的一张图进行简单的概括：<br><img src="/uploads/7293029-e8b3a15d2ed0a6ee.png" alt="shortcuts"></p>
+<p>我们先将这些重要的类挑选出来：</p>
+<ul>
+<li><p><strong>LifecycleObserver接口（Lifecycle观察者</strong>：实现该接口的类，通过注解的方式，可以通过被<code>LifecycleOwner</code>类的AddObserver（LifecycleObserver o）方法注册，被注册后，LifeCycleObserver便可以观察到LifecycleOwner生命周期事件。</p>
+</li>
+<li><p><strong>LifecycleOwner接口(Lifecycle持有者)</strong>：实现该类接口的类持有生命周期（Lifecycle对象），该接口的生命周期(Lifecycle对象)的改变会被其他注册的观察者<strong>LifecycleObserver</strong>观察到并触发其对应的事件</p>
+</li>
+<li><p>Lifecycle(生命周期)：和<strong>LifecycleOwner</strong>不同的是，<strong>LifecycleOwner</strong>本身持有<code>Lifecycle</code>对象，<strong>LifecycleOwner</strong>通过其<code>Lifecycle getLifecycle()</code>的接口获取背部<code>Lifecycle</code>对象。</p>
+</li>
+<li><p><strong>State(当前生命周期所处状态)</strong>：如图所示。</p>
+</li>
+<li><strong>Event(生命周期改变对应的事件)</strong>：如图所示，当<code>Lifecycle</code>发生改变，如进入<code>onCreate</code>，会自动发出<code>ON_CREATE</code>事件.</li>
+</ul>
+<p>了解了这些类和接口的职责，接下来原理分析就简单很多了，我们以<code>Fragment</code>为例，来看下实际<code>Fragment</code>等类和上述类或接口的联系：</p>
+<h5 id="Fragment：LifecycleOwner"><a href="#Fragment：LifecycleOwner" class="headerlink" title="Fragment：LifecycleOwner"></a>Fragment：LifecycleOwner</h5><ul>
+<li>Fragment(Activity同理，我们 本文以Fragment为例，下同)：实现了<strong>LifecycleOwner</strong>接口，这意味着Fragment对象持有生命周期对象（Lifecycle），并可以通过<strong>Lifecycle getLifecycle()</strong>方法获取内部的Lifecycle对象：<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Fragment</span> <span class="keyword">implements</span> <span class="title">xxx</span>, <span class="title">LifecycleOwner</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//...省略其他</span></span><br><span class="line"></span><br><span class="line">   LifecycleRegistry mLifecycleRegistry = <span class="keyword">new</span> LifecycleRegistry(<span class="keyword">this</span>);</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Lifecycle <span class="title">getLifecycle</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> mLifecycleRegistry;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">LifecycleOwner</span> </span>&#123;</span><br><span class="line">    <span class="meta">@NonNull</span></span><br><span class="line">    <span class="function">Lifecycle <span class="title">getLifecycle</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>可以看到，实现的<code>getLifecycle()</code>方法，实际上返回的是<strong>LifecycleRegistry</strong>对象，<strong>LifecycleRegistry</strong>对象实际上继承了 <code>Lifecycle</code>。持有<code>Lifecycle</code>有什么作用呢？实际上在Fragment对应的生命周期内，都会发送对应的生命周期事件给内部的<strong>LifecycleRegistry</strong>对象处理：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Fragment</span> <span class="keyword">implements</span> <span class="title">xxx</span>, <span class="title">LifecycleOwner</span> </span>&#123;</span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">performCreate</span><span class="params">(Bundle savedInstanceState)</span> </span>&#123;</span><br><span class="line">        onCreate(savedInstanceState);  <span class="comment">//1.先执行生命周期方法</span></span><br><span class="line">        <span class="comment">//...省略代码</span></span><br><span class="line">        <span class="comment">//2.生命周期事件分发</span></span><br><span class="line">        mLifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_CREATE);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">performStart</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        onStart();</span><br><span class="line">        <span class="comment">//...</span></span><br><span class="line">        mLifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_START);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">performResume</span><span class="params">()</span> </span>&#123;</span><br><span class="line">         onResume();</span><br><span class="line">        <span class="comment">//...</span></span><br><span class="line">        mLifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_RESUME);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">performPause</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">//3.注意，调用顺序变了</span></span><br><span class="line">        mLifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_PAUSE);</span><br><span class="line">        <span class="comment">//...</span></span><br><span class="line">        onPause();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">performStop</span><span class="params">()</span> </span>&#123;</span><br><span class="line">       mLifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_STOP);</span><br><span class="line">        <span class="comment">//...</span></span><br><span class="line">        onStop();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">performDestroy</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        mLifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY);</span><br><span class="line">        <span class="comment">//...</span></span><br><span class="line">        onDestroy();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>随着<code>Fragment</code>不同走到不同的生命周期，除了暴露给我们的生命周期方法<code>onCreate/onStart/…./onDestroy</code>等，同时，Fragment内部的<code>Lifecycle</code>对象（就是<code>mLifecycleRegistry</code>）还将生命周期对应的事件作为参数传给了 <code>handleLifecycleEvent()</code> 方法。<br><strong> 同时，你会发现<code>Fragment</code>中<code>performCreate()</code>、<code>performStart()</code>、<code>performResume()</code>会先调用自身的<code>onXXX()</code>方法，然后再调用<code>LifecycleRegistry</code>的<code>handleLifecycleEvent()</code>方法；而在<code>performPause()</code>、<code>performStop()</code>、<code>performDestroy()</code>中会先<code>LifecycleRegistry</code>的<code>handleLifecycleEvent()</code>方法 ，然后调用自身的<code>onXXX()</code>方法。</strong></p>
+<p>参考Android架构组件(一)——Lifecycle，文中的时序图：<br><img src="/uploads/7293029-a125ace9440970e6.png" alt="shortcuts"><br>我们从图中可以看到，当<code>Fragment</code>将生命周期对应的事件交给其内部的<code>Lifecycle</code>处理后， <code>LifecycleObserver</code>（就是我们上文自定义的Presenter），就能够接收到对应的生命周期事件，这是如何实现的呢？</p>
+<h5 id="LifecycleRegistry：Lifecycle"><a href="#LifecycleRegistry：Lifecycle" class="headerlink" title="LifecycleRegistry：Lifecycle"></a>LifecycleRegistry：Lifecycle</h5><p>首先确认一点，<code>LifecycleRegistry</code> 就是<code>Lifecycle</code>的子类：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">LifecycleRegistry</span> <span class="keyword">extends</span> <span class="title">Lifecycle</span> </span>&#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>我们再看一下Lifecycle类：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">Lifecycle</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//注册LifecycleObserver （比如Presenter）</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">addObserver</span><span class="params">(@NonNull LifecycleObserver observer)</span></span>;</span><br><span class="line">        <span class="comment">//移除LifecycleObserver </span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">removeObserver</span><span class="params">(@NonNull LifecycleObserver observer)</span></span>;</span><br><span class="line">        <span class="comment">//获取当前状态</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> State <span class="title">getCurrentState</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">enum</span> Event &#123;</span><br><span class="line">            ON_CREATE,</span><br><span class="line">            ON_START,</span><br><span class="line">            ON_RESUME,</span><br><span class="line">            ON_PAUSE,</span><br><span class="line">            ON_STOP,</span><br><span class="line">            ON_DESTROY,</span><br><span class="line">            ON_ANY</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">       <span class="keyword">public</span> <span class="keyword">enum</span> State &#123;</span><br><span class="line">            DESTROYED,</span><br><span class="line">            INITIALIZED,</span><br><span class="line">            CREATED,</span><br><span class="line">            STARTED,</span><br><span class="line">            RESUMED;</span><br><span class="line"></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isAtLeast</span><span class="params">(@NonNull State state)</span> </span>&#123;</span><br><span class="line">                <span class="keyword">return</span> compareTo(state) &gt;= <span class="number">0</span>;</span><br><span class="line">            &#125;</span><br><span class="line">       &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><code>Lifecycle</code>没什么要讲的，几个抽象方法也能看懂，作为<code>Lifecycle</code>的子类，<code>LifecycleRegistry</code> 同样也能通过addObserver方法注册<code>LifecycleObserver</code> （就是Presenter），当<code>LifecycleRegistry</code>本身的生命周期改变后（可以想象，内部一定有一个成员变量State记录当前的生命周期），<code>LifecycleRegistry</code>就会逐个通知每一个注册的<code>LifecycleObserver</code> ，并执行对应生命周期的方法。<br>我们看一下<code>LifecycleRegistry</code> 的<code>handleLifecycleEvent()</code>方法：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">handleLifecycleEvent</span><span class="params">(@NonNull Lifecycle.Event event)</span> </span>&#123;</span><br><span class="line">        State next = getStateAfter(event);</span><br><span class="line">        moveToState(next);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<p>看方法的名字我们就可以知道，<code>handleLifecycleEvent</code>方法会通过 <code>getStateAfter</code>获取当前应处的状态并修改<code>Lifecycle本身的State</code>值，紧接着遍历所<code>LifecycleObserver</code> 并同步且通知其状态发生变化，因此就能触发LifecycleObserver 对应的生命周期事件。</p>
+<h5 id="尝试复用LifecycleRegistry"><a href="#尝试复用LifecycleRegistry" class="headerlink" title="尝试复用LifecycleRegistry"></a>尝试复用LifecycleRegistry</h5><p>首先，<code>LifecycleRegistry</code> 本身就是一个成熟的 <code>Lifecycle</code> 实现类，它被实例化在<code>Activity</code>和<code>Fragment</code>中使用，如果我们需要自定义<code>LifecycleOwner</code>并实现接口需要返回一个Lifecycle实例，完全可以直接在自定义<code>LifecycleOwner</code>中new一个<code>LifecycleRegistry</code>成员并返回它（简而言之就是：直接拿来用即可）。</p>
+<p>以下是Google官方文档：</p>
+<blockquote>
+<p>LifecycleRegistry: An implementation of Lifecycle that can handle multiple observers. It is used by Fragments and Support Library Activities. You can also directly use it if you have a custom LifecycleOwner.</p>
+</blockquote>
+<h5 id="注解和DefaultLifecycleObserver的取舍"><a href="#注解和DefaultLifecycleObserver的取舍" class="headerlink" title="注解和DefaultLifecycleObserver的取舍"></a>注解和DefaultLifecycleObserver的取舍</h5><p>其次，Google的<code>Lifecycle</code>库中提供了一个 <code>DefaultLifecycleObserver</code>类,方便我们直接实现<code>LifecycleObserver</code>接口，相比较于文中demo所使用的注解方式，Google官方更推荐我们使用 <code>DefaultLifecycleObserver</code> 类，并声明</p>
+<blockquote>
+<p>一旦Java 8成为Android的主流，注释将被弃用，所以介于DefaultLifecycleObserver和注解两者之间,更推荐使用 DefaultLifecycleObserver 。<br>官方原文：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * If you use &lt;b&gt;Java 8 Language&lt;/b&gt;, then observe events with &#123;@link DefaultLifecycleObserver&#125;.</span></span><br><span class="line"><span class="comment"> * To include it you should add &#123;@code "android.arch.lifecycle:common-java8:&lt;version&gt;"&#125; to your</span></span><br><span class="line"><span class="comment"> * build.gradle file.</span></span><br><span class="line"><span class="comment"> * &lt;pre&gt;</span></span><br><span class="line"><span class="comment"> * class TestObserver implements DefaultLifecycleObserver &#123;</span></span><br><span class="line"><span class="comment"> *     &#123;@literal @&#125;Override</span></span><br><span class="line"><span class="comment"> *     public void onCreate(LifecycleOwner owner) &#123;</span></span><br><span class="line"><span class="comment"> *         // your code</span></span><br><span class="line"><span class="comment"> *     &#125;</span></span><br><span class="line"><span class="comment"> * &#125;</span></span><br><span class="line"><span class="comment"> * &lt;/pre&gt;</span></span><br><span class="line"><span class="comment"> * If you use &lt;b&gt;Java 7 Language&lt;/b&gt;, Lifecycle events are observed using annotations.</span></span><br><span class="line"><span class="comment"> * Once Java 8 Language becomes mainstream on Android, annotations will be deprecated, so between</span></span><br><span class="line"><span class="comment"> * &#123;@link DefaultLifecycleObserver&#125; and annotations,</span></span><br><span class="line"><span class="comment"> * you must always prefer &#123;@code DefaultLifecycleObserver&#125;.</span></span><br><span class="line"><span class="comment"> */</span></span><br></pre></td></tr></table></figure></p>
+</blockquote>
+<h5 id="Lifecycles-的最佳实践"><a href="#Lifecycles-的最佳实践" class="headerlink" title="Lifecycles 的最佳实践"></a>Lifecycles 的最佳实践</h5><ul>
+<li>保持 UI 控制器（Activity 和 Fragment）尽可能的精简。它们不应该试图去获取它们所需的数据；相反，要用 ViewModel来获取，并且观察 LiveData将数据变化反映到视图中。</li>
+<li>尝试编写数据驱动（data-driven）的 UI，即 UI 控制器的责任是在数据改变时更新视图或者将用户的操作通知给 ViewModel。</li>
+<li>将数据逻辑放到 ViewModel 类中。ViewModel 应该作为 UI 控制器和应用程序其它部分的连接服务。注意：不是由 ViewModel 负责获取数据（例如：从网络获取）。相反，ViewModel 调用相应的组件获取数据，然后将数据获取结果提供给 UI 控制器。</li>
+<li>使用Data Binding来保持视图和 UI 控制器之间的接口干净。这样可以让视图更具声明性，并且尽可能减少在 Activity 和 Fragment 中编写更新代码。如果你喜欢在 Java 中执行该操作，请使用像Butter Knife 这样的库来避免使用样板代码并进行更好的抽象化。</li>
+<li>如果 UI 很复杂，可以考虑创建一个 Presenter 类来处理 UI 的修改。虽然通常这样做不是必要的，但可能会让 UI 更容易测试。</li>
+<li>不要在 ViewModel 中引用View或者 Activity的 context。因为如果ViewModel存活的比 Activity 时间长（在配置更改的情况下），Activity 将会被泄漏并且无法被正确的回收。</li>
+</ul>
+<h4 id="总结："><a href="#总结：" class="headerlink" title="总结："></a>总结：</h4><p>总而言之，Lifecycle还是有可取之处的，相对于其它架构组件之间的配合，Lifecycle更简单且独立（实际上配合其他组件味道更佳）。</p>
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/02/21/hello-world/" rel="next" title="Hello World">
+                <i class="fa fa-chevron-left"></i> Hello World
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/uploads/avatar.png"
+               alt="刘启明" />
+          <p class="site-author-name" itemprop="name">刘启明</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">26</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+          
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://www.github.com/timmy6" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> github
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.cnblogs.com/lomomiao/" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> 博客旧址(博客园)
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.weibo.com/u/3917867123" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> 新浪微博
+                  
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator">
+            <i class="fa fa-angle-double-up"></i>
+          </div>
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#概述"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Lifecycle简介及基础使用"><span class="nav-number">2.</span> <span class="nav-text">Lifecycle简介及基础使用</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#为什么要引进Lifecycle？"><span class="nav-number">2.1.</span> <span class="nav-text">为什么要引进Lifecycle？</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#如何集成LifeCycle"><span class="nav-number">2.2.</span> <span class="nav-text">如何集成LifeCycle</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#1-Prestener继承LifecycleObserver接口"><span class="nav-number">2.2.1.</span> <span class="nav-text">1.Prestener继承LifecycleObserver接口</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#2-在Activity-Fragment容器中添加Observer"><span class="nav-number">2.2.2.</span> <span class="nav-text">2.在Activity/Fragment容器中添加Observer</span></a></li></ol></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#原理分析："><span class="nav-number">3.</span> <span class="nav-text">原理分析：</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#Fragment：LifecycleOwner"><span class="nav-number">3.1.</span> <span class="nav-text">Fragment：LifecycleOwner</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#LifecycleRegistry：Lifecycle"><span class="nav-number">3.2.</span> <span class="nav-text">LifecycleRegistry：Lifecycle</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#尝试复用LifecycleRegistry"><span class="nav-number">3.3.</span> <span class="nav-text">尝试复用LifecycleRegistry</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#注解和DefaultLifecycleObserver的取舍"><span class="nav-number">3.4.</span> <span class="nav-text">注解和DefaultLifecycleObserver的取舍</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Lifecycles-的最佳实践"><span class="nav-number">3.5.</span> <span class="nav-text">Lifecycles 的最佳实践</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#总结："><span class="nav-number">4.</span> <span class="nav-text">总结：</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator">
+            <i class="fa fa-angle-double-down"></i>
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">刘启明</span>
+</div>
+
+
+
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<span id="busuanzi_container_site_pv">
+    本站总访问量<span id="busuanzi_value_site_pv"></span>次
+</span>
+
+<script>
+var birthDay = new Date("11/20/2014");
+var now = new Date();
+var duration = now.getTime() - birthDay.getTime();
+var total= Math.floor(duration / (1000 * 60 * 60 * 24));
+document.getElementById("showDays").innerHTML = "本站已运行 "+total+" 天";
+</script>
+<span id="showDays"></span>
+      </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  
+
+
+  
+
+
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=0.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=0.5.0"></script>
+
+
+
+  
+  
+
+  
+  
+<script type="text/javascript" src="/js/src/scrollspy.js?v=0.5.0"></script>
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 1 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = NexT.utils.escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    NexT.motion.middleWares.sidebar = function () {
+      var $tocContent = $('.post-toc-content');
+
+      if (CONFIG.scheme !== 'Pisces' && (CONFIG.sidebar.display === 'post' || CONFIG.sidebar.display === 'always')) {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          NexT.utils.displaySidebar();
+        }
+      }
+    };
+  });
+</script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=0.5.0"></script>
+
+
+
+  
+
+
+
+  
+
+    <script type="text/javascript">
+      var disqus_shortname = 'liuqiming';
+      var disqus_identifier = '2018/08/13/android-lifecycle/';
+      var disqus_title = 'Android官方架构组件：Lifecycle介绍及原理分析';
+      var disqus_url = 'http://yoursite.com/2018/08/13/android-lifecycle/';
+
+      function run_disqus_script(disqus_script){
+        var dsq = document.createElement('script');
+        dsq.type = 'text/javascript';
+        dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      }
+
+      run_disqus_script('count.js');
+      
+        run_disqus_script('embed.js');
+      
+    </script>
+  
+
+
+
+  
+  
+
+  
+  
+
+
+</body>
+</html>

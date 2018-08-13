@@ -57,24 +57,13 @@
 
 
 
-<meta name="description" content="Glide 和 Picasso 可以说是目前 Android 上最流行的图片加载库了。大部分安卓应用开发人员都有使用过这两个库在他们的开发工作中。这两个库也都确实提供了大量图片加载的功能，而且也都经过了很多应用的检验，是可靠可信的。表面看上去似乎两者工作原理很相似，但是实际上是有着很大差别的，主要体现在下面几个方面：
-
-下载图片的方式
-图片的缓存机制
-加载到内存的机制
-
-本文主要会围绕这几个方面来">
+<meta name="description" content="Glide 和 Picasso 可以说是目前 Android 上最流行的图片加载库了。大部分安卓应用开发人员都有使用过这两个库在他们的开发工作中。这两个库也都确实提供了大量图片加载的功能，而且也都经过了很多应用的检验，是可靠可信的。表面看上去似乎两者工作原理很相似，但是实际上是有着很大差别的，主要体现在下面几个方面：  下载图片的方式 图片的缓存机制 加载到内存的机制  本文主要会围绕这几个方面来">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Glide 和 Picasso 对比.">
 <meta property="og:url" content="http://yoursite.com/2017/05/29/glide-picasso/index.html">
 <meta property="og:site_name" content="刘启明">
-<meta property="og:description" content="Glide 和 Picasso 可以说是目前 Android 上最流行的图片加载库了。大部分安卓应用开发人员都有使用过这两个库在他们的开发工作中。这两个库也都确实提供了大量图片加载的功能，而且也都经过了很多应用的检验，是可靠可信的。表面看上去似乎两者工作原理很相似，但是实际上是有着很大差别的，主要体现在下面几个方面：
-
-下载图片的方式
-图片的缓存机制
-加载到内存的机制
-
-本文主要会围绕这几个方面来">
+<meta property="og:description" content="Glide 和 Picasso 可以说是目前 Android 上最流行的图片加载库了。大部分安卓应用开发人员都有使用过这两个库在他们的开发工作中。这两个库也都确实提供了大量图片加载的功能，而且也都经过了很多应用的检验，是可靠可信的。表面看上去似乎两者工作原理很相似，但是实际上是有着很大差别的，主要体现在下面几个方面：  下载图片的方式 图片的缓存机制 加载到内存的机制  本文主要会围绕这几个方面来">
+<meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://yoursite.com/uploads/glide1.png">
 <meta property="og:image" content="http://yoursite.com/uploads/glide2.png">
 <meta property="og:image" content="http://yoursite.com/uploads/glide3.png">
@@ -84,13 +73,8 @@
 <meta property="og:updated_time" content="2017-12-02T06:41:24.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Glide 和 Picasso 对比.">
-<meta name="twitter:description" content="Glide 和 Picasso 可以说是目前 Android 上最流行的图片加载库了。大部分安卓应用开发人员都有使用过这两个库在他们的开发工作中。这两个库也都确实提供了大量图片加载的功能，而且也都经过了很多应用的检验，是可靠可信的。表面看上去似乎两者工作原理很相似，但是实际上是有着很大差别的，主要体现在下面几个方面：
-
-下载图片的方式
-图片的缓存机制
-加载到内存的机制
-
-本文主要会围绕这几个方面来">
+<meta name="twitter:description" content="Glide 和 Picasso 可以说是目前 Android 上最流行的图片加载库了。大部分安卓应用开发人员都有使用过这两个库在他们的开发工作中。这两个库也都确实提供了大量图片加载的功能，而且也都经过了很多应用的检验，是可靠可信的。表面看上去似乎两者工作原理很相似，但是实际上是有着很大差别的，主要体现在下面几个方面：  下载图片的方式 图片的缓存机制 加载到内存的机制  本文主要会围绕这几个方面来">
+<meta name="twitter:image" content="http://yoursite.com/uploads/glide1.png">
 
 
 
@@ -328,7 +312,7 @@
 <p>从这点来看，似乎 Glide 的这种设计很有问题了？当然不是，这种做法也会带来一定的好处，在下面的memory中就会展示。</p>
 <h3 id="内存使用"><a href="#内存使用" class="headerlink" title="内存使用"></a>内存使用</h3><p>Glide 默认是用的 RGB_555 的设定，PIcasso 则是用的 ARGB _8888的设定。为了公平起见，我这里修改了 GlideModule，让 Glide 也使用 ARGB _8888的格式，做法也很简单，新建一个类然后继承 GlideModule</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;meta-data android:name=<span class="string">"example.com.myanimation.GlideConfiguration"</span> android:value=<span class="string">"GlideModule"</span>/&gt;</span><br></pre></td></tr></table></figure>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">GlideConfiguration</span> <span class="keyword">implements</span> <span class="title">GlideModule</span> </span>&#123;</span><br><span class="line">    <span class="annotation">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">applyOptions</span><span class="params">(Context context, GlideBuilder builder)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// Apply options to the builder here.</span></span><br><span class="line">        builder.setDecodeFormat(DecodeFormat.PREFER_ARGB_8888);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="annotation">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">registerComponents</span><span class="params">(Context context, Glide glide)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// register ModelLoaders here.</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">GlideConfiguration</span> <span class="keyword">implements</span> <span class="title">GlideModule</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">applyOptions</span><span class="params">(Context context, GlideBuilder builder)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// Apply options to the builder here.</span></span><br><span class="line">        builder.setDecodeFormat(DecodeFormat.PREFER_ARGB_8888);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">registerComponents</span><span class="params">(Context context, Glide glide)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// register ModelLoaders here.</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h4 id="下面是两者加载的对比"><a href="#下面是两者加载的对比" class="headerlink" title="下面是两者加载的对比:"></a>下面是两者加载的对比:</h4><p><img src="/uploads/glide4.png" alt="glide"></p>
 <h3 id="加载图片的时间"><a href="#加载图片的时间" class="headerlink" title="加载图片的时间"></a>加载图片的时间</h3><p>这里先说明下，当尝试加载一个图片的时候，两个库都会采用先从缓存中读取，如果缓存中没有，再去下载的做法。<br>实际试验中，Picasso 会比 Glide 快一点。猜测可能的原因还是因为之前讲到的缓存机制导致，因为Picasso 是直接把图加载到内存中，而 Glide 则需要改变图片大小再加载到内存中去。这个应该是会耗费一定的时间。</p>
 <p><img src="/uploads/glide5.gif" alt="glide"></p>
@@ -437,7 +421,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">25</span>
+              <span class="site-state-item-count">26</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
