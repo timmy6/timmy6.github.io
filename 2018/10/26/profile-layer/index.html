@@ -57,28 +57,22 @@
 
 
 
-<meta name="description" content="今天心血来潮想看某个电视剧，在家打开打开某视频网站，是这样的：我的内心是这样的：高贵的程序员怎么能被小小的VIP拦住自己前进的脚步！所以，今天就向大家推荐一个chrome超时空宇宙霹雳无敌轰天响地的插件 —— Tampermonkey。 Tampermonkey是什么 不装扩展（Extensions)的chrome只能发挥它40%的能力。  Tampermonkey是chrome的一个扩展程序，是">
+<meta name="description" content="iOS7带来的一个比较大的变化是圆形图像的使用比方形图像更频繁。在系统默认的应用，比如通讯录和电话中都能找到圆形图像。在这个文章中，我们一起来研究一下如何使用CALayer类来创建圆形或者圆角的图像。 可能你之前并没有听过CALayer类。但是在你构建你的应用的时候肯定用到了它。UIKit里面的每一种view(例如：UIView, UIImageView)都是建立在CALayer的实例基础上的(l">
 <meta property="og:type" content="article">
-<meta property="og:title" content="教你利用Tampermonkey，免VIP观看各大视频网站VIP视频">
-<meta property="og:url" content="http://yoursite.com/2018/08/31/tampermonkey-md/index.html">
+<meta property="og:title" content="如何生成圆形和圆角的图像">
+<meta property="og:url" content="http://yoursite.com/2018/10/26/profile-layer/index.html">
 <meta property="og:site_name" content="刘启明">
-<meta property="og:description" content="今天心血来潮想看某个电视剧，在家打开打开某视频网站，是这样的：我的内心是这样的：高贵的程序员怎么能被小小的VIP拦住自己前进的脚步！所以，今天就向大家推荐一个chrome超时空宇宙霹雳无敌轰天响地的插件 —— Tampermonkey。 Tampermonkey是什么 不装扩展（Extensions)的chrome只能发挥它40%的能力。  Tampermonkey是chrome的一个扩展程序，是">
+<meta property="og:description" content="iOS7带来的一个比较大的变化是圆形图像的使用比方形图像更频繁。在系统默认的应用，比如通讯录和电话中都能找到圆形图像。在这个文章中，我们一起来研究一下如何使用CALayer类来创建圆形或者圆角的图像。 可能你之前并没有听过CALayer类。但是在你构建你的应用的时候肯定用到了它。UIKit里面的每一种view(例如：UIView, UIImageView)都是建立在CALayer的实例基础上的(l">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="http://yoursite.com/uploads/tampermonkey1.png">
-<meta property="og:image" content="http://yoursite.com/uploads/tampermonkey2.jpg">
-<meta property="og:image" content="http://yoursite.com/uploads/tampermonkey3.jpeg">
-<meta property="og:image" content="http://yoursite.com/uploads/tampermonkey4.jpeg">
-<meta property="og:image" content="http://yoursite.com/uploads/tampermonkey5.png">
-<meta property="og:image" content="http://yoursite.com/uploads/tampermonkey6.jpeg">
-<meta property="og:image" content="http://yoursite.com/uploads/tampermonkey7.jpeg">
-<meta property="og:image" content="http://yoursite.com/uploads/tampermonkey8.jpeg">
-<meta property="og:image" content="http://yoursite.com/uploads/tampermonkey9.jpg">
-<meta property="og:image" content="http://yoursite.com/uploads/tampermonkey10.png">
-<meta property="og:updated_time" content="2018-08-31T14:49:42.000Z">
+<meta property="og:image" content="http://www.appcoda.com/wp-content/uploads/2014/04/circular-image-featured.jpg">
+<meta property="og:image" content="http://www.appcoda.com/wp-content/uploads/2014/04/square-image-profile.jpg">
+<meta property="og:image" content="http://www.appcoda.com/wp-content/uploads/2014/04/circular-image-profile.jpg">
+<meta property="og:image" content="http://www.appcoda.com/wp-content/uploads/2014/04/square-corner-image-profile.jpg">
+<meta property="og:updated_time" content="2018-10-26T14:08:59.383Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="教你利用Tampermonkey，免VIP观看各大视频网站VIP视频">
-<meta name="twitter:description" content="今天心血来潮想看某个电视剧，在家打开打开某视频网站，是这样的：我的内心是这样的：高贵的程序员怎么能被小小的VIP拦住自己前进的脚步！所以，今天就向大家推荐一个chrome超时空宇宙霹雳无敌轰天响地的插件 —— Tampermonkey。 Tampermonkey是什么 不装扩展（Extensions)的chrome只能发挥它40%的能力。  Tampermonkey是chrome的一个扩展程序，是">
-<meta name="twitter:image" content="http://yoursite.com/uploads/tampermonkey1.png">
+<meta name="twitter:title" content="如何生成圆形和圆角的图像">
+<meta name="twitter:description" content="iOS7带来的一个比较大的变化是圆形图像的使用比方形图像更频繁。在系统默认的应用，比如通讯录和电话中都能找到圆形图像。在这个文章中，我们一起来研究一下如何使用CALayer类来创建圆形或者圆角的图像。 可能你之前并没有听过CALayer类。但是在你构建你的应用的时候肯定用到了它。UIKit里面的每一种view(例如：UIView, UIImageView)都是建立在CALayer的实例基础上的(l">
+<meta name="twitter:image" content="http://www.appcoda.com/wp-content/uploads/2014/04/circular-image-featured.jpg">
 
 
 
@@ -96,7 +90,7 @@
   };
 </script>
 
-  <title> 教你利用Tampermonkey，免VIP观看各大视频网站VIP视频 | 刘启明 </title>
+  <title> 如何生成圆形和圆角的图像 | 刘启明 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -226,7 +220,7 @@
             
             
               
-                教你利用Tampermonkey，免VIP观看各大视频网站VIP视频
+                如何生成圆形和圆角的图像
               
             
           </h1>
@@ -238,8 +232,8 @@
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2018-08-31T22:45:46+08:00" content="2018-08-31">
-              2018-08-31
+            <time itemprop="dateCreated" datetime="2018-10-26T22:06:09+08:00" content="2018-10-26">
+              2018-10-26
             </time>
           </span>
 	
@@ -254,8 +248,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/有意思的小玩意儿/" itemprop="url" rel="index">
-                    <span itemprop="name">有意思的小玩意儿</span>
+                  <a href="/categories/iOS-开发/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS 开发</span>
                   </a>
                 </span>
 
@@ -270,8 +264,8 @@
             
               <span class="post-comments-count">
                 &nbsp; | &nbsp;
-                <a href="/2018/08/31/tampermonkey-md/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2018/08/31/tampermonkey-md/" itemprop="commentsCount"></span>
+                <a href="/2018/10/26/profile-layer/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2018/10/26/profile-layer/" itemprop="commentsCount"></span>
                 </a>
               </span>
             
@@ -292,34 +286,40 @@
       
 
       
-        <p>今天心血来潮想看某个电视剧，在家打开打开某视频网站，是这样的：<br><img src="/uploads/tampermonkey1.png" alt="shortcuts"><br>我的内心是这样的：<br><img src="/uploads/tampermonkey2.jpg" alt="shortcuts"><br>高贵的程序员怎么能被小小的VIP拦住自己前进的脚步！所以，今天就向大家推荐一个<code>chrome</code>超时空宇宙霹雳无敌轰天响地的插件 —— <code>Tampermonkey</code>。</p>
-<h3 id="Tampermonkey是什么"><a href="#Tampermonkey是什么" class="headerlink" title="Tampermonkey是什么"></a>Tampermonkey是什么</h3><blockquote>
-<p>不装扩展（Extensions)的chrome只能发挥它40%的能力。</p>
-</blockquote>
-<p><code>Tampermonkey</code>是<code>chrome</code>的一个扩展程序，是一个用户脚本管理器，适用于<code>Chrome</code>、<code>Microsoft Edge</code>，<code>Safari</code>，<code>Opera Next</code>、<code>Firfox</code>。功能之强大，号称第二个<code>chrome网上应用商店</code>，利用<code>Tampermonkey</code>，用户可以自由定制网页，实现你想要的各种功能，比如<em>去除广告</em>、<em>下载网盘文件</em>，<em>破解视频VIP限制</em>，它提供了脚本安装、自动更新检查、标签中的脚本运行状况速览等管理功能。比如你想要定制某一个功能，那么你只需往<code>Tampermonkey</code>里面添加对应的脚本就可以了，而不用再安装其它浏览器插件。相对于插件扩展，脚本更轻量级，不占用太多资源并且只在特定的站点生效。所以在技术人员的圈子了，<code>Tampermonkey</code>几乎是万能的。</p>
-<h3 id="如何安装Tampermonkey"><a href="#如何安装Tampermonkey" class="headerlink" title="如何安装Tampermonkey"></a>如何安装Tampermonkey</h3><p>这里已经为你准备了两种方法：</p>
+        <p>iOS7带来的一个比较大的变化是圆形图像的使用比方形图像更频繁。在系统默认的应用，比如通讯录和电话中都能找到圆形图像。在这个文章中，我们一起来研究一下如何使用CALayer类来创建圆形或者圆角的图像。</p>
+<p>可能你之前并没有听过CALayer类。但是在你构建你的应用的时候肯定用到了它。UIKit里面的每一种view(例如：UIView, UIImageView)都是建立在CALayer的实例基础上的(layer对象)。layer对象被设计用来管理view的后备储存和处理view相关的动画。layer对象提供一系列的标签来控制view的可视化内容：</p>
 <ul>
-<li>如何已经翻墙了，访问chrome网上应用商店，搜索Tampermonkey就可以在线安装了。什么，没有翻墙？<em>可以找我问服务器代理SS账号密码</em>，或者请看下一条方法.</li>
-<li>百度网盘：<a href="https://pan.baidu.com/s/1J_ezaJL6Iq8i-mAQsjpZtw，提取码：9jmm，下载完成后，将文件拖到chrome浏览器里，然后松开鼠标，就可以完成安装了。" target="_blank" rel="noopener">https://pan.baidu.com/s/1J_ezaJL6Iq8i-mAQsjpZtw，提取码：9jmm，下载完成后，将文件拖到chrome浏览器里，然后松开鼠标，就可以完成安装了。</a></li>
+<li>背景颜色</li>
+<li>边缘以及边缘宽度</li>
+<li>阴影颜色，阴影宽度等</li>
+<li>透明度</li>
+<li>圆角半径</li>
 </ul>
-<p>安装成功之后，在你的<code>chrome</code>右上角会出现一个小黑框框，如下图：<br><img src="/uploads/tampermonkey3.jpeg" alt="shortcuts"><br>如果<code>chrome</code>提示：无法安装，请在<code>chrome</code>右上角，点那<em>三个点点</em>——&gt;<em>更多工具</em>——&gt;<em>扩展程序</em>，然后打开<em>开发者模式</em>，如下图：<br><img src="/uploads/tampermonkey4.jpeg" alt="shortcuts"><br><img src="/uploads/tampermonkey5.png" alt="shortcuts"><br>完成后，重新将扩展文件拖入<code>chrome</code>安装。</p>
-<h3 id="获取功能脚本"><a href="#获取功能脚本" class="headerlink" title="获取功能脚本"></a>获取功能脚本</h3><p>在文章的开头我们有说过，<code>Tampermonkey</code>是一个用户脚本管理器，想要去实现<em>破解VIP视频限制</em>的功能，我们还需要有一个<em>VIP视频破解脚本</em>。这个脚本从哪里来呢？这里就不得不提<code>Greasy Fork</code>网站。在<code>Greasy Fork</code>网站上还有很多很有用的插件，比如<em>屏蔽广告</em>、<em>下载网盘文件</em>、<em>vip视频解析</em>等。你可以根据个人需要，去网站上找一些实用的脚本。我们今天要用的是一款叫做：<em>vip视频破解脚本</em>，<a href="https://greasyfork.org/zh-CN/scripts/26556-vip%E8%A7%86%E9%A2%91%E7%A0%B4%E8%A7%A3" target="_blank" rel="noopener">脚本下载地址：https://greasyfork.org/zh-CN/scripts/26556-vip%E8%A7%86%E9%A2%91%E7%A0%B4%E8%A7%A3</a><br>这款VIP视频破解脚本的功能主要有：</p>
-<ul>
-<li>爱奇艺选集后获取正确解析地址</li>
-<li>支持腾讯视频选集后自动破解</li>
-<li>可设置是否自动解析</li>
-<li>解析后自动停止原始视频播放</li>
-<li>添加“能嵌则嵌”选项，如果选择了该项且非将http资源嵌入https页面则将接口视频嵌入页面，支持选集</li>
-</ul>
-<p><img src="/uploads/tampermonkey6.jpeg" alt="shortcuts"></p>
-<p>安装成功后，点击右上角的<code>Tampermonkey</code> ——&gt; 管理面板，可以看到如下界面：<br><img src="/uploads/tampermonkey7.jpeg" alt="shortcuts"><br><img src="/uploads/tampermonkey8.jpeg" alt="shortcuts"><br><em>到此，恭喜你，安装成功啦，可以愉快的打开视频网站啦~</em><br><img src="/uploads/tampermonkey9.jpg" alt="shortcuts"></p>
-<h3 id="实验劳动成果"><a href="#实验劳动成果" class="headerlink" title="实验劳动成果"></a>实验劳动成果</h3><p>打开视频网站，比如说<code>腾讯视频</code>，打开<code>《如懿传》</code><br>看到左上角的小问号没有？点它，然后：</p>
-<ul>
-<li>勾选“能嵌就嵌”.</li>
-<li>然后再列表下面点击第一个.<br>如图：<br><img src="/uploads/tampermonkey10.png" alt="shortcuts"><br>好了，可以搬上凳子，端起瓜子愉快的看VIP电视剧啦~</li>
-</ul>
-<h3 id="内存问题？"><a href="#内存问题？" class="headerlink" title="内存问题？"></a>内存问题？</h3><p>有的人会担心插件内存，我们都知道插件是要占用内存的，我们绝对不允许chrome一打开，内存就蹭蹭的向小火箭一样往上升(尤其是Android开发者，Android Studio一开，Android虚拟机一开，内存直接爆炸，所以我现在为了节省内存，虚拟机都不开了，直接用真机)，现在的网页和浏览器本身，都非常占用内存，尤其是像这样一个万能的插件，会不会占用很多内存呢？答案时候，不会的。因为 Tampermonkey 基于代码脚本运行，内存占用非常小，而且每开一个网页，它只会运行相应的脚本。比如说你在看视频，那么只有视频相应的脚本开启。浏览器占内存的常识，在这里可能不能通用了。</p>
-<h3 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h3><p><a href="https://greasyfork.org/zh-CN" target="_blank" rel="noopener">Greasy Fory 是专门提供用户脚本的网站，感兴趣的可以上去看看有没有解决你痛点的脚本。链接地址：https://greasyfork.org/zh-CN</a></p>
+<p>下面我们就使用圆角半径这个标签来挥之圆角和圆形的图像。</p>
+<p><img src="http://www.appcoda.com/wp-content/uploads/2014/04/circular-image-featured.jpg" alt="art1"></p>
+<p>要明白CALayer是如何工作的，最好的办法就是实践。我们来创建一个简单的包含圆形图片的个人资料view.</p>
+<p>##demo项目</p>
+<p>首先，我们从下载<a href="https://github.com/timmy6/ProfileDemo" target="_blank" rel="noopener">这个项目</a>开始。项目中已经预搭建了profile view 但是你编译运行app的时候会发现图像还是方形的。整个demo项目非常简单。唯一需要注意的是ProfileViewController是和Storyboard中的view相关联的。</p>
+<p>并且profile图像(UIImageView)已经链接到ProfileViewController.h里的profileImageView属性上。</p>
+<p><img src="http://www.appcoda.com/wp-content/uploads/2014/04/square-image-profile.jpg" alt="art2"></p>
+<p>##创建圆形图像</p>
+<p>接下来我们来研究一下如何通过边缘半径来把普通图像转换成圆形图像。</p>
+<p>打开ProfileViewController.m，在viewDidLoad:方法中添加以下代码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">self.profileImageView.layer.cornerRadius = self.profileImageView.frame.size.width / 2;</span><br><span class="line">self.profileImageView.clipsToBounds = YES;</span><br></pre></td></tr></table></figure>
+<p>每个view都绑定了一个layer属性。上面的代码中第一行便是设置这个layer对象(即CALayer类的实例)的边缘半径属性。要把方形图像变成圆形图像，边缘半径必须设成图像宽度的一半。举个例子，如果方形图像的宽度是100像素，那半径就是50像素。第二步则是要把clipsToBounds属性设为YES来使layer正常工作。</p>
+<p>现在你再重新编译并运行app的话，你会发现图像已经变成圆形了。</p>
+<p><img src="http://www.appcoda.com/wp-content/uploads/2014/04/circular-image-profile.jpg" alt="art3"></p>
+<p>简单吧？只需要两行代码，方形图像就变成圆形图像了。完全不需要ps。</p>
+<p>##添加边缘</p>
+<p>接下来，我们给图像添加个边缘，让它看起来更完美。和上面一样，仅需两行代码便能实现这个效果。在viewDidLoad:方法的设置边缘半径的代码下添加以下两行代码:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">self.profileImageView.layer.borderWidth = 3.0f;</span><br><span class="line">self.profileImageView.layer.borderColor = [UIColor whiteColor].CGColor;</span><br></pre></td></tr></table></figure>
+<p>上面的代码非常简单明了。我们只是设置了边缘的宽度还有边缘颜色。现在编译运行app后你会看到有一圈白色包围在图像边缘上。</p>
+<p>##创建圆角图像</p>
+<p>相同的方法也可以应用到圆角图像上。技巧是把边缘半径改成其他值。比如10，</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">self.profileImageView.layer.cornerRadius = 10.0f;</span><br></pre></td></tr></table></figure>
+<p>现在图像就会变成圆角矩形图像了。</p>
+<p><img src="http://www.appcoda.com/wp-content/uploads/2014/04/square-corner-image-profile.jpg" alt="art4"></p>
+<p>完整的项目可以从<a href="https://github.com/timmy6/ProfileDemo" target="_blank" rel="noopener">这边</a>下载。</p>
 
       
     </div>
@@ -331,17 +331,13 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/08/13/android-lifecycle/" rel="next" title="Android官方架构组件：Lifecycle介绍及原理分析">
-                <i class="fa fa-chevron-left"></i> Android官方架构组件：Lifecycle介绍及原理分析
+              <a href="/2018/08/31/tampermonkey-md/" rel="next" title="教你利用Tampermonkey，免VIP观看各大视频网站VIP视频">
+                <i class="fa fa-chevron-left"></i> 教你利用Tampermonkey，免VIP观看各大视频网站VIP视频
               </a>
             
           </div>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2018/10/26/profile-layer/" rel="prev" title="如何生成圆形和圆角的图像">
-                如何生成圆形和圆角的图像 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -485,7 +481,7 @@
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Tampermonkey是什么"><span class="nav-number">1.</span> <span class="nav-text">Tampermonkey是什么</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#如何安装Tampermonkey"><span class="nav-number">2.</span> <span class="nav-text">如何安装Tampermonkey</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#获取功能脚本"><span class="nav-number">3.</span> <span class="nav-text">获取功能脚本</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实验劳动成果"><span class="nav-number">4.</span> <span class="nav-text">实验劳动成果</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#内存问题？"><span class="nav-number">5.</span> <span class="nav-text">内存问题？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#最后"><span class="nav-number">6.</span> <span class="nav-text">最后</span></a></li></ol></div>
+              <p class="post-toc-empty">此文章未包含目录</p>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator">
@@ -746,9 +742,9 @@ document.getElementById("showDays").innerHTML = "本站已运行 "+total+" 天";
 
     <script type="text/javascript">
       var disqus_shortname = 'liuqiming';
-      var disqus_identifier = '2018/08/31/tampermonkey-md/';
-      var disqus_title = '教你利用Tampermonkey，免VIP观看各大视频网站VIP视频';
-      var disqus_url = 'http://yoursite.com/2018/08/31/tampermonkey-md/';
+      var disqus_identifier = '2018/10/26/profile-layer/';
+      var disqus_title = '如何生成圆形和圆角的图像';
+      var disqus_url = 'http://yoursite.com/2018/10/26/profile-layer/';
 
       function run_disqus_script(disqus_script){
         var dsq = document.createElement('script');

@@ -64,7 +64,7 @@
 <meta property="og:site_name" content="刘启明">
 <meta property="og:description" content="1.初始化一个与屏幕大小相同的View(1)12self.view = [[UIView alloc] initWithFrame:[UIScreen mainScreen].bounds];//[UIScreen mainScreen].bounds是整个屏幕的大小，初始化时将window大小设置为整个屏幕; (2)12self.webView = [[View alloc] initWithF">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-10-10T14:30:40.912Z">
+<meta property="og:updated_time" content="2018-10-11T01:40:07.525Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="iOS 个人实际开发知识点集锦(长久更新)">
 <meta name="twitter:description" content="1.初始化一个与屏幕大小相同的View(1)12self.view = [[UIView alloc] initWithFrame:[UIScreen mainScreen].bounds];//[UIScreen mainScreen].bounds是整个屏幕的大小，初始化时将window大小设置为整个屏幕; (2)12self.webView = [[View alloc] initWithF">
@@ -297,6 +297,18 @@
 <li>相同点 :  都是弱引用声明类型</li>
 <li>不同点：如果用weak声明的变量在栈中会自动清空，赋值为nil。如果用assign声明的变量在栈中可能不会自动赋值为nil，就会造成野指针错误。</li>
 </ul>
+<h4 id="8-layoutSubviews在以下情况会被调用"><a href="#8-layoutSubviews在以下情况会被调用" class="headerlink" title="8.layoutSubviews在以下情况会被调用"></a>8.layoutSubviews在以下情况会被调用</h4><ul>
+<li>init初始化不会触发layoutSubviews.</li>
+<li>addSubview会触发layoutSubviews.</li>
+<li>设置view的Frame会触发layoutSubViews，当然前提是Frame的值前后发生了变化.</li>
+<li>滚动一个UIScrollView会触发layoutSubviews</li>
+<li>旋转Screen会触发父UIView上的layoutSubviews</li>
+<li>改变一个UIView大小的时候，也会触发父UIView上的layoutSubviews事件。</li>
+<li>直接调用setLayoutSubViews.</li>
+</ul>
+<h4 id="9-Block的用法"><a href="#9-Block的用法" class="headerlink" title="9.Block的用法"></a>9.Block的用法</h4><p>~ Block是iOS开发中一种比较特殊的数据结构，它可以保存一段代码，在合适的地方再调用，具有语法简介、回调方便、变成思路清晰、执行高效率等优点。</p>
+<p>1.Block定义及使用<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">返回值类型 (^block变量名)(形参列表) = ^(形参列表) &#123;</span><br><span class="line"></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">//调用Block保存的代码</span></span><br><span class="line">block变量名(实参);</span><br></pre></td></tr></table></figure></p>
+<p>2.在项目中使用格式(一般声明在@interface之外).<br>在项目中，通常会重新定义Block的类型的别名，然后用别名来定义Block的类型<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//定义block类型</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">void</span> (^Block)(<span class="keyword">int</span>);</span><br><span class="line"><span class="comment">//定义block</span></span><br><span class="line">Block block = ^(<span class="keyword">int</span> a)&#123;&#125;;</span><br><span class="line"><span class="comment">//调用block</span></span><br><span class="line">block(<span class="number">3</span>);</span><br></pre></td></tr></table></figure></p>
 
       
     </div>
@@ -393,7 +405,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">26</span>
+              <span class="site-state-item-count">27</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -401,7 +413,7 @@
           
             <div class="site-state-item site-state-categories">
               <a href="/categories">
-                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-count">10</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -462,7 +474,7 @@
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-初始化一个与屏幕大小相同的View"><span class="nav-number">1.</span> <span class="nav-text">1.初始化一个与屏幕大小相同的View</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-跳转界面"><span class="nav-number">2.</span> <span class="nav-text">2.跳转界面</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-设置默认布局开始位置-UIViewController-的-edgeForExtendedLayout属性"><span class="nav-number">3.</span> <span class="nav-text">3.设置默认布局开始位置(UIViewController 的 edgeForExtendedLayout属性)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-加载本地plist文件"><span class="nav-number">4.</span> <span class="nav-text">4.加载本地plist文件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-视图控制对象声明周期"><span class="nav-number">5.</span> <span class="nav-text">5.视图控制对象声明周期</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6-设置两个View居中对齐"><span class="nav-number">6.</span> <span class="nav-text">6.设置两个View居中对齐</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#7-weak和assign修饰符的区别"><span class="nav-number">7.</span> <span class="nav-text">7.weak和assign修饰符的区别</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-初始化一个与屏幕大小相同的View"><span class="nav-number">1.</span> <span class="nav-text">1.初始化一个与屏幕大小相同的View</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-跳转界面"><span class="nav-number">2.</span> <span class="nav-text">2.跳转界面</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-设置默认布局开始位置-UIViewController-的-edgeForExtendedLayout属性"><span class="nav-number">3.</span> <span class="nav-text">3.设置默认布局开始位置(UIViewController 的 edgeForExtendedLayout属性)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-加载本地plist文件"><span class="nav-number">4.</span> <span class="nav-text">4.加载本地plist文件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-视图控制对象声明周期"><span class="nav-number">5.</span> <span class="nav-text">5.视图控制对象声明周期</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6-设置两个View居中对齐"><span class="nav-number">6.</span> <span class="nav-text">6.设置两个View居中对齐</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#7-weak和assign修饰符的区别"><span class="nav-number">7.</span> <span class="nav-text">7.weak和assign修饰符的区别</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#8-layoutSubviews在以下情况会被调用"><span class="nav-number">8.</span> <span class="nav-text">8.layoutSubviews在以下情况会被调用</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#9-Block的用法"><span class="nav-number">9.</span> <span class="nav-text">9.Block的用法</span></a></li></ol></div>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator">
