@@ -1,0 +1,844 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.5.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.5.0" />
+
+
+
+
+
+
+<meta name="description" content="网上组件化的文章很多。很多文章一提到组件化，就会说解耦，一说到解耦就会说路由或者runtime。好像组件化 == 解耦 == 路由/Runtime，然而这是一个非常错误的观念。持有这一观点的人，没有搞清楚在组件化中什么是想要结果，什么是过程。  组件化和解耦大家不妨先思考两个问题：  为何要进行组件化开发？ 各个组件之间是否一定需要解耦？采用组件化，是为了组件能单独开发，能单独开发App就能快速">
+<meta property="og:type" content="article">
+<meta property="og:title" content="iOS组件化及架构设计">
+<meta property="og:url" content="http://yoursite.com/2018/11/10/component-pro/index.html">
+<meta property="og:site_name" content="刘启明">
+<meta property="og:description" content="网上组件化的文章很多。很多文章一提到组件化，就会说解耦，一说到解耦就会说路由或者runtime。好像组件化 == 解耦 == 路由/Runtime，然而这是一个非常错误的观念。持有这一观点的人，没有搞清楚在组件化中什么是想要结果，什么是过程。  组件化和解耦大家不妨先思考两个问题：  为何要进行组件化开发？ 各个组件之间是否一定需要解耦？采用组件化，是为了组件能单独开发，能单独开发App就能快速">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/10333442-bc9a765d74cca9a5.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1000/format/webp">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/10333442-7464e6a05db1b89e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1000/format/webp">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/10333442-bb5b6936a5dc0a85.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1000/format/webp">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/10333442-88d3fde3e1483d95.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1000/format/webp">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/10333442-c52c37c81a0939c6.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1000/format/webp">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/10333442-8eb0637a4286d1e8.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1000/format/webp">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/10333442-8e60870cb8ed52f2.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1000/format/webp">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/10333442-501afe909e01028d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1000/format/webp">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/10333442-829c98cbb704af7a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/946/format/webp">
+<meta property="og:updated_time" content="2018-11-10T13:23:33.272Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="iOS组件化及架构设计">
+<meta name="twitter:description" content="网上组件化的文章很多。很多文章一提到组件化，就会说解耦，一说到解耦就会说路由或者runtime。好像组件化 == 解耦 == 路由/Runtime，然而这是一个非常错误的观念。持有这一观点的人，没有搞清楚在组件化中什么是想要结果，什么是过程。  组件化和解耦大家不妨先思考两个问题：  为何要进行组件化开发？ 各个组件之间是否一定需要解耦？采用组件化，是为了组件能单独开发，能单独开发App就能快速">
+<meta name="twitter:image" content="https://upload-images.jianshu.io/upload_images/10333442-bc9a765d74cca9a5.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1000/format/webp">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"hide"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: '博主'
+    }
+  };
+</script>
+
+  <title> iOS组件化及架构设计 | 刘启明 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">刘启明</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu ">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-th fa-fw"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            时间轴
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-user fa-fw"></i> <br />
+            
+            留言板
+          </a>
+        </li>
+      
+
+      
+      
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                iOS组件化及架构设计
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2018-11-10T20:59:01+08:00" content="2018-11-10">
+              2018-11-10
+            </time>
+          </span>
+	
+          <span id="busuanzi_container_page_pv">  |  阅读量 <span id="busuanzi_value_page_pv"></span> 次</span>
+        
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/iOS开发/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS开发</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2018/11/10/component-pro/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2018/11/10/component-pro/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>网上组件化的文章很多。很多文章一提到组件化，就会说解耦，一说到解耦就会说路由或者runtime。好像组件化 == 解耦 == 路由/Runtime，然而这是一个非常错误的观念。持有这一观点的人，没有搞清楚在组件化中什么是想要结果，什么是过程。</p>
+</blockquote>
+<h4 id="组件化和解耦"><a href="#组件化和解耦" class="headerlink" title="组件化和解耦"></a>组件化和解耦</h4><p>大家不妨先思考两个问题：</p>
+<ul>
+<li>为何要进行组件化开发？</li>
+<li>各个组件之间是否一定需要解耦？<br>采用组件化，是为了组件能单独开发，能单独开发App就能快速集成，所以单独开发是结果。要让组件能单独开发，组件必须职责单一，对于代码中已有模块，就需要用到重构和解耦的技术，所以重构和解耦是过程。那解耦是否是必须的过程？不一定。比如UIKit，我们用这个系统组件并没有使用任何解耦手段。问题来了，UIKit苹果可以独立开发，我们使用它为什么没用解耦手段？答案很简单，UIKit没有依赖我们的代码所以不用解耦。</li>
+</ul>
+<blockquote>
+<p>PS：我这里不纠结组件、服务、模块、框架的概念，网上对这些概念的定义五花八门，实际上把简单的事说复杂了。我这里只关心一件事，这一部分代码能否独立开发，能就叫组件，不能我管你叫什么</p>
+</blockquote>
+<p>我们之所以要解耦才能独立开发，通常是出现了循环依赖。这时候当然可以无脑的用路由把两个组件的耦合解开，也可以独立开发。然而，这样做只是把强引用改成了弱引用，代码还是烂代码。站在重构的角度来说，A、B组件循环依赖就是设计有问题，要么应该重构A、B让依赖单向；要么应该抽离一个共用组件C，让A、B组件都只依赖于C。</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/10333442-bc9a765d74cca9a5.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1000/format/webp" alt="art1"></p>
+<p>如果我们每个组件都只是单向依赖其他组件，各个组件之间也就没有必要解耦。再换个角度说，如果一个组件职责不单一，即使跟其他组件解耦了，组件依然不能很好的工作。如何解耦只是重构过程中可选手段，代码设计的原则如依赖倒置、接口隔离、里氏替换，都可以指导我们写出好的组件。</p>
+<p><strong>所以在组件化中重要的是让组件职责单一，职责单一的重要标志之一就是没有组件间的循环依赖。</strong></p>
+<h4 id="架构图"><a href="#架构图" class="headerlink" title="架构图"></a>架构图</h4><p>一般来讲，App的组件可以分为三层，上层业务组件、中层UI组件、底层SDK组件</p>
+<p>同一层之间的组件互相独立，上层的组件耦合下层的组件。一般来讲，底层SDK组件和中层UI组件都是独立的功能，不会出现同层耦合。</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/10333442-7464e6a05db1b89e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1000/format/webp" alt="art1"></p>
+<p>同层耦合一般出现在上层业务组件中，常见有两类，一类是controller之间的跳转，这个可以用路由解决；另一类是数据获取，数据获取需要通过重构抽离一个数据模块，耦合这个数据模块可以用协议，这样可以用依赖注入的方式隔离实现。通过协议隔离的好处是，上层业务可以不依赖其他业务的实现单独编译通过，这对上层业务组件的单独开发比较好。</p>
+<p>这种方法把所有数据协议放在一起，简单粗暴，但每一个数据协议改动都会导致数据协议层重新发布，不是很合理，可以再进一步细分数据协议层。</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/10333442-bb5b6936a5dc0a85.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1000/format/webp" alt="art1"><br>业务组件耦个协议</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/10333442-88d3fde3e1483d95.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1000/format/webp" alt="art1"><br>业务组件自己需要的协议</p>
+<p>这种方法把数据协议层分成了多个，业务组件只依赖自己的数据协议。管理起来更麻烦一点，不过架构上更合理。</p>
+<p>建议组件化前期用第一种方案，后期细化为第二种。</p>
+<h4 id="包管理"><a href="#包管理" class="headerlink" title="包管理"></a>包管理</h4><p>要解除循环依赖，引入包管理技术cocoapods会让我们更有效率。pod不允许组件间有循环依赖，若有pod install时就会报错。</p>
+<p>cocoapods，提供私有pod repo，使用时把自己的组件放在私有pod repo里，然后在Podfile里直接通过pod命令集成。一个组件对应一个私有pod，每个组件依赖自己所需要的三方库。多个组件联合开发的时候，可以再一个podspec里配置子模块，这样在每个组件自己的podspec里，只需要把子模块里的pod依赖关系拷贝过去就行了。</p>
+<p>在多个组件集成时会有版本冲突的问题。比如登录组件（L）、广告组件（A）都依赖了埋点组件（O），L依赖O的1.1版本，A依赖O的1.2版本，这时候集成就会报错。为了解决这个错误，在组件间依赖时，不写版本号，版本号只在APP集成方写。即podfile里引用所有组件，并写上版本号，.podspec里不写版本号。</p>
+<p>这样做既可以保证APP集成方的稳定性，也可以解决组件依赖的版本冲突问题。这样做的坏处是，所有组件包括App集成方，在使用其他组件时，都必须使用其他组件最新的API，这会造成额外的升级工作量。如果不想接受组件升级最新api的成本，可以私有化一个三方库自己维护。</p>
+<p><em>组件开发完毕后告诉集成方，目前的组件稳定版本是多少，引用的三方库稳定版本集成方自己去决定</em></p>
+<p><img src="https://upload-images.jianshu.io/upload_images/10333442-c52c37c81a0939c6.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1000/format/webp" alt="art1"><br>推荐的组件版本管理方式</p>
+<p>另一种版本管理的方式，是在podspec里写依赖组件的版本号，podfile里不写组件依赖的版本，然后通过内部沟通来解决版本冲突的问题。我认为虽然也能做，但有很多弊端：</p>
+<ul>
+<li>作为App集成方，没办法单独控制依赖的三方库版本。三方库升级会更复杂</li>
+<li>每个依赖的三方库，都应该做了完整的单元测试，才能被集成到App中。所以正确的逻辑不是组件内测试过三方库没问题就在组件内写死版本号，而是这个三方库经过我们测试后，可以在我们系统中使用XX版本。</li>
+<li>在工程中就没有一个地方能完整知道所有的pod组件，而App集成方有权利知道这一点</li>
+<li>沟通成本高</li>
+</ul>
+<p><img src="https://upload-images.jianshu.io/upload_images/10333442-8eb0637a4286d1e8.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1000/format/webp" alt="art1"></p>
+<p><em>以上，就是组件化的所有东西。你可能会奇怪，解耦在组件化过程中有什么用。答案是解耦是为了更好的实现组件的单一职责，解耦的作用在架构设计中谈。需要再次强调，组件化 ≠ 解耦。</em><br>如果非要给组件化下一个定义，我的理解是：</p>
+<blockquote>
+<p>组件化意味着重构，目的是让每个组件职责单一</p>
+</blockquote>
+<h4 id="关于架构设计"><a href="#关于架构设计" class="headerlink" title="关于架构设计"></a>关于架构设计</h4><p>在我看来，iOS客户端架构主要为了解决两个问题，一是解决大型项目分组件开发的效率的问题，二是解决单进程App的稳定性的问题。<br>设计到架构设计的都是大型App，小型App主要是业务的堆叠。很多公司在业务初期都不会考虑架构，在业务发展到一定规模的时候，才会重新审视架构混乱带来的开发效率和业务稳定性瓶颈。这时候就会引入组件化的概念，我们常常面临的是对已有项目的组件化，这一过程会异常困难。</p>
+<h4 id="组件拆分原则"><a href="#组件拆分原则" class="headerlink" title="组件拆分原则"></a>组件拆分原则</h4><p>对老工程的组件拆分，我的办法是，从底层开始拆。SDK&gt;  模块 &gt; 业务 。如果App没有SDK可以抽离，就从模块开始拆，不要为了抽离SDK而抽离。常见的误区是，大家一拿到代码就把公共函数提出来作为共用框架，起的名字还特别接地气，如XXCommon。<br>事实上，这种框架型SDK，是最鸡肋的组件，原因是它实用性很小，无非就是减少了点冗余代码。而且在架构能力不强的情况下，它很容易变成“垃圾堆”，什么东西都想往里面放，后面越来越庞大。所以，开始拆分架构的时候，尽量以业务优先，比如先拆分享模块。</p>
+<p><em>如果两个组件中有共同的函数，前期不要想着提出来，改个名字让它冗余是更好的办法。</em> 如果共同耦合的是一个静态库，可以利用动态库的隔离性封装静态库，具体方法可以网上找。</p>
+<h4 id="响应式"><a href="#响应式" class="headerlink" title="响应式"></a>响应式</h4><p>基础组件常常要在系统启动时初始化，或者接受App生命周期时间。这就引出了个问题，如何给appDelegate瘦身？比如我们现在有两个基础组件A、B，他们都需要监听App生命周期事件，传统的做法是，A、B两个组件都提供一些函数在appDelegate中调用。但这样做的坏处是，如果某一天我不想引入B组件了，还得去改appDelegate代码。理想的方式是，基础组件的使用不需要在appDelegate里写代码</p>
+<p>为了实现基础组件与appDelegate分离，得对appDelegate改造。首先得提出一个观点，苹果的appDelegate设计的有问题，它在用代理模式解决观察者模式的问题。在《设计模式》中，代理模式的设计意图定义是：为其他对象提供一种代理以控制对这个对象的访问。反过来看appDelegate你会发现，它大部分代理函数都没有办法控制application，如applicationDidBecomeActive。applicationDidBecomeActive这种事件常常需要多个处理者，这种场景用观察者模式更适合。而openURL需要返回BOOL值，才需要使用代理模式。App生命周期事件虽然可以用监听通知获取，但用起来不如响应式监听信号方便。</p>
+<p>基于响应式编程的思想，我写了一个TLAppEventBus，提供属性来监听生命周期事件。我并不喜欢庞大的ReactiveObjectC，所以我通过category实现了简单的响应式，用户只需要监听需要的信号即可。在TLAppEventBus里，我默认提供了8个系统事件用来监听，如果有其他的系统事件需要监听，可以使用扩展的方法，给TLAppEventBus添加属性（见文末Demo）。</p>
+<h4 id="路由"><a href="#路由" class="headerlink" title="路由"></a>路由</h4><p>对于Appdelegate中的openURL的事件，苹果使用代理模式并没有问题，但我们常常需要在openURL里面写if-else区分事件的处理者，这也会造成多个URL处理模块耦合在Appdelegate中。我认为appdelegate中的openURL应该用路由转发的方式来解耦。</p>
+<p>openURL代理需要同步返回处理结果，但网上开源的路由框架能同步返回结果的。所以我这边实现了一个能同步返回结果的路由TLRouter，同时支持了注册scheme。注册scheme这一特性，在第三方分享的场景下会比较有用（见文末Demo）。</p>
+<p>另外，网上大部分方案都搞错了场景。以蘑菇街的路由方案为例（好像iOS的路由就是他们提出来的？），蘑菇街认为路由主要有两个作用，一是发送数据让路由接收者处理，二是返回对象让路由发送者继续处理。我不禁想问，这是路由吗？不妨先回到URL的定义</p>
+<blockquote>
+<p>URL: 统一资源标识符（Uniform Resource Locator,统一资源定位符)是一个用于标识某一互联网资源名称的字符串</p>
+</blockquote>
+<p>openURL就是在访问资源，在浏览器中，openURL意味着打开一个网页，openURL的发起者并不关心打开的内容是什么，只关心打开的结果。所以苹果的openURL Api 就只返回了除了结果YES/NO，没有返回一个对象。所以，我对openURL这一行为定义如下</p>
+<blockquote>
+<p>openURL：访问资源，返回是否访问成功</p>
+</blockquote>
+<p>那把蘑菇街的路由，返回的对象改成BOOL值就可以了么？我认为还不够。对于客户端的路由，使用的实际上是通知的形式在解耦，带来的问题是路由的注册代码散落在各地，所以路由方案必须要配路由文档，要不然开发者会不知道路由在干嘛。</p>
+<p>有没有比文档更好的方式呢？我的思路是：用schema区分路由职责<br>系统的openURL只干了两件事：打开App ，比如打开微信</p>
+<blockquote>
+<p>[[UIApplicationsharedApplication]<br>openURL:[NSURLURLWithString:@”weixin://“]];<br>还有就是打开网页，比如<br>[[UIApplicationsharedApplication] openURL:<br>[NSURLURLWithString:@”<a href="https://www.baidu.com&quot;]]" target="_blank" rel="noopener">https://www.baidu.com&quot;]]</a>;</p>
+</blockquote>
+<p>两者的共性是页面切换。所以我这边设计的路由openURL，只扩充了controller跳转的功能，比如打开登录页</p>
+<blockquote>
+<p>[TLRouter openURL:@”innerJump://account/login”];</p>
+</blockquote>
+<p>只扩充了controller跳转的功能好处是让路由的职责更单一，同时也更符合苹果对openURL的定义。工程师在看到url schema的时候就知道他的作用，避免反复查看文档。<br><em>对于数据的传递，我认为不应该用路由的方式。相比路由，响应式会是更好的选择。</em>用响应式的思想，提供属性给相关组件去监听，代码逻辑会更清晰。至于响应式会带来耦合属性这个问题，我在组件化的部分已经讨论过。</p>
+<h4 id="依赖注入"><a href="#依赖注入" class="headerlink" title="依赖注入"></a>依赖注入</h4><p>依赖注入用于上层业务解耦中，有时多个业务需要用到同一个数据组件。这时可以使用IoC（Inversion of Control）的思想，让上层业务依赖IoC容器，IoC容器创建数据组件，并注入到容器里。具体实现可以通过iOS的协议来实现IoC容器和对象的接口一致，注入对象的获取通过runtime实例化。这样做有个缺点是类名会写死在IoC容器中，如果要动态配置，可以把类名放在plist中让IoC容器去读它。（见Demo TLUserModuleContainer类）</p>
+<h4 id="App配置"><a href="#App配置" class="headerlink" title="App配置"></a>App配置</h4><p>有时候我们需要组件的跨App复用，在App集成组件时，能够不改代码只改配置是最理想的方式。使用组件+plist配置是一个方案，具体做法是把A组件的配置放在A.plist中，在A组件内写死要读取A.plist。<br><em>以配置代替硬编码，防止对代码的侵入，是一个很好的思路。</em> 设想一下，如果我们可以通过配置在决定App是否使用组件、也可通过配置来改变组件和app所需的参数，那运维可以代替app开发来出包，这对效率和稳定性都会有提升。为了实现这一效果，我使用了OC的runtime来动态注册组件。需要在didfinishLaunch初始化的组件，可以实现代理 - (void)initializeWhenLaunch; 这样，自动初始化函数，就可以通过runtime+plist里配置的class name自动初始化。组件需要初始化的代码，可以在自己的initializeWhenLaunch里做。</p>
+<p>由于路由只扩充了controller跳转的功能，所以路由注册这一行为也可进行一次抽象，把不同的部分放在plist配置文件，相同的放到runtime里做。这样做还有个好处是，程序内的路由跳转在一个plist里可以都可以看到<br><img src="https://upload-images.jianshu.io/upload_images/10333442-8e60870cb8ed52f2.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1000/format/webp" alt="art1"></p>
+<h4 id="iOS解耦工具Tourelle"><a href="#iOS解耦工具Tourelle" class="headerlink" title="iOS解耦工具Tourelle"></a>iOS解耦工具Tourelle</h4><p>Tourelle，是根据上面的思路写的一个开源项目<a href="https://github.com/zhudaye12138/Tourelle" target="_blank" rel="noopener">https://github.com/zhudaye12138/Tourelle</a>可以通过pod集成  pod ‘Tourelle’。下面介绍一下他的使用方式</p>
+<h4 id="TLAppEventBus"><a href="#TLAppEventBus" class="headerlink" title="TLAppEventBus"></a>TLAppEventBus</h4><p>TLAppEventBus通过接收系统通知来获取app生命周期事件，收到生命周期事件后改变对应属性的值。默认提供了didEnterBackground等八个属性，可以使用响应式函数来监听 </p>
+<ul>
+<li>(void)observeWithBlock:(TLObservingBlock)block; <figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[TLAppEventBus.shared.didBecomeActive observeWithBlock:^(idnewValue) &#123;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//do some thing</span></span><br><span class="line"></span><br><span class="line">    &#125;];</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>需要注意，如果在其它地方使用observeWithBlock，需要设置属性的owner，否则没有办法监听到。这里不用单独设置是因为在TLAppEventBus里已设置好<br>TLAppEventBus使用前需要调用 - (void)start; 如果需要监听更多的事件，可以调用</p>
+<ul>
+<li>(void)startWithNotificationMap:(NSDictionary *)map; <figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">NSMutableDictionary</span> *defaultMap = [<span class="built_in">NSMutableDictionary</span> dictionaryWithDictionary:[TLAppEventBus defaultNotificationMap]]; <span class="comment">//获取默认map</span></span><br><span class="line"></span><br><span class="line">    [defaultMapsetObject:KDidChangeStatusBarOrientation forKey:<span class="built_in">UIApplicationWillChangeStatusBarOrientationNotification</span>]; <span class="comment">//添加新的事件</span></span><br><span class="line"></span><br><span class="line">    [TLAppEventBus.shared startWithNotificationMap:defaultMap];<span class="comment">//开启EventBus</span></span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>添加新事件需要用分类添加TLAppEventBus的属性，添加后就可正常使用了<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">-(<span class="keyword">void</span>)setDidChangeStatusBarOrientation:(<span class="built_in">NSNotification</span>*)didChangeStatusBarOrientation &#123;</span><br><span class="line"></span><br><span class="line">    objc_setAssociatedObject(<span class="keyword">self</span>, (__bridge <span class="keyword">const</span> <span class="keyword">void</span> *)KDidChangeStatusBarOrientation , didChangeStatusBarOrientation, OBJC_ASSOCIATION_RETAIN_NONATOMIC);</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">-(<span class="built_in">NSNotification</span>*)didChangeStatusBarOrientation &#123;</span><br><span class="line"></span><br><span class="line">    returnobjc_getAssociatedObject(<span class="keyword">self</span>, (__bridge <span class="keyword">const</span> <span class="keyword">void</span> *)KDidBecomeActive);</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h4 id="TLRouter"><a href="#TLRouter" class="headerlink" title="TLRouter"></a>TLRouter</h4><p>路由支持两种注册方式，一种只写schema，一种写url路径<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">[TLRouter registerURL:<span class="string">@"wx1234567://"</span> hander:^(TLRouterURL *routeURL, <span class="keyword">void</span> (^callback)(<span class="built_in">BOOL</span> result)) &#123;       </span><br><span class="line"></span><br><span class="line">        <span class="comment">//do something     </span></span><br><span class="line"></span><br><span class="line">&#125;]<span class="comment">//注册schema</span></span><br><span class="line"></span><br><span class="line">[TLRouter registerURL:<span class="string">@"InnerJump://account/login"</span> hander:^(TLRouterURL *routeURL, <span class="keyword">void</span> (^callback)(<span class="built_in">BOOL</span> result)) &#123;</span><br><span class="line"></span><br><span class="line">                <span class="comment">//do something</span></span><br><span class="line"></span><br><span class="line"> &#125;]<span class="comment">//注册url路径</span></span><br></pre></td></tr></table></figure></p>
+<p>支持同步 &amp; 异步获取返回值，其中异步转同步内部通过semaphore实现<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">+(<span class="keyword">void</span>)openURL:(<span class="built_in">NSString</span>*)url callback:(<span class="keyword">void</span>(^)(BOOLresult))callback;</span><br><span class="line"></span><br><span class="line">+(<span class="built_in">BOOL</span>)openURL:(<span class="built_in">NSString</span>*)url;</span><br></pre></td></tr></table></figure></p>
+<p>另外openURL除了支持url中带参数，也支持参数放在字典中</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">+(<span class="built_in">BOOL</span>)openURL:(<span class="built_in">NSString</span>*)url param:(<span class="built_in">NSDictionary</span> *)param;</span><br></pre></td></tr></table></figure>
+<h4 id="TLAppLaunchHelper"><a href="#TLAppLaunchHelper" class="headerlink" title="TLAppLaunchHelper"></a>TLAppLaunchHelper</h4><p>TLAppLaunchHelper有两个函数，一个用来初始化组件。该函数会读取AutoInitialize.plist中的classes，通过runtime + 自动初始化协议完成初始化<br><img src="https://upload-images.jianshu.io/upload_images/10333442-501afe909e01028d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1000/format/webp" alt="art1"></p>
+<p>另一个函数用来自动注册路由，该函数会读取AutoRegistURL.plist完成路由注册。其中controller代表类名，params代表默认参数，如果openURL传的参数与默认参数不符合，路由会报错<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">-(<span class="keyword">void</span>)autoRegistURL;</span><br></pre></td></tr></table></figure></p>
+<p><img src="https://upload-images.jianshu.io/upload_images/10333442-829c98cbb704af7a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/946/format/webp" alt="art1"><br>路由注册时，并不决定controller跳转的方式。注册者只是调用presentingSelf方法，跳转方式由controller中presentingSelf方法决定。<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">-(<span class="built_in">BOOL</span>)presentingSelf &#123;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">UINavigationController</span> *rootVC = (<span class="built_in">UINavigationController</span> *) APPWINDOW.rootViewController;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>(rootVC) &#123;</span><br><span class="line"></span><br><span class="line">        [rootVCpushViewController:<span class="keyword">self</span> animated:<span class="literal">YES</span>];</span><br><span class="line"></span><br><span class="line">        returnYES;</span><br><span class="line"></span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">NO</span>;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h4 id="耦合检测工具"><a href="#耦合检测工具" class="headerlink" title="耦合检测工具"></a>耦合检测工具</h4><p>针对既有代码的组件化重构，我这边开发了一个耦合检测工具，目前只支持OC。</p>
+<p>耦合检测工具的原理是这样：工具认为工程中一级文件夹由组件构成，比如A工程下面有aa、bb、cc三个文件夹，aa、bb、cc就是三个待检测的组件。耦合检测分三步，第一步通过正则找到组件内.h文件中所有关键字（包括函数、宏定义和类）。第二步通过找到的组件内关键字，再通过正则去其它组件的.m中找是否使用了该组件的关键字，如果使用了，两个组件就有耦合关系。第三步，输出耦合检测报告</p>
+<p>代码：开源中….</p>
+<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><p>本文给出了组件化的定义：组件化意味着重构，目的是让每个组件职责单一以提升集成效率。包管理技术Pod是组件化常用的工具，iOS组件依赖及组件版本号确定，都可以用pod实现。整个iOS工程的组件通常分为3层，业务组件、模块组件和SDK组件。在老工程重构时，优先抽离SDK组件，切记不要写XXCommon让它变成垃圾堆。</p>
+<p>关于解耦的技术，appldegate适合用观察者模式替换代理模式，路由只用来做controller之间的跳转，上层业务组件的解耦更多是靠重构而不是全用路由。工程的组件和路由都可通过runtime + 配置的形式自动注册，这样做维护和集成都会很方便。</p>
+<p>Demo地址：<a href="https://github.com/zhudaye12138/Tourelle" target="_blank" rel="noopener">https://github.com/zhudaye12138/Tourelle</a></p>
+<blockquote>
+<p>本文转载至：<a href="https://www.jianshu.com/p/d88aef8e29a4" target="_blank" rel="noopener">朱大爷</a></p>
+</blockquote>
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/10/26/profile-layer/" rel="next" title="如何生成圆形和圆角的图像">
+                <i class="fa fa-chevron-left"></i> 如何生成圆形和圆角的图像
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/uploads/avatar.png"
+               alt="刘启明" />
+          <p class="site-author-name" itemprop="name">刘启明</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">28</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+          
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://www.github.com/timmy6" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> github
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.cnblogs.com/lomomiao/" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> 博客旧址(博客园)
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.weibo.com/u/3917867123" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> 新浪微博
+                  
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator">
+            <i class="fa fa-angle-double-up"></i>
+          </div>
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#组件化和解耦"><span class="nav-number">1.</span> <span class="nav-text">组件化和解耦</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#架构图"><span class="nav-number">2.</span> <span class="nav-text">架构图</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#包管理"><span class="nav-number">3.</span> <span class="nav-text">包管理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#关于架构设计"><span class="nav-number">4.</span> <span class="nav-text">关于架构设计</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#组件拆分原则"><span class="nav-number">5.</span> <span class="nav-text">组件拆分原则</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#响应式"><span class="nav-number">6.</span> <span class="nav-text">响应式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#路由"><span class="nav-number">7.</span> <span class="nav-text">路由</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#依赖注入"><span class="nav-number">8.</span> <span class="nav-text">依赖注入</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#App配置"><span class="nav-number">9.</span> <span class="nav-text">App配置</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#iOS解耦工具Tourelle"><span class="nav-number">10.</span> <span class="nav-text">iOS解耦工具Tourelle</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#TLAppEventBus"><span class="nav-number">11.</span> <span class="nav-text">TLAppEventBus</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#TLRouter"><span class="nav-number">12.</span> <span class="nav-text">TLRouter</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#TLAppLaunchHelper"><span class="nav-number">13.</span> <span class="nav-text">TLAppLaunchHelper</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#耦合检测工具"><span class="nav-number">14.</span> <span class="nav-text">耦合检测工具</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#总结"><span class="nav-number">15.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator">
+            <i class="fa fa-angle-double-down"></i>
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">刘启明</span>
+</div>
+
+
+
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<span id="busuanzi_container_site_pv">
+    本站总访问量<span id="busuanzi_value_site_pv"></span>次
+</span>
+
+<script>
+var birthDay = new Date("11/20/2014");
+var now = new Date();
+var duration = now.getTime() - birthDay.getTime();
+var total= Math.floor(duration / (1000 * 60 * 60 * 24));
+document.getElementById("showDays").innerHTML = "本站已运行 "+total+" 天";
+</script>
+<span id="showDays"></span>
+      </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  
+
+
+  
+
+
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=0.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=0.5.0"></script>
+
+
+
+  
+  
+
+  
+  
+<script type="text/javascript" src="/js/src/scrollspy.js?v=0.5.0"></script>
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 1 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = NexT.utils.escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    NexT.motion.middleWares.sidebar = function () {
+      var $tocContent = $('.post-toc-content');
+
+      if (CONFIG.scheme !== 'Pisces' && (CONFIG.sidebar.display === 'post' || CONFIG.sidebar.display === 'always')) {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          NexT.utils.displaySidebar();
+        }
+      }
+    };
+  });
+</script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=0.5.0"></script>
+
+
+
+  
+
+
+
+  
+
+    <script type="text/javascript">
+      var disqus_shortname = 'liuqiming';
+      var disqus_identifier = '2018/11/10/component-pro/';
+      var disqus_title = 'iOS组件化及架构设计';
+      var disqus_url = 'http://yoursite.com/2018/11/10/component-pro/';
+
+      function run_disqus_script(disqus_script){
+        var dsq = document.createElement('script');
+        dsq.type = 'text/javascript';
+        dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      }
+
+      run_disqus_script('count.js');
+      
+        run_disqus_script('embed.js');
+      
+    </script>
+  
+
+
+
+  
+  
+
+  
+  
+
+
+</body>
+</html>
