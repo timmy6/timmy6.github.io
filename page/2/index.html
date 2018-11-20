@@ -220,6 +220,127 @@
             
               
                 
+                <a class="post-title-link" href="/2017/05/29/glide-picasso/" itemprop="url">
+                  Glide 和 Picasso 对比.
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2017-05-29T10:16:47+08:00" content="2017-05-29">
+              2017-05-29
+            </time>
+          </span>
+	
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Android-进阶/" itemprop="url" rel="index">
+                    <span itemprop="name">Android 进阶</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2017/05/29/glide-picasso/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2017/05/29/glide-picasso/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+          Glide 和 Picasso 可以说是目前 Android 上最流行的图片加载库了。大部分安卓应用开发人员都有使用过这两个库在他们的开发工作中。这两个库也都确实提供了大量图片加载的功能，而且也都经过了很多应用的检验，是可靠可信的。表面看上去似乎两者工作原理很相似，但是实际上是有着很大差别的，主要体现在下面几个方面：
+
+下载图片的方式
+图片的缓存机制
+加载到内存的机制
+
+本文主要会围绕这几个方面
+          ...
+
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2017/05/29/glide-picasso/" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+        
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
                 <a class="post-title-link" href="/2017/03/11/wemart-sdk/" itemprop="url">
                   wemartSDK 集成文档
                 </a>
@@ -1252,121 +1373,6 @@ Google做的最明智的规定之一就是严格执行code review。每一个改
 
 
     
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2016/04/24/listview-scroll-conflict/" itemprop="url">
-                  ListView 滑动冲突
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-04-24T23:25:22+08:00" content="2016-04-24">
-              2016-04-24
-            </time>
-          </span>
-	
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/Android-进阶/" itemprop="url" rel="index">
-                    <span itemprop="name">Android 进阶</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-              <span class="post-comments-count">
-                &nbsp; | &nbsp;
-                <a href="/2016/04/24/listview-scroll-conflict/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2016/04/24/listview-scroll-conflict/" itemprop="commentsCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-
-          
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-          在Android中，有时候会遇到子控件和父控件都要滑动的情况，尤其是当子控件为listview的时候。这种情况较常见，典型的launcher，每个屏幕上放上listview就会出现这种情况。有两点需要注意：1.一般来说，view的onTouchEvent返回true，即消耗点击事件，viewgroup的onInterceptTouchEvent返回false，即不拦截点击事件，这一点从andro
-          ...
-
-          <div class="post-more-link text-center">
-            <a class="btn" href="/2016/04/24/listview-scroll-conflict/" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-        
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
 
   </section>
 
@@ -1413,7 +1419,7 @@ Google做的最明智的规定之一就是严格执行code review。每一个改
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">28</span>
+              <span class="site-state-item-count">29</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>

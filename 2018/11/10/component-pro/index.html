@@ -73,7 +73,7 @@
 <meta property="og:image" content="https://upload-images.jianshu.io/upload_images/10333442-8e60870cb8ed52f2.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1000/format/webp">
 <meta property="og:image" content="https://upload-images.jianshu.io/upload_images/10333442-501afe909e01028d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1000/format/webp">
 <meta property="og:image" content="https://upload-images.jianshu.io/upload_images/10333442-829c98cbb704af7a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/946/format/webp">
-<meta property="og:updated_time" content="2018-11-10T13:23:33.272Z">
+<meta property="og:updated_time" content="2018-11-10T13:29:11.554Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="iOS组件化及架构设计">
 <meta name="twitter:description" content="网上组件化的文章很多。很多文章一提到组件化，就会说解耦，一说到解耦就会说路由或者runtime。好像组件化 == 解耦 == 路由/Runtime，然而这是一个非常错误的观念。持有这一观点的人，没有搞清楚在组件化中什么是想要结果，什么是过程。  组件化和解耦大家不妨先思考两个问题：  为何要进行组件化开发？ 各个组件之间是否一定需要解耦？采用组件化，是为了组件能单独开发，能单独开发App就能快速">
@@ -310,9 +310,8 @@
 <p>同一层之间的组件互相独立，上层的组件耦合下层的组件。一般来讲，底层SDK组件和中层UI组件都是独立的功能，不会出现同层耦合。</p>
 <p><img src="https://upload-images.jianshu.io/upload_images/10333442-7464e6a05db1b89e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1000/format/webp" alt="art1"></p>
 <p>同层耦合一般出现在上层业务组件中，常见有两类，一类是controller之间的跳转，这个可以用路由解决；另一类是数据获取，数据获取需要通过重构抽离一个数据模块，耦合这个数据模块可以用协议，这样可以用依赖注入的方式隔离实现。通过协议隔离的好处是，上层业务可以不依赖其他业务的实现单独编译通过，这对上层业务组件的单独开发比较好。</p>
-<p>这种方法把所有数据协议放在一起，简单粗暴，但每一个数据协议改动都会导致数据协议层重新发布，不是很合理，可以再进一步细分数据协议层。</p>
-<p><img src="https://upload-images.jianshu.io/upload_images/10333442-bb5b6936a5dc0a85.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1000/format/webp" alt="art1"><br>业务组件耦个协议</p>
-<p><img src="https://upload-images.jianshu.io/upload_images/10333442-88d3fde3e1483d95.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1000/format/webp" alt="art1"><br>业务组件自己需要的协议</p>
+<p>这种方法把所有数据协议放在一起，简单粗暴，但每一个数据协议改动都会导致数据协议层重新发布，不是很合理，可以再进一步细分数据协议层。<br>业务组件耦个协议:<br><img src="https://upload-images.jianshu.io/upload_images/10333442-bb5b6936a5dc0a85.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1000/format/webp" alt="art1"></p>
+<p>业务组件自己需要的协议:<br><img src="https://upload-images.jianshu.io/upload_images/10333442-88d3fde3e1483d95.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1000/format/webp" alt="art1"></p>
 <p>这种方法把数据协议层分成了多个，业务组件只依赖自己的数据协议。管理起来更麻烦一点，不过架构上更合理。</p>
 <p>建议组件化前期用第一种方案，后期细化为第二种。</p>
 <h4 id="包管理"><a href="#包管理" class="headerlink" title="包管理"></a>包管理</h4><p>要解除循环依赖，引入包管理技术cocoapods会让我们更有效率。pod不允许组件间有循环依赖，若有pod install时就会报错。</p>
@@ -409,6 +408,10 @@
 
           <div class="post-nav-prev post-nav-item">
             
+              <a href="/2018/11/20/static-const-extern/" rel="prev" title="iOS中static，const，extern相关的问题">
+                iOS中static，const，extern相关的问题 <i class="fa fa-chevron-right"></i>
+              </a>
+            
           </div>
         </div>
       
@@ -482,7 +485,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">28</span>
+              <span class="site-state-item-count">29</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>

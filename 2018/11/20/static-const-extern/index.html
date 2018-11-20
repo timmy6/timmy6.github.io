@@ -57,17 +57,34 @@
 
 
 
-<meta name="description" content="新的博客建好了，简约而不简单，博客这个地方，不需要建立的太奢华、绚丽夺目，简简单单就好。前两年，是在博客园写博客，说起来，不算是写博客，顶多算是记录自己职业生涯前进的脚印与所遇到的困难。这个时代是不断在变化的，沧海桑田，但，互联网所记录的东西，是可以一直保存下来的，从将日记写在本子上，发展到将日记记录在网上，这本身就是一个进步。搬到新博客，我会用心去记录，拒绝原封不动的“拿来主义”。不说自己写">
+<meta name="description" content="一、 staticstatic分两种情况，修饰局部变量和全局变量。我们首先要搞清楚生命周期和作用域的概念。  生命周期：这个变量能存活多久，它所占用的内存什么时候分配，什么时候收回。 作用域：说白了就是这个变量在什么区域是可见的，可以拿来用的。  static修饰局部变量在函数或者说代码块内部声明的变量叫局部变量。 局部变量局部变量是存储在栈区的，它的生命周期是整个代码块，作用域也是整个代码块，一">
 <meta property="og:type" content="article">
-<meta property="og:title" content="第一篇博客">
-<meta property="og:url" content="http://yoursite.com/2016/02/29/2016-02-29/index.html">
+<meta property="og:title" content="iOS中static，const，extern相关的问题">
+<meta property="og:url" content="http://yoursite.com/2018/11/20/static-const-extern/index.html">
 <meta property="og:site_name" content="刘启明">
-<meta property="og:description" content="新的博客建好了，简约而不简单，博客这个地方，不需要建立的太奢华、绚丽夺目，简简单单就好。前两年，是在博客园写博客，说起来，不算是写博客，顶多算是记录自己职业生涯前进的脚印与所遇到的困难。这个时代是不断在变化的，沧海桑田，但，互联网所记录的东西，是可以一直保存下来的，从将日记写在本子上，发展到将日记记录在网上，这本身就是一个进步。搬到新博客，我会用心去记录，拒绝原封不动的“拿来主义”。不说自己写">
+<meta property="og:description" content="一、 staticstatic分两种情况，修饰局部变量和全局变量。我们首先要搞清楚生命周期和作用域的概念。  生命周期：这个变量能存活多久，它所占用的内存什么时候分配，什么时候收回。 作用域：说白了就是这个变量在什么区域是可见的，可以拿来用的。  static修饰局部变量在函数或者说代码块内部声明的变量叫局部变量。 局部变量局部变量是存储在栈区的，它的生命周期是整个代码块，作用域也是整个代码块，一">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2016-04-29T16:19:22.000Z">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/5796542-eeef5743e6099f5b.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/553/format/webp">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/5796542-565a909c8bf910fe.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/451/format/webp">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/5796542-a36d59e9e20bf39e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/535/format/webp">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/5796542-6463855ad5a20d6d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/460/format/webp">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/5796542-14de861ac69264f6.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/686/format/webp">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/5796542-a63d6b030ac5220f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/688/format/webp">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/5796542-03de4615b6603425.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/400/format/webp">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/5796542-078743a17e4727b2.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/633/format/webp">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/5796542-086535a84235a37d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/705/format/webp">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/5796542-46716470893f1036.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/858/format/webp">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/5796542-1219ddc15ed8269a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/854/format/webp">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/5796542-1c00f6e37826b729.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/839/format/webp">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/5796542-44758319cb382d84.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/664/format/webp">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/5796542-45cecb3710c7770f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/715/format/webp">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/5796542-20b5e35b5cf0ab41.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/519/format/webp">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/5796542-e93d0dcff22eb5c4.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/570/format/webp">
+<meta property="og:updated_time" content="2018-11-20T13:13:43.821Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="第一篇博客">
-<meta name="twitter:description" content="新的博客建好了，简约而不简单，博客这个地方，不需要建立的太奢华、绚丽夺目，简简单单就好。前两年，是在博客园写博客，说起来，不算是写博客，顶多算是记录自己职业生涯前进的脚印与所遇到的困难。这个时代是不断在变化的，沧海桑田，但，互联网所记录的东西，是可以一直保存下来的，从将日记写在本子上，发展到将日记记录在网上，这本身就是一个进步。搬到新博客，我会用心去记录，拒绝原封不动的“拿来主义”。不说自己写">
+<meta name="twitter:title" content="iOS中static，const，extern相关的问题">
+<meta name="twitter:description" content="一、 staticstatic分两种情况，修饰局部变量和全局变量。我们首先要搞清楚生命周期和作用域的概念。  生命周期：这个变量能存活多久，它所占用的内存什么时候分配，什么时候收回。 作用域：说白了就是这个变量在什么区域是可见的，可以拿来用的。  static修饰局部变量在函数或者说代码块内部声明的变量叫局部变量。 局部变量局部变量是存储在栈区的，它的生命周期是整个代码块，作用域也是整个代码块，一">
+<meta name="twitter:image" content="https://upload-images.jianshu.io/upload_images/5796542-eeef5743e6099f5b.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/553/format/webp">
 
 
 
@@ -85,7 +102,7 @@
   };
 </script>
 
-  <title> 第一篇博客 | 刘启明 </title>
+  <title> iOS中static，const，extern相关的问题 | 刘启明 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -215,7 +232,7 @@
             
             
               
-                第一篇博客
+                iOS中static，const，extern相关的问题
               
             
           </h1>
@@ -227,8 +244,8 @@
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-02-29T22:36:24+08:00" content="2016-02-29">
-              2016-02-29
+            <time itemprop="dateCreated" datetime="2018-11-20T20:59:01+08:00" content="2018-11-20">
+              2018-11-20
             </time>
           </span>
 	
@@ -243,8 +260,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/人生苦短/" itemprop="url" rel="index">
-                    <span itemprop="name">人生苦短</span>
+                  <a href="/categories/iOS开发/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS开发</span>
                   </a>
                 </span>
 
@@ -259,8 +276,8 @@
             
               <span class="post-comments-count">
                 &nbsp; | &nbsp;
-                <a href="/2016/02/29/2016-02-29/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2016/02/29/2016-02-29/" itemprop="commentsCount"></span>
+                <a href="/2018/11/20/static-const-extern/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2018/11/20/static-const-extern/" itemprop="commentsCount"></span>
                 </a>
               </span>
             
@@ -281,9 +298,27 @@
       
 
       
-        <blockquote>
-<p> 新的博客建好了，简约而不简单，博客这个地方，不需要建立的太奢华、绚丽夺目，简简单单就好。前两年，是在<a href="http://www.cnblogs.com/lomomiao/" target="_blank" rel="noopener">博客园</a>写博客，说起来，不算是写博客，顶多算是记录自己职业生涯前进的脚印与所遇到的困难。这个时代是不断在变化的，沧海桑田，但，互联网所记录的东西，是可以一直保存下来的，从将日记写在本子上，发展到将日记记录在网上，这本身就是一个进步。搬到新博客，我会用心去记录，拒绝原封不动的“拿来主义”。不说自己写的东西，对他人能带来多少实质性的帮助，只希望，三年、五年、甚至十年二十年之后，自己重新看自己曾经写过的东西，能让自己觉得，虽然时光流逝，青春不返，但却将青春的故事，记录在了互联网上。<br>    刚毕业的时候，有幸认识了蚂蚁金服某程序员，暂且就称他为罗吧，罗给了我一个内推的机会，让我能够参加阿里的校招面试，并给了我一个月面试准备时间。虽然最终这个事还是黄了，但是在这一个月里，对我的心态成长和技术成长的好处，让我受益匪浅。也就是在这个时候，在我心里埋下了一个走进BAT的种子，虽然知道自己距BAT的要求，还有一段距离。付出总有收获，我相信有一天我可以做到。<br>      今年是和苗苗在一起的第三年。<br>    加油！</p>
+        <h3 id="一、-static"><a href="#一、-static" class="headerlink" title="一、 static"></a>一、 static</h3><p>static分两种情况，修饰局部变量和全局变量。<br>我们首先要搞清楚生命周期和作用域的概念。</p>
+<ul>
+<li><em>生命周期：</em>这个变量能存活多久，它所占用的内存什么时候分配，什么时候收回。</li>
+<li><em>作用域：</em>说白了就是这个变量在什么区域是可见的，可以拿来用的。</li>
+</ul>
+<h4 id="static修饰局部变量"><a href="#static修饰局部变量" class="headerlink" title="static修饰局部变量"></a>static修饰局部变量</h4><p>在函数或者说代码块内部声明的变量叫局部变量。</p>
+<p><em>局部变量</em><br>局部变量是存储在栈区的，它的生命周期是整个代码块，作用域也是整个代码块，一旦出了这个代码块，存储局部变量的这个栈内存就会被回收，局部变量也就被销毁了。看一个例子：<br><img src="https://upload-images.jianshu.io/upload_images/5796542-eeef5743e6099f5b.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/553/format/webp" alt="art1"><br>打印结果：<br><img src="https://upload-images.jianshu.io/upload_images/5796542-565a909c8bf910fe.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/451/format/webp" alt="art1"></p>
+<p>这个其实很好理解，局部变量a是在test方法的代码块内声明的，所以它的生命周期就是这个代码块，当我们调用完一次test方法后，局部变量a就被销毁了，不存在了。在下一次调用test方法时又在栈区重新申请了内存。<br>当我们用static修饰局部变量时，变量被称为静态局部变量，这个静态局部变量和全局变量，静态全局变量一样，是存储在静态存储区。**由于存储在静态存储区，所以这块内存直到程序结束才会销毁。也就是说，静态局部变量的生命周期是整个源程序。但是它只在声明它的代码块可见，也就是说它的作用域是声明它的代码块。我们把局部变量a用static修饰：<br><img src="https://upload-images.jianshu.io/upload_images/5796542-a36d59e9e20bf39e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/535/format/webp" alt="art1"><br>看一下打印结果：<br><img src="https://upload-images.jianshu.io/upload_images/5796542-6463855ad5a20d6d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/460/format/webp" alt="art1"><br>当我们第一次调用test方法时，在静态存储区申请了一块内存吗，这块内存名字叫a，里面装着数字0，然后把数字0加1，变成了1，当第二次调用test方法时，会去静态存储区查找有没有一块内存叫a，如果有那就不用重新分配内存初始化，这里找到了这块叫a的内存，所以不用进行初始化，所以a里面还是装的1然后对1加1，得到了2.</p>
+<h4 id="static修饰全局变量"><a href="#static修饰全局变量" class="headerlink" title="static修饰全局变量"></a>static修饰全局变量</h4><p>当全局变量没有使用static修饰符时，其存储在静态存储区，直到程序结束才销毁。也就是其作用域是整个源程序。我们可以使用extern关键字来引用这个全局变量。<br>Test.h:<br><img src="https://upload-images.jianshu.io/upload_images/5796542-14de861ac69264f6.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/686/format/webp" alt="art1"><br>ViewController.m:<br><img src="https://upload-images.jianshu.io/upload_images/5796542-a63d6b030ac5220f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/688/format/webp" alt="art1"><br>结果：<br><img src="https://upload-images.jianshu.io/upload_images/5796542-03de4615b6603425.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/400/format/webp" alt="art1"><br>当全局变量使用static修饰时，其生命周期没有变，依旧是在程序结束时才销毁。但是其作用域变了，以前是整个源程序，现在只限于申明它的这个文件才可见，即使用extern引用也不行，比如我们把上面的例子中globalVar前面用static修饰，那么程序就会报错：<br><img src="https://upload-images.jianshu.io/upload_images/5796542-078743a17e4727b2.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/633/format/webp" alt="art1"></p>
+<h4 id="总结："><a href="#总结：" class="headerlink" title="总结："></a>总结：</h4><p><em>static修饰局部变量：</em>将局部变量的本来分配在栈区改为分配在静态存储区，也就改变了局部变量的生命周期。<br><em>static修饰全局变量：</em>本来是在整个源程序的所有文件都可见，static修饰后，改为只在申明自己的文件可见，即修改了作用域。</p>
+<h3 id="二、const"><a href="#二、const" class="headerlink" title="二、const"></a>二、const</h3><p>const修饰变量主要强调变量是不可修改的。我们看一下下面代码段：<br><img src="https://upload-images.jianshu.io/upload_images/5796542-086535a84235a37d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/705/format/webp" alt="art1"><br>从结果可以看到变量a的值修改成功，那么我们将变量a用const修饰试一试：<br><img src="https://upload-images.jianshu.io/upload_images/5796542-46716470893f1036.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/858/format/webp" alt="art1"><br>使用const修饰变量a之后，a的值就不能修改了，所以这里修改就不成功了。</p>
+<blockquote>
+<p>需要注意的一点是，const修饰的是其右边的值，也就是const右边的这个整体的值不能改变。</p>
 </blockquote>
+<p>下面例子是const修饰*str这个整体，所以这个整体不能改变，这个整体是str指向的内存中的值。<br><img src="https://upload-images.jianshu.io/upload_images/5796542-1219ddc15ed8269a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/854/format/webp" alt="art1"></p>
+<p>下面例子是const修饰str的，所以str指向的地址不能改变，因此这里的改变就产生了错误。<br><img src="https://upload-images.jianshu.io/upload_images/5796542-1c00f6e37826b729.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/839/format/webp" alt="art1"></p>
+<p>一般联合使用static和const来定义一个只能在本文件中使用的，不能修改的变量：<br><img src="https://upload-images.jianshu.io/upload_images/5796542-44758319cb382d84.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/664/format/webp" alt="art1"></p>
+<p><em>这样定义相对于用#define来定义的话，优点就在于它指定了变量的类型，而#define是不能指定变量的类型的。</em></p>
+<h3 id="三、extern"><a href="#三、extern" class="headerlink" title="三、extern"></a>三、extern</h3><p>extern主要是用来引用全局变量，它的原理就是先在本文件中查找，本文件中查找不到再到其他文件中查找。<br>常把extern和const联合使用在项目中创建一个文件，这个文件文件中包含整个项目中都能访问的全局常量。比如我们在项目中创建的这个文件为LMConst.h,LMConst.m。<br>LMConst.h：<br><img src="https://upload-images.jianshu.io/upload_images/5796542-45cecb3710c7770f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/715/format/webp" alt="art1"><br>LMConst.m:</p>
+<p>pch文件：<br><img src="https://upload-images.jianshu.io/upload_images/5796542-20b5e35b5cf0ab41.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/519/format/webp" alt="art1"></p>
+<p>然后我们就可以直接在其他文件中使用NOTIFICATION_NAME这个字符串常量了：<br><img src="https://upload-images.jianshu.io/upload_images/5796542-e93d0dcff22eb5c4.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/570/format/webp" alt="art1"></p>
 
       
     </div>
@@ -295,13 +330,13 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
+              <a href="/2018/11/10/component-pro/" rel="next" title="iOS组件化及架构设计">
+                <i class="fa fa-chevron-left"></i> iOS组件化及架构设计
+              </a>
+            
           </div>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2016/03/06/2016-03-06/" rel="prev" title="书单 (持续更新)">
-                书单 (持续更新) <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -445,7 +480,7 @@
               
             
             
-              <p class="post-toc-empty">此文章未包含目录</p>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#一、-static"><span class="nav-number">1.</span> <span class="nav-text">一、 static</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#static修饰局部变量"><span class="nav-number">1.1.</span> <span class="nav-text">static修饰局部变量</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#static修饰全局变量"><span class="nav-number">1.2.</span> <span class="nav-text">static修饰全局变量</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#总结："><span class="nav-number">1.3.</span> <span class="nav-text">总结：</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#二、const"><span class="nav-number">2.</span> <span class="nav-text">二、const</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#三、extern"><span class="nav-number">3.</span> <span class="nav-text">三、extern</span></a></li></ol></div>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator">
@@ -706,9 +741,9 @@ document.getElementById("showDays").innerHTML = "本站已运行 "+total+" 天";
 
     <script type="text/javascript">
       var disqus_shortname = 'liuqiming';
-      var disqus_identifier = '2016/02/29/2016-02-29/';
-      var disqus_title = '第一篇博客';
-      var disqus_url = 'http://yoursite.com/2016/02/29/2016-02-29/';
+      var disqus_identifier = '2018/11/20/static-const-extern/';
+      var disqus_title = 'iOS中static，const，extern相关的问题';
+      var disqus_url = 'http://yoursite.com/2018/11/20/static-const-extern/';
 
       function run_disqus_script(disqus_script){
         var dsq = document.createElement('script');
