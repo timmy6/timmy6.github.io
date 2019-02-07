@@ -66,8 +66,9 @@
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://yoursite.com/uploads/mvvm.png">
 <meta property="og:image" content="http://yoursite.com/uploads/mvvm_user_info.png">
+<meta property="og:image" content="http://yoursite.com/uploads/mvvm_balance.png">
 <meta property="og:image" content="http://yoursite.com/uploads/mvvm2.png">
-<meta property="og:updated_time" content="2019-02-07T02:28:58.272Z">
+<meta property="og:updated_time" content="2019-02-07T02:55:46.159Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="iOS架构：MVVM设计模式 + RAC响应式编程">
 <meta name="twitter:description" content="一：为什么要使用MVVM?为什么要用MVVM？只是因为它不会让我时常懵逼。 每次做完项目过后，都会被自己庞大的 ViewController 代码吓坏，不管是什么网络请求、网络数据处理、跳转交互逻辑统统往 ViewController 里面塞，就算是自己写的代码，也不敢直视。我不得不思考是不是MVC模式太过落后了，毕竟它叫做 Massive View Controller，其实说 MVC 落后不太">
@@ -304,6 +305,7 @@
 <p>当然，有些开发者不太愿意用这些东西，大概是因为他们觉得这破坏了代理、通知、监听、闭包等的逻辑观感。但是笔者 MVVM 搭建思路里面会涉及大量的属性绑定、事件传递，运用 RAC 能大量简化代码，使逻辑更加的清晰。</p>
 <p>在这之前，如果你没有用过RAC，请先Google搜索：RAC<br>大致的了解一下RAC过后，便可以往下（^）</p>
 <p>四：MVVM模块具体实现<br>这是要实现的界面：</p>
+<p><img src="/uploads/mvvm_user_info.png" alt="shortcuts"></p>
 <h4 id="1-Model"><a href="#1-Model" class="headerlink" title="1.Model"></a>1.Model</h4><p>这里弱化了 Model，只是做为数据模型使用。只有在 View 需要显示网络数据的时候，对应的 ViewModel 里面才有 Model 的相关处理。</p>
 <h4 id="2-ViewModel"><a href="#2-ViewModel" class="headerlink" title="2.ViewModel"></a>2.ViewModel</h4><p>在实际开发当中，一个 View 对应一个 ViewModel，主 View 对应并且绑定一个主 ViewModel。</p>
 <p>主 ViewModel 承担了网络请求、点击事件协议、初始化子 ViewModel 并且给子 ViewModel 的属性赋初值；网络请求成功返回数据过后，主 ViewModel 还需要给子 ViewModel 的属性赋予新的值。</p>
@@ -320,7 +322,7 @@
 <p>首先，我们来看一看 ViewModel 的概念，Model 是模型，所以 ViewModel 就是视图的模型。而在传统的 MVC 中，瘦 Model 叫做数据模型，其实瘦 Model 叫做 DataModel 更为合适；而胖 Model 只是将网络请求的逻辑、网络数据处理的逻辑写在了里面，方便于 View 更加便捷的展示数据，所以，胖 Model 的功能和 ViewModel 大同小异，笔者把它叫做“少根筋的 ViewModel”。</p>
 <p>这么一想，我们似乎应该将网络数据处理的逻辑放在子 ViewModel 中，来为主 ViewModel 减负。</p>
 <p>笔者也想这么做。<br>但是有个问题，举个简单的例子，比如这个需求：</p>
-<p><img src="/uploads/mvvm_user_info.png" alt="shortcuts"></p>
+<p><img src="/uploads/mvvm_balance.png" alt="shortcuts"></p>
 <p>一般的思路是自定义一个 CollectionviewCell 和一个 ViewModel，因为它们的布局是一样的，我们需要在主 ViewModel 中声明一个数组属性，然后放入两个 ViewModel，分别对应两个 Cell。</p>
 <p>image 和 title 这种静态数据我们可以在主ViewModel中为这两个子ViewModel赋值，而下方的具体额度和数量来自网络，网络请求下来的数据通常是:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    balance:<span class="string">"100"</span></span><br><span class="line">    redPacket:<span class="string">"3"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <p>我们需要把”100“转化为”100元“，”3“转化为”3个“。<br>这个网络数据处理逻辑按正常的逻辑来说是应该放在 ViewModel 中的，但是有个问题，我们这个 collectionviewcell 是复用的，它的 ViewModel 也是同一个，而处理的数据是两个不同的字段，我们如何区分？而且不要忘了，网络请求成功获得的数据是在主 ViewModel 中的，还涉及到传值。再按照这个思路去实现必然更为复杂，所以我干脆一刀切，不管是静态数据还是网络数据的处理，通通放在主 ViewModel 中。</p>
