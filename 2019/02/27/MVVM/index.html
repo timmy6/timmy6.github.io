@@ -1,0 +1,816 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.5.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.5.0" />
+
+
+
+
+
+
+<meta name="description" content="一：为什么要使用MVVM?为什么要用MVVM？只是因为它不会让我时常懵逼。 每次做完项目过后，都会被自己庞大的 ViewController 代码吓坏，不管是什么网络请求、网络数据处理、跳转交互逻辑统统往 ViewController 里面塞，就算是自己写的代码，也不敢直视。我不得不思考是不是MVC模式太过落后了，毕竟它叫做 Massive View Controller，其实说 MVC 落后不太">
+<meta property="og:type" content="article">
+<meta property="og:title" content="iOS架构：MVVM设计模式 + RAC响应式编程">
+<meta property="og:url" content="http://yoursite.com/2019/02/27/MVVM/index.html">
+<meta property="og:site_name" content="刘启明">
+<meta property="og:description" content="一：为什么要使用MVVM?为什么要用MVVM？只是因为它不会让我时常懵逼。 每次做完项目过后，都会被自己庞大的 ViewController 代码吓坏，不管是什么网络请求、网络数据处理、跳转交互逻辑统统往 ViewController 里面塞，就算是自己写的代码，也不敢直视。我不得不思考是不是MVC模式太过落后了，毕竟它叫做 Massive View Controller，其实说 MVC 落后不太">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://yoursite.com/uploads/mvvm.png">
+<meta property="og:image" content="http://yoursite.com/uploads/mvvm_user_info.png">
+<meta property="og:image" content="http://yoursite.com/uploads/mvvm2.png">
+<meta property="og:updated_time" content="2019-02-07T02:28:58.272Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="iOS架构：MVVM设计模式 + RAC响应式编程">
+<meta name="twitter:description" content="一：为什么要使用MVVM?为什么要用MVVM？只是因为它不会让我时常懵逼。 每次做完项目过后，都会被自己庞大的 ViewController 代码吓坏，不管是什么网络请求、网络数据处理、跳转交互逻辑统统往 ViewController 里面塞，就算是自己写的代码，也不敢直视。我不得不思考是不是MVC模式太过落后了，毕竟它叫做 Massive View Controller，其实说 MVC 落后不太">
+<meta name="twitter:image" content="http://yoursite.com/uploads/mvvm.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"hide"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: '博主'
+    }
+  };
+</script>
+
+  <title> iOS架构：MVVM设计模式 + RAC响应式编程 | 刘启明 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">刘启明</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu ">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-home fa-fw"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-th fa-fw"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            时间轴
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-user fa-fw"></i> <br />
+            
+            留言板
+          </a>
+        </li>
+      
+
+      
+      
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                iOS架构：MVVM设计模式 + RAC响应式编程
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2019-02-27T09:49:01+08:00" content="2019-02-27">
+              2019-02-27
+            </time>
+          </span>
+	
+          <span id="busuanzi_container_page_pv">  |  阅读量 <span id="busuanzi_value_page_pv"></span> 次</span>
+        
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/iOS开发/" itemprop="url" rel="index">
+                    <span itemprop="name">iOS开发</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2019/02/27/MVVM/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2019/02/27/MVVM/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="一：为什么要使用MVVM"><a href="#一：为什么要使用MVVM" class="headerlink" title="一：为什么要使用MVVM?"></a>一：为什么要使用MVVM?</h3><p>为什么要用MVVM？只是因为它不会让我时常懵逼。</p>
+<p>每次做完项目过后，都会被自己庞大的 ViewController 代码吓坏，不管是什么网络请求、网络数据处理、跳转交互逻辑统统往 ViewController 里面塞，就算是自己写的代码，也不敢直视。我不得不思考是不是MVC模式太过落后了，毕竟它叫做 Massive View Controller，其实说 MVC 落后不太合理，说它太原始了比较合适。</p>
+<p>MVC 模式的历史非常的久远，它其实不过是对工程代码的一种模块化，不管是 MVVM、MVCS、还是听起来就毛骨悚然的 VIPER，都是对 MVC 标准的三个模块的继续划分，细分下去，使每个模块的功能更加的独立和单一，而最终目的都是为了提升代码的规范程度，解耦，和降低维护成本。具体用什么模式需要根据项目的需求来决定，而这里笔者就 MVVM 架构和设计，浅谈拙见。</p>
+<h3 id="二：MVVM模块划分"><a href="#二：MVVM模块划分" class="headerlink" title="二：MVVM模块划分"></a>二：MVVM模块划分</h3><p>传统的MVC模式分为：Model、View、Controller。Model 是数据模型，有胖瘦之分，View 负责界面展示，而 Controller 就负责剩下的逻辑和业务。</p>
+<p>MVVM 模式多了一个 ViewModel，它的作用是为 Controller 减负，将Controller里面的逻辑（主要是弱业务逻辑）转移到自身，其实它涉及到的工作不止是这些，还包括页面展示数据的处理等。（后序章节会有具体讲解）</p>
+<p><img src="/uploads/mvvm.png" alt="shortcuts"></p>
+<p>我的设计是这样的：</p>
+<ul>
+<li>一个 View 对应一个 ViewModel，View 界面元素属性与 ViewModel 处理后的数据属性绑定</li>
+<li>Model 只是在有网络数据的时候需要创建，它的作用只是一个数据的中专站，也就是一个极为简介的瘦 Model</li>
+<li>这里弱化了 Model 的作用，而将对网络数据的处理的逻辑放在 ViewModel 中，也就是说，只有在有网络数据展示的 View 的 ViewModel 中，才会看见 Model 的影子，而处理过后的数据，将变成 ViewModel 的属性，注意一点，这些属性一定要尽量“直观”，比如能写成UIImage 就不要写成 URL</li>
+<li>ViewModel 和 Model 可以视情况看是否需要属性绑定</li>
+<li>Controller 的作用就是将主View通过与之对应的 ViewModel 初始化，然后添加到 self.view，然后就是监听跳转逻辑触发等少部分业务逻辑，当然，ViewController 的路由跳转还可以解放出来。</li>
+</ul>
+<p><strong>注意：这里面提到的绑定，其实就是对属性的监听，当属性变化时，监听者做一些逻辑处理，由此涉及到一个框架————RAC</strong></p>
+<h3 id="ReactiveCocoa"><a href="#ReactiveCocoa" class="headerlink" title="ReactiveCocoa"></a>ReactiveCocoa</h3><p>RAC是一个强大的工具，它和MVVM模式的结合使用只能用一个词形容 ——— 完美。</p>
+<p>当然，有些开发者不太愿意用这些东西，大概是因为他们觉得这破坏了代理、通知、监听、闭包等的逻辑观感。但是笔者 MVVM 搭建思路里面会涉及大量的属性绑定、事件传递，运用 RAC 能大量简化代码，使逻辑更加的清晰。</p>
+<p>在这之前，如果你没有用过RAC，请先Google搜索：RAC<br>大致的了解一下RAC过后，便可以往下（^）</p>
+<p>四：MVVM模块具体实现<br>这是要实现的界面：</p>
+<h4 id="1-Model"><a href="#1-Model" class="headerlink" title="1.Model"></a>1.Model</h4><p>这里弱化了 Model，只是做为数据模型使用。只有在 View 需要显示网络数据的时候，对应的 ViewModel 里面才有 Model 的相关处理。</p>
+<h4 id="2-ViewModel"><a href="#2-ViewModel" class="headerlink" title="2.ViewModel"></a>2.ViewModel</h4><p>在实际开发当中，一个 View 对应一个 ViewModel，主 View 对应并且绑定一个主 ViewModel。</p>
+<p>主 ViewModel 承担了网络请求、点击事件协议、初始化子 ViewModel 并且给子 ViewModel 的属性赋初值；网络请求成功返回数据过后，主 ViewModel 还需要给子 ViewModel 的属性赋予新的值。</p>
+<p>主 ViewModel 的观感是这样的：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">MineViewModel</span> : <span class="title">NSObject</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">//viewModel</span></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>) MineHeaderViewModel *mineHeaderViewModel;</span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>) <span class="built_in">NSArray</span>&lt;MineTopCollectionViewCellViewModel *&gt; *dataSorceOfMineTopCollectionViewCell;</span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>) <span class="built_in">NSArray</span>&lt;MineDownCollectionViewCellViewModel *&gt; *dataSorceOfMineDownCollectionViewCell;</span><br><span class="line"></span><br><span class="line"><span class="comment">//RACCommand</span></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>) RACCommand *autoLoginCommand;</span><br><span class="line"></span><br><span class="line"><span class="comment">//RACSubject</span></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>) RACSubject *pushSubject;</span><br><span class="line"></span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+<p>其中，RACCommand 是放网络请求的地方，RACSubject 相当于协议，这里用于点击事件的代理，而 ViewModel 下面的一个 ViewModel 属性和三个装有 ViewModel 的数组需要着重说一下。</p>
+<p>在iOS开发中，我们通常会自定义 View，而自定义的 View 有可能是继承自 UICollectionviewCell（UITableViewCell、UITableViewHeaderFooterView 等），当我们自定义一个 View 的时候，这个 View 不需要复用且只有一个，我们就在主 ViewModel 声明一个子 ViewModel 属性，当我们自定义一个需要复用的 cell、item、headerView 等的时候，我们就在主 ViewModel 中声明数组属性，用于储存复用的 cell、item 的 ViewModel，中心思想仍然是一个 View 对应一个 ViewModel。</p>
+<p>在.m文件中，对这些属性做懒加载处理，并且将 RACCommand 和 RACSubject 配置好，方便之后在需要的时候触发以及调用，代码如下：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">MineViewModel</span></span></span><br><span class="line"></span><br><span class="line">- (<span class="keyword">instancetype</span>)init</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">self</span> = [<span class="keyword">super</span> init];</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">self</span>) &#123;</span><br><span class="line">        [<span class="keyword">self</span> initialize];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">self</span>;</span><br><span class="line">&#125;</span><br><span class="line">- (<span class="keyword">void</span>)initialize &#123;</span><br><span class="line">    [<span class="keyword">self</span>.autoLoginCommand.executionSignals.switchToLatest subscribeNext:^(<span class="keyword">id</span> responds) &#123;</span><br><span class="line">        <span class="comment">//处理网络请求数据</span></span><br><span class="line">        ......</span><br><span class="line">    &#125;];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">#pragma mark *** getter ***</span></span><br><span class="line">- (RACSubject *)pushSubject &#123;</span><br><span class="line">    <span class="keyword">if</span> (!_pushSubject) &#123;</span><br><span class="line">        _pushSubject = [RACSubject subject];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> _pushSubject;</span><br><span class="line">&#125;</span><br><span class="line">- (RACCommand *)autoLoginCommand &#123;</span><br><span class="line">    <span class="keyword">if</span> (!_autoLoginCommand) &#123;</span><br><span class="line">        _autoLoginCommand = [[RACCommand alloc] initWithSignalBlock:^RACSignal *(<span class="keyword">id</span> input) &#123;</span><br><span class="line">            <span class="keyword">return</span> [RACSignal createSignal:^RACDisposable *(<span class="keyword">id</span>&lt;RACSubscriber&gt; subscriber) &#123;</span><br><span class="line">                <span class="built_in">NSDictionary</span> *paramDic = @&#123;......&#125;;</span><br><span class="line">                [Network start:paramDic success:^(<span class="keyword">id</span> datas) &#123;</span><br><span class="line">                    [subscriber sendNext:datas];</span><br><span class="line">                    [subscriber sendCompleted];</span><br><span class="line">                &#125; failure:^(<span class="built_in">NSString</span> *errorMsg) &#123;</span><br><span class="line">                    [subscriber sendNext:errorMsg];</span><br><span class="line">                    [subscriber sendCompleted];</span><br><span class="line">                &#125;];</span><br><span class="line">                <span class="keyword">return</span> <span class="literal">nil</span>;</span><br><span class="line">            &#125;];</span><br><span class="line">        &#125;];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> _autoLoginCommand;</span><br><span class="line">&#125;</span><br><span class="line">- (MineHeaderViewModel *)mineHeaderViewModel &#123;</span><br><span class="line">    <span class="keyword">if</span> (!_mineHeaderViewModel) &#123;</span><br><span class="line">        _mineHeaderViewModel = [MineHeaderViewModel new];</span><br><span class="line">        _mineHeaderViewModel.headerBackgroundImage = [<span class="built_in">UIImage</span> imageNamed:<span class="string">@"BG"</span>];</span><br><span class="line">        _mineHeaderViewModel.headerImageUrlStr = <span class="literal">nil</span>;</span><br><span class="line">        [[[RACObserve([LoginBackInfoModel shareLoginBackInfoModel], headimg) distinctUntilChanged] takeUntil:<span class="keyword">self</span>.rac_willDeallocSignal] subscribeNext:^(<span class="keyword">id</span> x) &#123;</span><br><span class="line">            <span class="keyword">if</span> (x == <span class="literal">nil</span>) &#123;</span><br><span class="line">                _mineHeaderViewModel.headerImageUrlStr = <span class="literal">nil</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                _mineHeaderViewModel.headerImageUrlStr = x;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;];</span><br><span class="line">        ......</span><br><span class="line">    <span class="keyword">return</span> _mineHeaderViewModel;</span><br><span class="line">&#125;</span><br><span class="line">- (<span class="built_in">NSArray</span>&lt;MineTopCollectionViewCellViewModel *&gt; *)dataSorceOfMineTopCollectionViewCell &#123;</span><br><span class="line">    <span class="keyword">if</span> (!_dataSorceOfMineTopCollectionViewCell) &#123;</span><br><span class="line">        MineTopCollectionViewCellViewModel *model1 = [MineTopCollectionViewCellViewModel new];</span><br><span class="line">        MineTopCollectionViewCellViewModel *model2 = [MineTopCollectionViewCellViewModel new];</span><br><span class="line">        ......</span><br><span class="line">        _dataSorceOfMineTopCollectionViewCell = @[model1, model2];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> _dataSorceOfMineTopCollectionViewCell;</span><br><span class="line">&#125;</span><br><span class="line">- (<span class="built_in">NSArray</span>&lt;MineDownCollectionViewCellViewModel *&gt; *)dataSorceOfMineDownCollectionViewCell &#123;</span><br><span class="line">    <span class="keyword">if</span> (!_dataSorceOfMineDownCollectionViewCell) &#123;</span><br><span class="line">        ......</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> _dataSorceOfMineDownCollectionViewCell;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure></p>
+<p>为了方便，我直接将以前写的一些代码贴上来了，不要被它的长度吓着了，你完全可以忽略内部实现，只需要知道，这里不过是实现了 RACCommand 和 RACSubject 以及初始化子 ViewModel。</p>
+<p>是的，主 ViewModel 的主要工作基本上只有这三个。</p>
+<p>关于属性绑定的逻辑，我将在之后讲到。<br>我们先来看看子 ViweModel 的观感：</p>
+<figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">MineTopCollectionViewCellViewModel</span> : <span class="title">NSObject</span></span></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>) <span class="built_in">UIImage</span> *headerImage;</span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">copy</span>) <span class="built_in">NSString</span> *headerTitle;</span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">copy</span>) <span class="built_in">NSString</span> *content;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure>
+<p>我没有贴.m里面的代码，因为里面没有代码（嘿嘿）。<br>接下来说说，为什么我设计的子 ViewModel 只有几个单一的属性，而主 ViewModel 却有如此多的逻辑。</p>
+<p>首先，我们来看一看 ViewModel 的概念，Model 是模型，所以 ViewModel 就是视图的模型。而在传统的 MVC 中，瘦 Model 叫做数据模型，其实瘦 Model 叫做 DataModel 更为合适；而胖 Model 只是将网络请求的逻辑、网络数据处理的逻辑写在了里面，方便于 View 更加便捷的展示数据，所以，胖 Model 的功能和 ViewModel 大同小异，笔者把它叫做“少根筋的 ViewModel”。</p>
+<p>这么一想，我们似乎应该将网络数据处理的逻辑放在子 ViewModel 中，来为主 ViewModel 减负。</p>
+<p>笔者也想这么做。<br>但是有个问题，举个简单的例子，比如这个需求：</p>
+<p><img src="/uploads/mvvm_user_info.png" alt="shortcuts"></p>
+<p>一般的思路是自定义一个 CollectionviewCell 和一个 ViewModel，因为它们的布局是一样的，我们需要在主 ViewModel 中声明一个数组属性，然后放入两个 ViewModel，分别对应两个 Cell。</p>
+<p>image 和 title 这种静态数据我们可以在主ViewModel中为这两个子ViewModel赋值，而下方的具体额度和数量来自网络，网络请求下来的数据通常是:<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    balance:<span class="string">"100"</span></span><br><span class="line">    redPacket:<span class="string">"3"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>我们需要把”100“转化为”100元“，”3“转化为”3个“。<br>这个网络数据处理逻辑按正常的逻辑来说是应该放在 ViewModel 中的，但是有个问题，我们这个 collectionviewcell 是复用的，它的 ViewModel 也是同一个，而处理的数据是两个不同的字段，我们如何区分？而且不要忘了，网络请求成功获得的数据是在主 ViewModel 中的，还涉及到传值。再按照这个思路去实现必然更为复杂，所以我干脆一刀切，不管是静态数据还是网络数据的处理，通通放在主 ViewModel 中。</p>
+<p>这样做虽然让主 ViewModel 任务繁重，子 ViewModel 过于轻量，但是带来的好处却很多，一一列举：</p>
+<ul>
+<li>在主 ViewModel 的懒加载中，实现对子 ViewModel 的初始化和赋予初值，在RACCommand 中网络请求成功过后，主 ViewModel 需要再次给子 ViewModel 赋值。赋值条理清晰，两个模块。</li>
+<li>子 ViewModel 只放其对应的 View 需要的数据属性，作用相当于 Model，但是比 Model 更加灵活，因为如果该 View 内部有着一些点击事件等，我们同样可以在子 ViewModel 中添加RACSubject（或者协议）等，子 ViewModel 的灵活性很高。</li>
+<li>不管是静态数据还是网络数据统一处理，所有子 ViewModel 的初始化和属性赋值放在一块儿，所有网络请求放在一块儿，所有 RACSubject 放在一块儿，结构更加清晰，维护方便。</li>
+</ul>
+<h4 id="3-View"><a href="#3-View" class="headerlink" title="3.View"></a>3.View</h4><p>之前讲到，ViewModel 和 Model 交互的唯一场景是有网络请求数据需要展示的情况，而 View 和 ViewModel 却是一一对应，绑不绑定需要视情况而定。下面详细介绍。</p>
+<p>自定义View这里分两种情况，分别处理：</p>
+<h5 id="（1）非继承有复用机制的-View（不是继承-UICollectionviewCell-等）"><a href="#（1）非继承有复用机制的-View（不是继承-UICollectionviewCell-等）" class="headerlink" title="（1）非继承有复用机制的 View（不是继承 UICollectionviewCell 等）"></a>（1）非继承有复用机制的 View（不是继承 UICollectionviewCell 等）</h5><p>这里以界面的主 View 为例</p>
+<p>.h<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">- (instancetype)initWithViewModel:(MineViewModel *)viewModel;</span><br></pre></td></tr></table></figure></p>
+<p>该 View 需要和 ViewModel 绑定，实现相应的逻辑和触发事件，并且保证 ViewModel 的唯一性。<br>.m<br>这里就不贴代码了，反正 View 与 ViewModel 的交互无非就是触发网络请求、触发点击事件、将 ViewModel 的数据属性展示在界面上。</p>
+<h5 id="（2）继承有复用机制的-View（UICollectionviewCell-等）"><a href="#（2）继承有复用机制的-View（UICollectionviewCell-等）" class="headerlink" title="（2）继承有复用机制的 View（UICollectionviewCell 等）"></a>（2）继承有复用机制的 View（UICollectionviewCell 等）</h5><p>最值得注意的地方就是 cell、item 的复用机制问题了。<br>我们在自定义这些 cell、item 的时候，并不能绑定相应的 ViewModel，因为它的复用原理，将会出现多个 cell（item）的 ViewModel 一模一样，在这里，笔者使用了如下的解决方案：<br>首先，在自定义的 cell（item）.h 中声明一个 ViewModel 属性。<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#import <span class="meta-string">&lt;UIKit/UIKit.h&gt;</span></span></span><br><span class="line"><span class="meta">#import <span class="meta-string">"MineTopCollectionViewCellViewModel.h"</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">MineTopCollectionViewCell</span> : <span class="title">UICollectionViewCell</span></span></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>) MineTopCollectionViewCellViewModel *viewModel;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure></p>
+<p>然后，在该属性的setter方法中给该cell的界面元素赋值：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#pragma mark *** setter ***</span></span><br><span class="line">- (<span class="keyword">void</span>)setViewModel:(MineTopCollectionViewCellViewModel *)viewModel &#123;</span><br><span class="line">    <span class="keyword">if</span> (!viewModel)  <span class="keyword">return</span>;</span><br><span class="line">    _viewModel = viewModel;</span><br><span class="line"></span><br><span class="line">    RAC(<span class="keyword">self</span>, contentLabel.text) = [[RACObserve(viewModel, content) distinctUntilChanged] takeUntil:<span class="keyword">self</span>.rac_willDeallocSignal];</span><br><span class="line">    <span class="keyword">self</span>.headerImageView.image = viewModel.headerImage;</span><br><span class="line">    <span class="keyword">self</span>.headerLabel.text = viewModel.headerTitle;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><strong>ps:这里再次看到RAC（）和RACObserve（）这两个宏，这是属性绑定，如果你不懂，可以先不用管，在后面我会讲解一下我的属性绑定思路，包括不使用 ReactiveCocoa 达到同样的效果。</strong></p>
+<p>重写setter的作用大家应该知道吧，就是在 collectionView 的协议方法中写到：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cell.viewModel = <span class="keyword">self</span>.viewModel.collectionCellViewModel;</span><br></pre></td></tr></table></figure></p>
+<p>的时候，能够执行到该setter方法中，改变该cell的布局。</p>
+<p>好吧，这就是精髓，废话不说了。</p>
+<p>想了一下，还是贴上主 View 的 .m 代码吧：<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">MineView</span> () &lt;<span class="title">UICollectionViewDelegate</span>, <span class="title">UICollectionViewDataSource</span>, <span class="title">UICollectionViewDelegateFlowLayout</span>&gt;</span></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>) <span class="built_in">UICollectionView</span> *collectionView;</span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>) MineViewModel *viewModel;</span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">MineView</span></span></span><br><span class="line">- (<span class="keyword">instancetype</span>)initWithViewModel:(MineViewModel *)viewModel</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">self</span> = [<span class="keyword">super</span> init];</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">self</span>) &#123;</span><br><span class="line">        <span class="keyword">self</span>.backgroundColor = [<span class="built_in">UIColor</span> colorWithRed:<span class="number">243</span>/<span class="number">255.0</span> green:<span class="number">244</span>/<span class="number">255.0</span> blue:<span class="number">245</span>/<span class="number">255.0</span> alpha:<span class="number">1</span>];</span><br><span class="line">        <span class="keyword">self</span>.viewModel = viewModel;</span><br><span class="line">        [<span class="keyword">self</span> addSubview:<span class="keyword">self</span>.collectionView];</span><br><span class="line"></span><br><span class="line">        [<span class="keyword">self</span> setNeedsUpdateConstraints];</span><br><span class="line">        [<span class="keyword">self</span> updateConstraintsIfNeeded];</span><br><span class="line"></span><br><span class="line">        [<span class="keyword">self</span> bindViewModel];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">self</span>;</span><br><span class="line">&#125;</span><br><span class="line">- (<span class="keyword">void</span>)updateConstraints &#123;</span><br><span class="line">    [<span class="keyword">self</span>.collectionView mas_makeConstraints:^(MASConstraintMaker *make) &#123;</span><br><span class="line">        make.edges.mas_equalTo(<span class="keyword">self</span>);</span><br><span class="line">    &#125;];</span><br><span class="line">    [<span class="keyword">super</span> updateConstraints];</span><br><span class="line">&#125;</span><br><span class="line">- (<span class="keyword">void</span>)bindViewModel &#123;</span><br><span class="line">    [<span class="keyword">self</span>.viewModel.autoLoginCommand execute:<span class="literal">nil</span>];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">#pragma mark *** UICollectionViewDataSource ***</span></span><br><span class="line">- (<span class="built_in">NSInteger</span>)numberOfSectionsInCollectionView:(<span class="built_in">UICollectionView</span> *)collectionView &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">3</span>;</span><br><span class="line">&#125;</span><br><span class="line">- (<span class="built_in">NSInteger</span>)collectionView:(<span class="built_in">UICollectionView</span> *)collectionView numberOfItemsInSection:(<span class="built_in">NSInteger</span>)section &#123;</span><br><span class="line">    <span class="keyword">if</span> (section == <span class="number">1</span>) <span class="keyword">return</span> <span class="keyword">self</span>.viewModel.dataSorceOfMineTopCollectionViewCell.count;</span><br><span class="line">    ......</span><br><span class="line">&#125;</span><br><span class="line">- (<span class="built_in">UICollectionViewCell</span> *)collectionView:(<span class="built_in">UICollectionView</span> *)collectionView cellForItemAtIndexPath:(<span class="built_in">NSIndexPath</span> *)indexPath &#123;</span><br><span class="line">    <span class="keyword">if</span> (indexPath.section == <span class="number">1</span>) &#123;</span><br><span class="line">        MineTopCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:[<span class="built_in">NSString</span> stringWithUTF8String:object_getClassName([MineTopCollectionViewCell <span class="keyword">class</span>])] forIndexPath:indexPath];</span><br><span class="line">            cell.viewModel = <span class="keyword">self</span>.viewModel.dataSorceOfMineTopCollectionViewCell[indexPath.row];</span><br><span class="line">            <span class="keyword">return</span> cell;</span><br><span class="line">    &#125;</span><br><span class="line">    ......</span><br><span class="line">&#125;</span><br><span class="line">- (<span class="built_in">UICollectionReusableView</span> *)collectionView:(<span class="built_in">UICollectionView</span> *)collectionView viewForSupplementaryElementOfKind:(<span class="built_in">NSString</span> *)kind atIndexPath:(<span class="built_in">NSIndexPath</span> *)indexPath &#123;</span><br><span class="line">    ......</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">#pragma mark *** UICollectionViewDelegate ***</span></span><br><span class="line">- (<span class="keyword">void</span>)collectionView:(<span class="built_in">UICollectionView</span> *)collectionView didSelectItemAtIndexPath:(<span class="built_in">NSIndexPath</span> *)indexPath &#123;</span><br><span class="line">    [<span class="keyword">self</span>.viewModel.pushSubject sendNext:<span class="literal">nil</span>];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">#pragma mark *** UICollectionViewDelegateFlowLayout ***</span></span><br><span class="line">    ......</span><br><span class="line"><span class="meta">#pragma mark *** Getter ***</span></span><br><span class="line">- (<span class="built_in">UICollectionView</span> *)collectionView &#123;</span><br><span class="line">    <span class="keyword">if</span> (!_collectionView) &#123;</span><br><span class="line">        ......</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> _collectionView;</span><br><span class="line">&#125;</span><br><span class="line">- (MineViewModel *)viewModel &#123;</span><br><span class="line">    <span class="keyword">if</span> (!_viewModel) &#123;</span><br><span class="line">        _viewModel = [[MineViewModel alloc] init];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> _viewModel;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure></p>
+<h5 id="Controller"><a href="#Controller" class="headerlink" title="Controller"></a>Controller</h5><p>这家伙已经解放了。<br><figure class="highlight objc"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">@interface</span> <span class="title">MineViewController</span> ()</span></span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>) MineView *mineView;</span><br><span class="line"><span class="keyword">@property</span> (<span class="keyword">nonatomic</span>, <span class="keyword">strong</span>) MineViewModel *mineViewModel;</span><br><span class="line"><span class="keyword">@end</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">@implementation</span> <span class="title">MineViewController</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#pragma mark *** life cycle ***</span></span><br><span class="line">- (<span class="keyword">void</span>)viewDidLoad &#123;</span><br><span class="line">    [<span class="keyword">super</span> viewDidLoad];</span><br><span class="line">    <span class="keyword">self</span>.hidesBottomBarWhenPushed = <span class="literal">YES</span>;</span><br><span class="line">    [<span class="keyword">self</span>.view addSubview:<span class="keyword">self</span>.mineView];</span><br><span class="line">    [<span class="keyword">self</span> bindViewModel];</span><br><span class="line">&#125;</span><br><span class="line">- (<span class="keyword">void</span>)updateViewConstraints &#123;</span><br><span class="line">    [<span class="keyword">self</span>.mineView mas_makeConstraints:^(MASConstraintMaker *make) &#123;</span><br><span class="line">        make.edges.mas_equalTo(<span class="keyword">self</span>.view);</span><br><span class="line">    &#125;];</span><br><span class="line">    [<span class="keyword">super</span> updateViewConstraints];</span><br><span class="line">&#125;</span><br><span class="line">- (<span class="keyword">void</span>)bindViewModel &#123;</span><br><span class="line">    @weakify(<span class="keyword">self</span>);</span><br><span class="line">    [[<span class="keyword">self</span>.mineViewModel.pushSubject takeUntil:<span class="keyword">self</span>.rac_willDeallocSignal] subscribeNext:^(<span class="built_in">NSString</span> *x) &#123;</span><br><span class="line">        @strongify(<span class="keyword">self</span>);</span><br><span class="line">        [<span class="keyword">self</span>.navigationController pushViewController:[LoginViewController new] animated:<span class="literal">YES</span>];</span><br><span class="line">    &#125;];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">#pragma mark *** getter ***</span></span><br><span class="line">- (MineView *)mineView &#123;</span><br><span class="line">    <span class="keyword">if</span> (!_mineView) &#123;</span><br><span class="line">        _mineView = [[MineView alloc] initWithViewModel:<span class="keyword">self</span>.mineViewModel];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> _mineView;</span><br><span class="line">&#125;</span><br><span class="line">- (MineViewModel *)mineViewModel &#123;</span><br><span class="line">    <span class="keyword">if</span> (!_mineViewModel) &#123;</span><br><span class="line">        _mineViewModel = [[MineViewModel alloc] init];</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> _mineViewModel;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">@end</span></span><br></pre></td></tr></table></figure></p>
+<p>是不是非常清爽，清爽得甚至怀疑它的存在感了（_）。</p>
+<h3 id="五：附加描述"><a href="#五：附加描述" class="headerlink" title="五：附加描述"></a>五：附加描述</h3><h4 id="1、绑定思想"><a href="#1、绑定思想" class="headerlink" title="1、绑定思想"></a>1、绑定思想</h4><p>我想，懂一些 RAC 的人都知道属性绑定吧，RAC（，）和 RACObserve（，），这是最常用的，它的作用是将 A 类的 a 属性绑定到 B 类的 b 属性上，当 A 类的 a 属性发生变化时，B 类的 b 属性会自动做出相应的处理变化。</p>
+<p>这样就可以解决相当多的需求了，比如：用户信息展示界面-&gt;登录界面-&gt;登录成功-&gt;回到用户信息展示界面-&gt;展示用户信息</p>
+<p>以往我们的做法通常是，用户信息展示界面写一个通知监听-&gt;登录成功发送通知-&gt;用户信息展示界面刷新布局</p>
+<p>当然，也可以用协议、闭包什么的。而使用 RAC 的属性绑定、属性联合等一系列方法，将会有事半功倍的效果，充分的降低了代码的耦合度，降低维护成本，思路更清晰。</p>
+<p>在上面这个需求中，需要这样做:</p>
+<p>将用户信息展示 View 的属性，比如 self.name，self.phone 等与对应的 ViewModel 中的数据绑定。在主 ViewModel 中，为该子 ViewModel 初始化并赋值，用户信息展示 View 的内容就是这个初始值。当主 ViewModel 网络请求成功过后，再一次给该子 ViewModel 赋值，用户信息展示界面就能展示相应的数据了。</p>
+<p>而且，我们还可以做得更好，就像我以上的代码里面做的），将 View 的展示内容与 ViewModel 的属性绑定，将 ViewModel 的属性与 Model 的属性绑定，看个图吧：<br><img src="/uploads/mvvm2.png" alt="shortcuts"><br>只要 Model 属性一变，传递到 View 使界面元素变化，全自动无添加。有了这个东西过后，以后 reloadData 这个方法可能见得就比较少了。</p>
+<h4 id="2-整体逻辑梳理"><a href="#2-整体逻辑梳理" class="headerlink" title="2.整体逻辑梳理"></a>2.整体逻辑梳理</h4><ul>
+<li>1.进入 ViewController，懒加载初始化主 View（调用-initWithViewMdoel方法，保证主 ViewModel 唯一性），懒加载初始化主ViewModel。</li>
+<li>2.进入主 ViewModel，初始化配置网络请求、点击逻辑、初始化各个子 ViewModel。</li>
+<li>3.进入主 View，通过主 ViewModel 初始化，调用 ViewModel 中的对应逻辑和对应子ViewModel 展示数据。</li>
+<li>4.ViewController 与 ViewModel 的交互主要是跳转逻辑等。</li>
+</ul>
+<h4 id="3-创建自己的架构"><a href="#3-创建自己的架构" class="headerlink" title="3.创建自己的架构"></a>3.创建自己的架构</h4><p>其实在任何项目中，如果某一个模块代码量太大，我们完全可以自己进行代码分离，只要遵循一定的规则（当然这是自己定义的规则），最终的目的都是让功能和业务细化，分类。</p>
+<p>这相当于在沙滩上抓一把沙，最开始我们将石头和沙子分开，但是后来，发现沙子也有大有小，于是我们又按照沙子的大小分成两部分，再后来发现沙子颜色太多，我们又把不同颜色的沙子分开……</p>
+<p>在 MVVM 模式中，完全可以把 ViewModel 的网络请求逻辑提出来，叫做 NetworkingCenter；还可以把 ViewModel 中的点击等各种监听事件提出来，叫做 ActionCenter；还可以把界面展示的 View 的各种配置（比如在 tableView 协议方法中的写的数据）提出来，叫做 UserInterfaceConfigDataCenter；如果项目中需要处理的网络请求数据很多，我们可以将数据处理逻辑提出来，叫做 DataPrecessCenter ……</p>
+<p>记住一句话：万变不离其宗。</p>
+<h3 id="六：结语"><a href="#六：结语" class="headerlink" title="六：结语"></a>六：结语</h3><p>移动端的架构一直都是千变万化，没有万能的架构，只有万能的程序员，根据产品的需求选择相应的架构才是正确的做法。MVC 固然古老，但是在小型项目却依然实用；MVVM 虽然很强大，但是在有时候还是会增加代码量；VIPER 看似高大上，实际上应用场景比较少。在实际开发中，不拘泥于某种架构或者将它们结合起来用才是正确的做法。</p>
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/11/20/static-const-extern/" rel="next" title="iOS中static，const，extern相关的问题">
+                <i class="fa fa-chevron-left"></i> iOS中static，const，extern相关的问题
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/uploads/avatar.png"
+               alt="刘启明" />
+          <p class="site-author-name" itemprop="name">刘启明</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">30</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+          
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://www.github.com/timmy6" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> github
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.cnblogs.com/lomomiao/" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> 博客旧址(博客园)
+                  
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://www.weibo.com/u/3917867123" target="_blank">
+                  
+                    <i class="fa fa-globe"></i> 新浪微博
+                  
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator">
+            <i class="fa fa-angle-double-up"></i>
+          </div>
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#一：为什么要使用MVVM"><span class="nav-number">1.</span> <span class="nav-text">一：为什么要使用MVVM?</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#二：MVVM模块划分"><span class="nav-number">2.</span> <span class="nav-text">二：MVVM模块划分</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ReactiveCocoa"><span class="nav-number">3.</span> <span class="nav-text">ReactiveCocoa</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-Model"><span class="nav-number">3.1.</span> <span class="nav-text">1.Model</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-ViewModel"><span class="nav-number">3.2.</span> <span class="nav-text">2.ViewModel</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-View"><span class="nav-number">3.3.</span> <span class="nav-text">3.View</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#（1）非继承有复用机制的-View（不是继承-UICollectionviewCell-等）"><span class="nav-number">3.3.1.</span> <span class="nav-text">（1）非继承有复用机制的 View（不是继承 UICollectionviewCell 等）</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#（2）继承有复用机制的-View（UICollectionviewCell-等）"><span class="nav-number">3.3.2.</span> <span class="nav-text">（2）继承有复用机制的 View（UICollectionviewCell 等）</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Controller"><span class="nav-number">3.3.3.</span> <span class="nav-text">Controller</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#五：附加描述"><span class="nav-number">4.</span> <span class="nav-text">五：附加描述</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1、绑定思想"><span class="nav-number">4.1.</span> <span class="nav-text">1、绑定思想</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-整体逻辑梳理"><span class="nav-number">4.2.</span> <span class="nav-text">2.整体逻辑梳理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-创建自己的架构"><span class="nav-number">4.3.</span> <span class="nav-text">3.创建自己的架构</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#六：结语"><span class="nav-number">5.</span> <span class="nav-text">六：结语</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator">
+            <i class="fa fa-angle-double-down"></i>
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">刘启明</span>
+</div>
+
+
+
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+<span id="busuanzi_container_site_pv">
+    本站总访问量<span id="busuanzi_value_site_pv"></span>次
+</span>
+
+<script>
+var birthDay = new Date("11/20/2014");
+var now = new Date();
+var duration = now.getTime() - birthDay.getTime();
+var total= Math.floor(duration / (1000 * 60 * 60 * 24));
+document.getElementById("showDays").innerHTML = "本站已运行 "+total+" 天";
+</script>
+<span id="showDays"></span>
+      </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  
+
+
+  
+
+
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=0.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=0.5.0"></script>
+
+
+
+  
+  
+
+  
+  
+<script type="text/javascript" src="/js/src/scrollspy.js?v=0.5.0"></script>
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 1 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = NexT.utils.escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    NexT.motion.middleWares.sidebar = function () {
+      var $tocContent = $('.post-toc-content');
+
+      if (CONFIG.scheme !== 'Pisces' && (CONFIG.sidebar.display === 'post' || CONFIG.sidebar.display === 'always')) {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          NexT.utils.displaySidebar();
+        }
+      }
+    };
+  });
+</script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=0.5.0"></script>
+
+
+
+  
+
+
+
+  
+
+    <script type="text/javascript">
+      var disqus_shortname = 'liuqiming';
+      var disqus_identifier = '2019/02/27/MVVM/';
+      var disqus_title = 'iOS架构：MVVM设计模式 + RAC响应式编程';
+      var disqus_url = 'http://yoursite.com/2019/02/27/MVVM/';
+
+      function run_disqus_script(disqus_script){
+        var dsq = document.createElement('script');
+        dsq.type = 'text/javascript';
+        dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      }
+
+      run_disqus_script('count.js');
+      
+        run_disqus_script('embed.js');
+      
+    </script>
+  
+
+
+
+  
+  
+
+  
+  
+
+
+</body>
+</html>
