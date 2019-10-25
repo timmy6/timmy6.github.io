@@ -57,20 +57,17 @@
 
 
 
-<meta name="description" content="（一）创建新仓库创建新文件夹，打开，然后执行以下命令:1git init （二）检出仓库执行以下命令，创建一个本地仓库的克隆版本:1git clone /path/to/repository 如果是远程服务器上的仓库，你的命令会是这个样子:1git clone username@host:/path/to/repository （三）工作流你的本地仓库由git维护的三棵“树”组成。第一个是你的工作">
+<meta name="description" content="最近我遇到了一个 bug，我试着通过 Rails 在以“utf8”编码的 MariaDB 中保存一个 UTF-8 字符串，然后出现了一个离奇的错误：1Incorrect string value: ‘\xF0\x9F\x98\x83 &amp;lt;…’ for column ‘summary’ at row 1 我用的是 UTF-8 编码的客户端，服务器也是 UTF-8 编码的，数据库也是，就连要保存的">
 <meta property="og:type" content="article">
-<meta property="og:title" content="git快速入门">
-<meta property="og:url" content="http://yoursite.com/2016/03/10/git-guide/index.html">
+<meta property="og:title" content="永远不要在 MySQL 中使用 UTF-8">
+<meta property="og:url" content="http://yoursite.com/2019/10/25/mysql-utf-8/index.html">
 <meta property="og:site_name" content="刘启明">
-<meta property="og:description" content="（一）创建新仓库创建新文件夹，打开，然后执行以下命令:1git init （二）检出仓库执行以下命令，创建一个本地仓库的克隆版本:1git clone /path/to/repository 如果是远程服务器上的仓库，你的命令会是这个样子:1git clone username@host:/path/to/repository （三）工作流你的本地仓库由git维护的三棵“树”组成。第一个是你的工作">
+<meta property="og:description" content="最近我遇到了一个 bug，我试着通过 Rails 在以“utf8”编码的 MariaDB 中保存一个 UTF-8 字符串，然后出现了一个离奇的错误：1Incorrect string value: ‘\xF0\x9F\x98\x83 &amp;lt;…’ for column ‘summary’ at row 1 我用的是 UTF-8 编码的客户端，服务器也是 UTF-8 编码的，数据库也是，就连要保存的">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="http://yoursite.com/uploads/gitguide.png">
-<meta property="og:image" content="http://yoursite.com/uploads/git-branch.png">
-<meta property="og:updated_time" content="2016-09-09T15:02:24.000Z">
+<meta property="og:updated_time" content="2019-10-25T01:36:14.983Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="git快速入门">
-<meta name="twitter:description" content="（一）创建新仓库创建新文件夹，打开，然后执行以下命令:1git init （二）检出仓库执行以下命令，创建一个本地仓库的克隆版本:1git clone /path/to/repository 如果是远程服务器上的仓库，你的命令会是这个样子:1git clone username@host:/path/to/repository （三）工作流你的本地仓库由git维护的三棵“树”组成。第一个是你的工作">
-<meta name="twitter:image" content="http://yoursite.com/uploads/gitguide.png">
+<meta name="twitter:title" content="永远不要在 MySQL 中使用 UTF-8">
+<meta name="twitter:description" content="最近我遇到了一个 bug，我试着通过 Rails 在以“utf8”编码的 MariaDB 中保存一个 UTF-8 字符串，然后出现了一个离奇的错误：1Incorrect string value: ‘\xF0\x9F\x98\x83 &amp;lt;…’ for column ‘summary’ at row 1 我用的是 UTF-8 编码的客户端，服务器也是 UTF-8 编码的，数据库也是，就连要保存的">
 
 
 
@@ -88,7 +85,7 @@
   };
 </script>
 
-  <title> git快速入门 | 刘启明 </title>
+  <title> 永远不要在 MySQL 中使用 UTF-8 | 刘启明 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -218,7 +215,7 @@
             
             
               
-                git快速入门
+                永远不要在 MySQL 中使用 UTF-8
               
             
           </h1>
@@ -230,8 +227,8 @@
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-03-10T21:16:27+08:00" content="2016-03-10">
-              2016-03-10
+            <time itemprop="dateCreated" datetime="2019-10-25T09:26:42+08:00" content="2019-10-25">
+              2019-10-25
             </time>
           </span>
 	
@@ -246,8 +243,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/版本控制/" itemprop="url" rel="index">
-                    <span itemprop="name">版本控制</span>
+                  <a href="/categories/Java开发/" itemprop="url" rel="index">
+                    <span itemprop="name">Java开发</span>
                   </a>
                 </span>
 
@@ -262,8 +259,8 @@
             
               <span class="post-comments-count">
                 &nbsp; | &nbsp;
-                <a href="/2016/03/10/git-guide/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2016/03/10/git-guide/" itemprop="commentsCount"></span>
+                <a href="/2019/10/25/mysql-utf-8/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2019/10/25/mysql-utf-8/" itemprop="commentsCount"></span>
                 </a>
               </span>
             
@@ -284,24 +281,43 @@
       
 
       
-        <h3 id="（一）创建新仓库"><a href="#（一）创建新仓库" class="headerlink" title="（一）创建新仓库"></a>（一）创建新仓库</h3><p>创建新文件夹，打开，然后执行以下命令:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git init</span><br></pre></td></tr></table></figure></p>
-<h3 id="（二）检出仓库"><a href="#（二）检出仓库" class="headerlink" title="（二）检出仓库"></a>（二）检出仓库</h3><p>执行以下命令，创建一个本地仓库的克隆版本:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git clone /path/to/repository</span><br></pre></td></tr></table></figure></p>
-<p>如果是远程服务器上的仓库，你的命令会是这个样子:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git clone username@host:/path/to/repository</span><br></pre></td></tr></table></figure></p>
-<h3 id="（三）工作流"><a href="#（三）工作流" class="headerlink" title="（三）工作流"></a>（三）工作流</h3><p>你的本地仓库由git维护的三棵“树”组成。第一个是你的<strong>工作目录</strong>，它持有实际文件；第二个是<strong>暂存区</strong>，它像一个缓存区域，临时保存你的改动；最后是<strong>HEAD</strong>，它指向你最后一次提交的结果。<br><img src="/uploads/gitguide.png" alt="gitguide"></p>
-<h3 id="（四）添加和提交"><a href="#（四）添加和提交" class="headerlink" title="（四）添加和提交"></a>（四）添加和提交</h3><p>你可以提成更改（把他们添加到暂存区），使用如下命令:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">git add &lt;filename&gt;</span><br><span class="line">或者</span><br><span class="line">git *</span><br><span class="line">或者</span><br><span class="line">git add .</span><br></pre></td></tr></table></figure></p>
-<p>这是git基本工作流程的第一步；使用如下命令以实际提交改动:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git commit -am”代码提交信息”</span><br><span class="line">或者</span><br><span class="line">git commit -m”代码提交信息”</span><br></pre></td></tr></table></figure></p>
-<p>现在，你的改动已经提交到了HEAD，但是还没有到你的远程仓库。</p>
-<h3 id="（五）推送改动"><a href="#（五）推送改动" class="headerlink" title="（五）推送改动"></a>（五）推送改动</h3><p>你的改动现在已经在本地仓库的HEAD中了。执行如下命令以将这些改动提交到远程仓库:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git push origin master</span><br><span class="line">可以把master换成你想要推送的任何分支。</span><br></pre></td></tr></table></figure></p>
-<p>如果你还没有克隆现有仓库，并欲将你的仓库连接到某个远程服务器，你可以使用如下命令添加:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git remote add origin &lt;server&gt;</span><br><span class="line">这样你就能够将你的改动推送到所添加的服务器上去了。</span><br></pre></td></tr></table></figure></p>
-<h3 id="（六）分支"><a href="#（六）分支" class="headerlink" title="（六）分支"></a>（六）分支</h3><p>分支是用来将特性开发绝缘开来的。在你创建仓库的时候，master是默认的分支。一般在其他分支上进行开发，完成后再将他们合并到主分支上。<br><img src="/uploads/git-branch.png" alt="gitguide"><br>创建一个叫”version1”的分支，并切换过去:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">git checkout -b version1</span><br><span class="line">切换回主分支:</span><br><span class="line">git checkout master</span><br><span class="line">把新建的分支删掉：</span><br><span class="line">git branch -d version1</span><br><span class="line">除非你将分支推送到远程仓库，不然该分支就是本地分支，不为他人所见的。</span><br><span class="line">执行下面这条命令推送本地分支</span><br><span class="line">git push origin version1</span><br></pre></td></tr></table></figure></p>
-<h3 id="（七）更新与合并"><a href="#（七）更新与合并" class="headerlink" title="（七）更新与合并"></a>（七）更新与合并</h3><p>要更新你的本地仓库至最新改动，执行<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git pull</span><br></pre></td></tr></table></figure></p>
-<p>要在你的工作目录中，获取并合并远程仓库的改动，执行:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git merge &lt;branch&gt;</span><br></pre></td></tr></table></figure></p>
-<p>在这两种情况下，git都会去尝试去自动合并改动。但是，有的时候并不成功，并可能出现冲突。这时候就需要你修改这些文件来手动合并这些冲突。改完之后，你需要执行如下命令以将他们标记为合并成功。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git add &lt;filename&gt;</span><br></pre></td></tr></table></figure></p>
-<p>在合并改动之前，你可以使用如下命令预览差异:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git diff &lt;source_branch&gt; &lt;target_branh&gt;</span><br></pre></td></tr></table></figure></p>
-<h3 id="（八）替换本地改动"><a href="#（八）替换本地改动" class="headerlink" title="（八）替换本地改动"></a>（八）替换本地改动</h3><p>假如你操作失误（当然，希望这种情况永远不会发生)你可以使用如下命令替换掉本地改动:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git checkout —-&lt;filename&gt;</span><br></pre></td></tr></table></figure></p>
-<p>假如你想丢弃你在本地的所有改动与提交，可以到服务器上获取最新的版本历时，并将你本地分支指向它:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git fetch origin</span><br><span class="line">git reset —hard origin/master</span><br></pre></td></tr></table></figure></p>
-<h3 id="（九）合并多个commit"><a href="#（九）合并多个commit" class="headerlink" title="（九）合并多个commit"></a>（九）合并多个commit</h3><p>有的时候我们可能由于各种原因提交了许多临时的commit，而这些commit拼接起来才是完整的任务。那么我们为了避免太多的commit而造成版本控制混乱，通常我们推荐将这些commit合并成同一个。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git rebase -i hash</span><br></pre></td></tr></table></figure></p>
-<p><strong>参考指南和手册:</strong><br><a href="http://marklodato.github.io/visual-git-guide/index-zh-cn.html" target="_blank" rel="noopener">图解git</a><br><a href="http://git-scm.com/book/en/v2" target="_blank" rel="noopener">git社区参考书</a></p>
+        <p>最近我遇到了一个 bug，我试着通过 Rails 在以“utf8”编码的 MariaDB 中保存一个 UTF-8 字符串，然后出现了一个离奇的错误：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Incorrect string value: ‘\xF0\x9F\x98\x83 &lt;…’ <span class="keyword">for</span> column ‘summary’ at row <span class="number">1</span></span><br></pre></td></tr></table></figure></p>
+<p>我用的是 UTF-8 编码的客户端，服务器也是 UTF-8 编码的，数据库也是，就连要保存的这个字符串“ &lt;…”也是合法的 UTF-8。<br>问题的症结在于，MySQL 的“utf8”实际上不是真正的 UTF-8。<br>“utf8”只支持每个字符最多三个字节，而真正的 UTF-8 是每个字符最多四个字节。<br>MySQL 一直没有修复这个 bug，他们在 2010 年发布了一个叫作“utf8mb4”的字符集，绕过了这个问题。<br>当然，他们并没有对新的字符集广而告之（可能是因为这个 bug 让他们觉得很尴尬），以致于现在网络上仍然在建议开发者使用“utf8”，但这些建议都是错误的。</p>
+<p>简单概括如下：</p>
+<ul>
+<li>MySQL 的“utf8mb4”是真正的“UTF-8”。</li>
+<li>MySQL 的“utf8”是一种“专属的编码”，它能够编码的 Unicode 字符并不多。</li>
+</ul>
+<p>我要在这里澄清一下：所有在使用“utf8”的 MySQL 和 MariaDB 用户都应该改用“utf8mb4”，永远都不要再使用“utf8”。</p>
+<h3 id="那么什么是编码？什么是-UTF-8？"><a href="#那么什么是编码？什么是-UTF-8？" class="headerlink" title="那么什么是编码？什么是 UTF-8？"></a>那么什么是编码？什么是 UTF-8？</h3><p>我们都知道，计算机使用 0 和 1 来存储文本。比如字符“C”被存成“01000011”，那么计算机在显示这个字符时需要经过两个步骤：</p>
+<ul>
+<li>计算机读取“01000011”，得到数字 67，因为 67 被编码成“01000011”。</li>
+<li>计算机在 Unicode 字符集中查找 67，找到了“C”。</li>
+</ul>
+<p>同样的：</p>
+<ul>
+<li>我的电脑将“C”映射成 Unicode 字符集中的 67。</li>
+<li>我的电脑将 67 编码成“01000011”，并发送给 Web 服务器。</li>
+</ul>
+<p>几乎所有的网络应用都使用了 Unicode 字符集，因为没有理由使用其他字符集。<br>Unicode 字符集包含了上百万个字符。最简单的编码是 UTF-32，每个字符使用 32 位。这样做最简单，因为一直以来，计算机将 32 位视为数字，而计算机最在行的就是处理数字。但问题是，这样太浪费空间了。<br>UTF-8 可以节省空间，在 UTF-8 中，字符“C”只需要 8 位，一些不常用的字符，比如“”需要 32 位。其他的字符可能使用 16 位或 24 位。一篇类似本文这样的文章，如果使用 UTF-8 编码，占用的空间只有 UTF-32 的四分之一左右。</p>
+<p>MySQL 的“utf8”字符集与其他程序不兼容，它所谓的“”，可能真的是一坨……</p>
+<h3 id="MySQL-简史"><a href="#MySQL-简史" class="headerlink" title="MySQL 简史"></a>MySQL 简史</h3><p>为什么 MySQL 开发者会让“utf8”失效？我们或许可以从提交日志中寻找答案。<br>MySQL 从 4.1 版本开始支持 UTF-8，也就是 2003 年，而今天使用的 UTF-8 标准（RFC 3629）是随后才出现的。<br>旧版的 UTF-8 标准（RFC 2279）最多支持每个字符 6 个字节。2002 年 3 月 28 日，MySQL 开发者在第一个 MySQL 4.1 预览版中使用了 RFC 2279。<br>同年 9 月，他们对 MySQL 源代码进行了一次调整：“UTF8 现在最多只支持 3 个字节的序列”。</p>
+<p>是谁提交了这些代码？他为什么要这样做？这个问题不得而知。在迁移到 Git 后（MySQL 最开始使用的是 BitKeeper），MySQL 代码库中的很多提交者的名字都丢失了。2003 年 9 月的邮件列表中也找不到可以解释这一变更的线索。</p>
+<p>不过我可以试着猜测一下。</p>
+<p>2002 年，MySQL 做出了一个决定：如果用户可以保证数据表的每一行都使用相同的字节数，那么 MySQL 就可以在性能方面来一个大提升。为此，用户需要将文本列定义为“CHAR”，每个“CHAR”列总是拥有相同数量的字符。如果插入的字符少于定义的数量，MySQL 就会在后面填充空格，如果插入的字符超过了定义的数量，后面超出部分会被截断。</p>
+<p>MySQL 开发者在最开始尝试 UTF-8 时使用了每个字符 6 个字节，CHAR(1) 使用 6 个字节，CHAR(2) 使用 12 个字节，并以此类推。</p>
+<p>应该说，他们最初的行为才是正确的，可惜这一版本一直没有发布。但是文档上却这么写了，而且广为流传，所有了解 UTF-8 的人都认同文档里写的东西。</p>
+<p>不过很显然，MySQL 开发者或厂商担心会有用户做这两件事：</p>
+<ul>
+<li>使用 CHAR 定义列（在现在看来，CHAR 已经是老古董了，但在那时，在 MySQL 中使用 CHAR 会更快，不过从 2005 年以后就不是这样子了）。</li>
+<li>将 CHAR 列的编码设置为“utf8”。</li>
+</ul>
+<p>我的猜测是 MySQL 开发者本来想帮助那些希望在空间和速度上双赢的用户，但他们搞砸了“utf8”编码。</p>
+<p>所以结果就是没有赢家。那些希望在空间和速度上双赢的用户，当他们在使用“utf8”的 CHAR 列时，实际上使用的空间比预期的更大，速度也比预期的慢。而想要正确性的用户，当他们使用“utf8”编码时，却无法保存像“”这样的字符。</p>
+<p>在这个不合法的字符集发布了之后，MySQL 就无法修复它，因为这样需要要求所有用户重新构建他们的数据库。最终，MySQL 在 2010 年重新发布了“utf8mb4”来支持真正的 UTF-8。</p>
+<h3 id="为什么这件事情会让人如此抓狂"><a href="#为什么这件事情会让人如此抓狂" class="headerlink" title="为什么这件事情会让人如此抓狂"></a>为什么这件事情会让人如此抓狂</h3><p>因为这个问题，我整整抓狂了一个礼拜。我被“utf8”愚弄了，花了很多时间才找到这个 bug。但我一定不是唯一的一个，网络上几乎所有的文章都把“utf8”当成是真正的 UTF-8。</p>
+<p>“utf8”只能算是个专有的字符集，它给我们带来了新问题，却一直没有得到解决。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>如果你在使用 MySQL 或 MariaDB，不要用“utf8”编码，改用“utf8mb4”。这里<a href="https://mathiasbynens.be/notes/mysql-utf8mb4#utf8-to-utf8mb4" target="_blank" rel="noopener">https://mathiasbynens.be/notes/mysql-utf8mb4#utf8-to-utf8mb4</a>提供了一个指南用于将现有数据库的字符编码从“utf8”转成“utf8mb4”。</p>
 
       
     </div>
@@ -313,17 +329,13 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2016/03/06/2016-03-06-2/" rel="next" title="Activity 的生命周期深入理解 ">
-                <i class="fa fa-chevron-left"></i> Activity 的生命周期深入理解 
+              <a href="/2019/02/27/MVVM/" rel="next" title="iOS架构：MVVM设计模式 + RAC响应式编程">
+                <i class="fa fa-chevron-left"></i> iOS架构：MVVM设计模式 + RAC响应式编程
               </a>
             
           </div>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2016/03/15/requestPermission/" rel="prev" title="Android 6.0 后的新授权机制">
-                Android 6.0 后的新授权机制 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -467,7 +479,7 @@
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#（一）创建新仓库"><span class="nav-number">1.</span> <span class="nav-text">（一）创建新仓库</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#（二）检出仓库"><span class="nav-number">2.</span> <span class="nav-text">（二）检出仓库</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#（三）工作流"><span class="nav-number">3.</span> <span class="nav-text">（三）工作流</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#（四）添加和提交"><span class="nav-number">4.</span> <span class="nav-text">（四）添加和提交</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#（五）推送改动"><span class="nav-number">5.</span> <span class="nav-text">（五）推送改动</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#（六）分支"><span class="nav-number">6.</span> <span class="nav-text">（六）分支</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#（七）更新与合并"><span class="nav-number">7.</span> <span class="nav-text">（七）更新与合并</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#（八）替换本地改动"><span class="nav-number">8.</span> <span class="nav-text">（八）替换本地改动</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#（九）合并多个commit"><span class="nav-number">9.</span> <span class="nav-text">（九）合并多个commit</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#那么什么是编码？什么是-UTF-8？"><span class="nav-number">1.</span> <span class="nav-text">那么什么是编码？什么是 UTF-8？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MySQL-简史"><span class="nav-number">2.</span> <span class="nav-text">MySQL 简史</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#为什么这件事情会让人如此抓狂"><span class="nav-number">3.</span> <span class="nav-text">为什么这件事情会让人如此抓狂</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li></ol></div>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator">
@@ -728,9 +740,9 @@ document.getElementById("showDays").innerHTML = "本站已运行 "+total+" 天";
 
     <script type="text/javascript">
       var disqus_shortname = 'liuqiming';
-      var disqus_identifier = '2016/03/10/git-guide/';
-      var disqus_title = 'git快速入门';
-      var disqus_url = 'http://yoursite.com/2016/03/10/git-guide/';
+      var disqus_identifier = '2019/10/25/mysql-utf-8/';
+      var disqus_title = '永远不要在 MySQL 中使用 UTF-8';
+      var disqus_url = 'http://yoursite.com/2019/10/25/mysql-utf-8/';
 
       function run_disqus_script(disqus_script){
         var dsq = document.createElement('script');
