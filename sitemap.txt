@@ -16,8 +16,8 @@ https://timmy6.github.io/2018/09/25/grpc2/
 https://timmy6.github.io/2018/09/20/grpc1/
 https://timmy6.github.io/2018/09/15/benchmark/
 https://timmy6.github.io/2018/09/12/var_dec/
-https://timmy6.github.io/categories/index.html
 https://timmy6.github.io/repository/index.html
+https://timmy6.github.io/categories/index.html
 https://timmy6.github.io/
 https://timmy6.github.io/tags/Go%E5%9F%BA%E7%A1%80/
 https://timmy6.github.io/categories/Go%E5%BC%80%E5%8F%91/

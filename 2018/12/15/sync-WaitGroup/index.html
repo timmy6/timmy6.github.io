@@ -17,7 +17,7 @@
   <meta http-equiv="window-target" content="_top" />
   
   
-  <title>使用 sync.WaitGroup 来实现并发操作 | Hexo</title>
+  <title>使用 sync.WaitGroup 来实现并发操作 | 刘启明的blog</title>
   <meta name="description" content="前言如果你有一个任务可以分解成多个子任务进行处理，同时每个子任务没有先后执行顺序的限制，等到全部子任务执行完毕后，再进行下一步处理。这时每个子任务的执行可以并发处理，这种情景下适合使用 sync.WaitGroup。 虽然 sync.WaitGroup 使用起来比较简单，但是一不留神很有可能踩到坑里。 sync.WaitGroup 正确使用比如，有一个任务需要执行 3 个子任务，那么可以这样写：">
 <meta property="og:type" content="article">
 <meta property="og:title" content="使用 sync.WaitGroup 来实现并发操作">

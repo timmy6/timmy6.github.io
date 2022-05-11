@@ -17,7 +17,7 @@
   <meta http-equiv="window-target" content="_top" />
   
   
-  <title>基于逃逸分析来提升程序性能 | Hexo</title>
+  <title>基于逃逸分析来提升程序性能 | 刘启明的blog</title>
   <meta name="description" content="前言为什么需要了解逃逸分析？ 因为我们想要提升程序性能，通过逃逸分析我们能够知道变量是分配到堆上还是栈上，如果分配到栈上，内存的分配和释放都是由编译器进行管理，分配和释放的速度非常快，如果分配到堆上，堆不像栈那样可以自动清理，它会引起频繁地进行垃圾回收（GC），而垃圾回收会占用比较大的系统开销。 什么是逃逸分析？ 在编译程序优化理论中，逃逸分析是一种确定指针动态范围的方法，简单来说就是分析在程序的">
 <meta property="og:type" content="article">
 <meta property="og:title" content="基于逃逸分析来提升程序性能">
