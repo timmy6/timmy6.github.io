@@ -21,22 +21,22 @@
   <meta name="description" content="概述这篇文章分享 Gin 的路由配置，主要包含的功能点如下：  实现了，路由分组 v1版本、v2版本。 实现了，生成签名和验证验证。 实现了，在配置文件中读取配置。  路由配置比如我们的接口地址是这样的：  &#x2F;v1&#x2F;product&#x2F;add &#x2F;v1&#x2F;member&#x2F;add &#x2F;v2&#x2F;product&#x2F;add &#x2F;v2&#x2F;member&#x2F;add  假设需求是这样的，接口支持多种请求方式，v1 不需签名验证，v2">
 <meta property="og:type" content="article">
 <meta property="og:title" content="路由配置">
-<meta property="og:url" content="https://github.com/2018/12/20/gin-router/index.html">
+<meta property="og:url" content="https://timmy6.github.io/2018/12/20/gin-router/index.html">
 <meta property="og:site_name" content="Hexo">
 <meta property="og:description" content="概述这篇文章分享 Gin 的路由配置，主要包含的功能点如下：  实现了，路由分组 v1版本、v2版本。 实现了，生成签名和验证验证。 实现了，在配置文件中读取配置。  路由配置比如我们的接口地址是这样的：  &#x2F;v1&#x2F;product&#x2F;add &#x2F;v1&#x2F;member&#x2F;add &#x2F;v2&#x2F;product&#x2F;add &#x2F;v2&#x2F;member&#x2F;add  假设需求是这样的，接口支持多种请求方式，v1 不需签名验证，v2">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://github.com/timmy6.github.io/images/%E8%B7%AF%E7%94%B1%E9%85%8D%E7%BD%AE/2_go_1.png">
-<meta property="og:image" content="https://github.com/timmy6.github.io/images/%E8%B7%AF%E7%94%B1%E9%85%8D%E7%BD%AE/2_go_2.png">
-<meta property="og:image" content="https://github.com/timmy6.github.io/images/%E8%B7%AF%E7%94%B1%E9%85%8D%E7%BD%AE/2_go_3.png">
-<meta property="og:image" content="https://github.com/timmy6.github.io/images/%E8%B7%AF%E7%94%B1%E9%85%8D%E7%BD%AE/2_go_4.png">
+<meta property="og:image" content="https://timmy6.github.io/images/%E8%B7%AF%E7%94%B1%E9%85%8D%E7%BD%AE/2_go_1.png">
+<meta property="og:image" content="https://timmy6.github.io/images/%E8%B7%AF%E7%94%B1%E9%85%8D%E7%BD%AE/2_go_2.png">
+<meta property="og:image" content="https://timmy6.github.io/images/%E8%B7%AF%E7%94%B1%E9%85%8D%E7%BD%AE/2_go_3.png">
+<meta property="og:image" content="https://timmy6.github.io/images/%E8%B7%AF%E7%94%B1%E9%85%8D%E7%BD%AE/2_go_4.png">
 <meta property="article:published_time" content="2018-12-20T12:22:50.000Z">
 <meta property="article:modified_time" content="2022-05-11T09:47:11.000Z">
 <meta property="article:author" content="John Doe">
 <meta property="article:tag" content="Go基础">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://github.com/timmy6.github.io/images/%E8%B7%AF%E7%94%B1%E9%85%8D%E7%BD%AE/2_go_1.png">
+<meta name="twitter:image" content="https://timmy6.github.io/images/%E8%B7%AF%E7%94%B1%E9%85%8D%E7%BD%AE/2_go_1.png">
   <!-- Canonical links -->
-  <link rel="canonical" href="https://github.com/2018/12/20/gin-router/index.html">
+  <link rel="canonical" href="https://timmy6.github.io/2018/12/20/gin-router/index.html">
   
     <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
   
@@ -44,7 +44,7 @@
     <link rel="icon" href="/favicon.png" type="image/x-icon">
   
   
-<link rel="stylesheet" href="/timmy6.github.io/css/style.css">
+<link rel="stylesheet" href="/css/style.css">
 
   
   
@@ -61,7 +61,7 @@
       
       <div class="profile-block text-center">
         <a id="avatar" href="https://github.com/timmy6" target="_blank">
-          <img class="img-circle img-rotate" src="/timmy6.github.io/images/avatar.jpg" width="200" height="200">
+          <img class="img-circle img-rotate" src="/images/avatar.jpg" width="200" height="200">
         </a>
         <h2 id="name" class="hidden-xs hidden-sm">刘启明</h2>
         <h3 id="title" class="hidden-xs hidden-sm hidden-md">Go Developer</h3>
@@ -105,7 +105,7 @@
         
         
         <li class="menu-item menu-item-home">
-          <a href="/timmy6.github.io/.">
+          <a href="/.">
             
             <i class="icon icon-home-fill"></i>
             
@@ -115,7 +115,7 @@
         
         
         <li class="menu-item menu-item-archives">
-          <a href="/timmy6.github.io/archives">
+          <a href="/archives">
             
             <i class="icon icon-archives-fill"></i>
             
@@ -125,7 +125,7 @@
         
         
         <li class="menu-item menu-item-categories">
-          <a href="/timmy6.github.io/categories">
+          <a href="/categories">
             
             <i class="icon icon-folder"></i>
             
@@ -135,7 +135,7 @@
         
         
         <li class="menu-item menu-item-tags">
-          <a href="/timmy6.github.io/tags">
+          <a href="/tags">
             
             <i class="icon icon-tags"></i>
             
@@ -145,7 +145,7 @@
         
         
         <li class="menu-item menu-item-repository">
-          <a href="/timmy6.github.io/repository">
+          <a href="/repository">
             
             <i class="icon icon-project"></i>
             
@@ -155,7 +155,7 @@
         
         
         <li class="menu-item menu-item-books">
-          <a href="/timmy6.github.io/books">
+          <a href="/books">
             
             <i class="icon icon-book-fill"></i>
             
@@ -165,7 +165,7 @@
         
         
         <li class="menu-item menu-item-links">
-          <a href="/timmy6.github.io/links">
+          <a href="/links">
             
             <i class="icon icon-friendship"></i>
             
@@ -175,7 +175,7 @@
         
         
         <li class="menu-item menu-item-about">
-          <a href="/timmy6.github.io/about">
+          <a href="/about">
             
             <i class="icon icon-cup-fill"></i>
             
@@ -218,7 +218,7 @@
   <div class="widget">
     <h3 class="widget-title">分类</h3>
     <div class="widget-body">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/timmy6.github.io/categories/Go%E5%BC%80%E5%8F%91/">Go开发</a><span class="category-list-count">18</span></li></ul>
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Go%E5%BC%80%E5%8F%91/">Go开发</a><span class="category-list-count">18</span></li></ul>
     </div>
   </div>
 
@@ -228,7 +228,7 @@
   <div class="widget">
     <h3 class="widget-title">标签</h3>
     <div class="widget-body">
-      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/timmy6.github.io/tags/Go%E5%9F%BA%E7%A1%80/" rel="tag">Go基础</a><span class="tag-list-count">18</span></li></ul>
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Go%E5%9F%BA%E7%A1%80/" rel="tag">Go基础</a><span class="tag-list-count">18</span></li></ul>
     </div>
   </div>
 
@@ -238,7 +238,7 @@
   <div class="widget">
     <h3 class="widget-title">标签云</h3>
     <div class="widget-body tagcloud">
-      <a href="/timmy6.github.io/tags/Go%E5%9F%BA%E7%A1%80/" style="font-size: 13px;">Go基础</a>
+      <a href="/tags/Go%E5%9F%BA%E7%A1%80/" style="font-size: 13px;">Go基础</a>
     </div>
   </div>
 
@@ -247,7 +247,7 @@
   <div class="widget">
     <h3 class="widget-title">归档</h3>
     <div class="widget-body">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/timmy6.github.io/archives/2019/01/">一月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/timmy6.github.io/archives/2018/12/">十二月 2018</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/timmy6.github.io/archives/2018/11/">十一月 2018</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/timmy6.github.io/archives/2018/10/">十月 2018</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/timmy6.github.io/archives/2018/09/">九月 2018</a><span class="archive-list-count">5</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">十一月 2018</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">十月 2018</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a><span class="archive-list-count">5</span></li></ul>
     </div>
   </div>
 
@@ -263,10 +263,10 @@
             
             <div class="item-inner">
               <p class="item-category">
-                <a class="category-link" href="/timmy6.github.io/categories/Go%E5%BC%80%E5%8F%91/">Go开发</a>
+                <a class="category-link" href="/categories/Go%E5%BC%80%E5%8F%91/">Go开发</a>
               </p>
               <p class="item-title">
-                <a href="/timmy6.github.io/2019/01/05/gin-log/" class="title">gin日志记录</a>
+                <a href="/2019/01/05/gin-log/" class="title">gin日志记录</a>
               </p>
               <p class="item-date">
                 <time datetime="2019-01-05T13:22:50.000Z" itemprop="datePublished">2019-01-05</time>
@@ -278,10 +278,10 @@
             
             <div class="item-inner">
               <p class="item-category">
-                <a class="category-link" href="/timmy6.github.io/categories/Go%E5%BC%80%E5%8F%91/">Go开发</a>
+                <a class="category-link" href="/categories/Go%E5%BC%80%E5%8F%91/">Go开发</a>
               </p>
               <p class="item-title">
-                <a href="/timmy6.github.io/2018/12/20/gin-router/" class="title">路由配置</a>
+                <a href="/2018/12/20/gin-router/" class="title">路由配置</a>
               </p>
               <p class="item-date">
                 <time datetime="2018-12-20T12:22:50.000Z" itemprop="datePublished">2018-12-20</time>
@@ -293,10 +293,10 @@
             
             <div class="item-inner">
               <p class="item-category">
-                <a class="category-link" href="/timmy6.github.io/categories/Go%E5%BC%80%E5%8F%91/">Go开发</a>
+                <a class="category-link" href="/categories/Go%E5%BC%80%E5%8F%91/">Go开发</a>
               </p>
               <p class="item-title">
-                <a href="/timmy6.github.io/2018/12/15/sync-WaitGroup/" class="title">使用 sync.WaitGroup 来实现并发操作</a>
+                <a href="/2018/12/15/sync-WaitGroup/" class="title">使用 sync.WaitGroup 来实现并发操作</a>
               </p>
               <p class="item-date">
                 <time datetime="2018-12-15T12:22:50.000Z" itemprop="datePublished">2018-12-15</time>
@@ -308,10 +308,10 @@
             
             <div class="item-inner">
               <p class="item-category">
-                <a class="category-link" href="/timmy6.github.io/categories/Go%E5%BC%80%E5%8F%91/">Go开发</a>
+                <a class="category-link" href="/categories/Go%E5%BC%80%E5%8F%91/">Go开发</a>
               </p>
               <p class="item-title">
-                <a href="/timmy6.github.io/2018/12/12/sync-map/" class="title">使用sync.Map来解决map的并发操作问题</a>
+                <a href="/2018/12/12/sync-map/" class="title">使用sync.Map来解决map的并发操作问题</a>
               </p>
               <p class="item-date">
                 <time datetime="2018-12-12T12:22:50.000Z" itemprop="datePublished">2018-12-12</time>
@@ -323,10 +323,10 @@
             
             <div class="item-inner">
               <p class="item-category">
-                <a class="category-link" href="/timmy6.github.io/categories/Go%E5%BC%80%E5%8F%91/">Go开发</a>
+                <a class="category-link" href="/categories/Go%E5%BC%80%E5%8F%91/">Go开发</a>
               </p>
               <p class="item-title">
-                <a href="/timmy6.github.io/2018/12/10/escape/" class="title">基于逃逸分析来提升程序性能</a>
+                <a href="/2018/12/10/escape/" class="title">基于逃逸分析来提升程序性能</a>
               </p>
               <p class="item-date">
                 <time datetime="2018-12-10T11:17:50.000Z" itemprop="datePublished">2018-12-10</time>
@@ -371,26 +371,26 @@
       <div class="article-meta">
         <span class="article-date">
     <i class="icon icon-calendar-check"></i>
-	<a href="/timmy6.github.io/2018/12/20/gin-router/" class="article-date">
+	<a href="/2018/12/20/gin-router/" class="article-date">
 	  <time datetime="2018-12-20T12:22:50.000Z" itemprop="datePublished">2018-12-20</time>
 	</a>
 </span>
         
   <span class="article-category">
     <i class="icon icon-folder"></i>
-    <a class="article-category-link" href="/timmy6.github.io/categories/Go%E5%BC%80%E5%8F%91/">Go开发</a>
+    <a class="article-category-link" href="/categories/Go%E5%BC%80%E5%8F%91/">Go开发</a>
   </span>
 
         
   <span class="article-tag">
     <i class="icon icon-tags"></i>
-	<a class="article-tag-link-link" href="/timmy6.github.io/tags/Go%E5%9F%BA%E7%A1%80/" rel="tag">Go基础</a>
+	<a class="article-tag-link-link" href="/tags/Go%E5%9F%BA%E7%A1%80/" rel="tag">Go基础</a>
   </span>
 
 
         
 
-        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/timmy6.github.io/2018/12/20/gin-router/#comments" class="article-comment-link">评论</a></span>
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2018/12/20/gin-router/#comments" class="article-comment-link">评论</a></span>
         
       </div>
     </div>
@@ -434,20 +434,20 @@
 
 <p>接下来，直接看效果吧。</p>
 <p>访问 v1 接口：</p>
-<p><img src="/timmy6.github.io/images/%E8%B7%AF%E7%94%B1%E9%85%8D%E7%BD%AE/2_go_1.png"></p>
+<p><img src="/images/%E8%B7%AF%E7%94%B1%E9%85%8D%E7%BD%AE/2_go_1.png"></p>
 <p>访问后，直接返回数据，不走签名验证。</p>
 <p>访问 v2 接口：</p>
-<p><img src="/timmy6.github.io/images/%E8%B7%AF%E7%94%B1%E9%85%8D%E7%BD%AE/2_go_2.png"></p>
+<p><img src="/images/%E8%B7%AF%E7%94%B1%E9%85%8D%E7%BD%AE/2_go_2.png"></p>
 <p>进入了这段验证：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">// 验证过期时间</span><br><span class="line">if ts &gt; GetTimeUnix() || GetTimeUnix() - ts &gt;= exp &#123;</span><br><span class="line">	RetJson(&quot;500&quot;, &quot;Ts Error&quot;, &quot;&quot;, c)</span><br><span class="line">	return</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>修改为合法的时间戳后：</p>
-<p><img src="/timmy6.github.io/images/%E8%B7%AF%E7%94%B1%E9%85%8D%E7%BD%AE/2_go_3.png"></p>
+<p><img src="/images/%E8%B7%AF%E7%94%B1%E9%85%8D%E7%BD%AE/2_go_3.png"></p>
 <p>进入了这段验证：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">// 验证签名</span><br><span class="line">if sn == &quot;&quot; || sn != CreateSign(req) &#123;</span><br><span class="line">	RetJson(&quot;500&quot;, &quot;Sn Error&quot;, &quot;&quot;, c)</span><br><span class="line">	return</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>修改为合法的签名后：</p>
-<p><img src="/timmy6.github.io/images/%E8%B7%AF%E7%94%B1%E9%85%8D%E7%BD%AE/2_go_4.png"></p>
+<p><img src="/images/%E8%B7%AF%E7%94%B1%E9%85%8D%E7%BD%AE/2_go_4.png"></p>
 <p>至此，简单的路由配置已经实现了。</p>
 <p>对了，还有一个点没说，就是如何读取配置文件中的配置，我是这样做的：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">package config</span><br><span class="line"></span><br><span class="line">const (</span><br><span class="line">	PORT       = &quot;:8080&quot;</span><br><span class="line">	APP_NAME   = &quot;ginDemo&quot;</span><br><span class="line">	APP_SECRET = &quot;6YJSuc50uJ18zj45&quot;</span><br><span class="line">	API_EXPIRY = &quot;120&quot;</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
@@ -462,7 +462,7 @@
     
     <li class="post-copyright-link hidden-xs">
       <strong>本文链接：</strong>
-      <a href="https://github.com/2018/12/20/gin-router/" title="路由配置" target="_blank" rel="external">https://github.com/2018/12/20/gin-router/</a>
+      <a href="https://timmy6.github.io/2018/12/20/gin-router/" title="路由配置" target="_blank" rel="external">https://timmy6.github.io/2018/12/20/gin-router/</a>
     </li>
     
     <li class="post-copyright-license">
@@ -477,7 +477,7 @@
     <figure class="media">
       <div class="media-left">
         <a href="https://github.com/timmy6" target="_blank" class="img-burn thumb-sm visible-lg">
-          <img src="/timmy6.github.io/images/avatar.jpg" class="img-rounded w-full" alt="">
+          <img src="/images/avatar.jpg" class="img-rounded w-full" alt="">
         </a>
       </div>
       <div class="media-body">
@@ -509,12 +509,12 @@
   <ul class="pager pull-left">
     
     <li class="prev">
-      <a href="/timmy6.github.io/2019/01/05/gin-log/" title="gin日志记录"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;上一篇</span></a>
+      <a href="/2019/01/05/gin-log/" title="gin日志记录"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;上一篇</span></a>
     </li>
     
     
     <li class="next">
-      <a href="/timmy6.github.io/2018/12/15/sync-WaitGroup/" title="使用 sync.WaitGroup 来实现并发操作"><span>下一篇&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+      <a href="/2018/12/15/sync-WaitGroup/" title="使用 sync.WaitGroup 来实现并发操作"><span>下一篇&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
     </li>
     
     
@@ -557,14 +557,14 @@
           <div class="tab-content">
             <div role="tabpanel" class="tab-pane fade active in" id="alipay">
               <div class="donate-payimg">
-                <img src="/timmy6.github.io/images/donate/alipayimg.png" alt="扫码支持" title="扫一扫" />
+                <img src="/images/donate/alipayimg.png" alt="扫码支持" title="扫一扫" />
               </div>
               <p class="text-muted mv">扫码打赏，你说多少就多少</p>
               <p class="text-grey">打开支付宝扫一扫，即可进行扫码打赏哦</p>
             </div>
             <div role="tabpanel" class="tab-pane fade" id="wechatpay">
               <div class="donate-payimg">
-                <img src="/timmy6.github.io/images/donate/wechatpayimg.png" alt="扫码支持" title="扫一扫" />
+                <img src="/images/donate/wechatpayimg.png" alt="扫码支持" title="扫一扫" />
               </div>
               <p class="text-muted mv">扫码打赏，你说多少就多少</p>
               <p class="text-grey">打开微信扫一扫，即可进行扫码打赏哦</p>
@@ -613,10 +613,10 @@
 window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
 </script>
 
-<script src="/timmy6.github.io/js/plugin.min.js"></script>
+<script src="/js/plugin.min.js"></script>
 
 
-<script src="/timmy6.github.io/js/application.js"></script>
+<script src="/js/application.js"></script>
 
 
     <script>
@@ -629,14 +629,14 @@ window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
             TAGS: '标签',
             UNTITLED: '(未命名)',
         },
-        ROOT_URL: '/timmy6.github.io/',
-        CONTENT_URL: '/timmy6.github.io/content.json',
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
     };
     window.INSIGHT_CONFIG = INSIGHT_CONFIG;
 })(window);
 </script>
 
-<script src="/timmy6.github.io/js/insight.js"></script>
+<script src="/js/insight.js"></script>
 
 
 

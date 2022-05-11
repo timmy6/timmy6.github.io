@@ -21,7 +21,7 @@
   <meta name="description" content="Desc:protobuf语法介绍，怎么写proto文件，grpc的使用入门 在gRPC官网用了一句话来介绍:“一个高性能、开源的通用RPC框架”，同时介绍了其四大特点：  定义简单 支持多种编程语言多种平台 快速启动和缩放 双向流媒体和集成身份验证">
 <meta property="og:type" content="article">
 <meta property="og:title" content="gRPC在Go中的使用（一）Protocol Buffers语法与相关使用">
-<meta property="og:url" content="https://github.com/2018/09/20/grpc1/index.html">
+<meta property="og:url" content="https://timmy6.github.io/2018/09/20/grpc1/index.html">
 <meta property="og:site_name" content="Hexo">
 <meta property="og:description" content="Desc:protobuf语法介绍，怎么写proto文件，grpc的使用入门 在gRPC官网用了一句话来介绍:“一个高性能、开源的通用RPC框架”，同时介绍了其四大特点：  定义简单 支持多种编程语言多种平台 快速启动和缩放 双向流媒体和集成身份验证">
 <meta property="og:locale" content="zh_CN">
@@ -36,7 +36,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://st.razeen.me/essay/image/go/grpc-001.png">
   <!-- Canonical links -->
-  <link rel="canonical" href="https://github.com/2018/09/20/grpc1/index.html">
+  <link rel="canonical" href="https://timmy6.github.io/2018/09/20/grpc1/index.html">
   
     <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
   
@@ -44,7 +44,7 @@
     <link rel="icon" href="/favicon.png" type="image/x-icon">
   
   
-<link rel="stylesheet" href="/timmy6.github.io/css/style.css">
+<link rel="stylesheet" href="/css/style.css">
 
   
   
@@ -61,7 +61,7 @@
       
       <div class="profile-block text-center">
         <a id="avatar" href="https://github.com/timmy6" target="_blank">
-          <img class="img-circle img-rotate" src="/timmy6.github.io/images/avatar.jpg" width="200" height="200">
+          <img class="img-circle img-rotate" src="/images/avatar.jpg" width="200" height="200">
         </a>
         <h2 id="name" class="hidden-xs hidden-sm">刘启明</h2>
         <h3 id="title" class="hidden-xs hidden-sm hidden-md">Go Developer</h3>
@@ -105,7 +105,7 @@
         
         
         <li class="menu-item menu-item-home">
-          <a href="/timmy6.github.io/.">
+          <a href="/.">
             
             <i class="icon icon-home-fill"></i>
             
@@ -115,7 +115,7 @@
         
         
         <li class="menu-item menu-item-archives">
-          <a href="/timmy6.github.io/archives">
+          <a href="/archives">
             
             <i class="icon icon-archives-fill"></i>
             
@@ -125,7 +125,7 @@
         
         
         <li class="menu-item menu-item-categories">
-          <a href="/timmy6.github.io/categories">
+          <a href="/categories">
             
             <i class="icon icon-folder"></i>
             
@@ -135,7 +135,7 @@
         
         
         <li class="menu-item menu-item-tags">
-          <a href="/timmy6.github.io/tags">
+          <a href="/tags">
             
             <i class="icon icon-tags"></i>
             
@@ -145,7 +145,7 @@
         
         
         <li class="menu-item menu-item-repository">
-          <a href="/timmy6.github.io/repository">
+          <a href="/repository">
             
             <i class="icon icon-project"></i>
             
@@ -155,7 +155,7 @@
         
         
         <li class="menu-item menu-item-books">
-          <a href="/timmy6.github.io/books">
+          <a href="/books">
             
             <i class="icon icon-book-fill"></i>
             
@@ -165,7 +165,7 @@
         
         
         <li class="menu-item menu-item-links">
-          <a href="/timmy6.github.io/links">
+          <a href="/links">
             
             <i class="icon icon-friendship"></i>
             
@@ -175,7 +175,7 @@
         
         
         <li class="menu-item menu-item-about">
-          <a href="/timmy6.github.io/about">
+          <a href="/about">
             
             <i class="icon icon-cup-fill"></i>
             
@@ -218,7 +218,7 @@
   <div class="widget">
     <h3 class="widget-title">分类</h3>
     <div class="widget-body">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/timmy6.github.io/categories/Go%E5%BC%80%E5%8F%91/">Go开发</a><span class="category-list-count">18</span></li></ul>
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Go%E5%BC%80%E5%8F%91/">Go开发</a><span class="category-list-count">18</span></li></ul>
     </div>
   </div>
 
@@ -228,7 +228,7 @@
   <div class="widget">
     <h3 class="widget-title">标签</h3>
     <div class="widget-body">
-      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/timmy6.github.io/tags/Go%E5%9F%BA%E7%A1%80/" rel="tag">Go基础</a><span class="tag-list-count">18</span></li></ul>
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Go%E5%9F%BA%E7%A1%80/" rel="tag">Go基础</a><span class="tag-list-count">18</span></li></ul>
     </div>
   </div>
 
@@ -238,7 +238,7 @@
   <div class="widget">
     <h3 class="widget-title">标签云</h3>
     <div class="widget-body tagcloud">
-      <a href="/timmy6.github.io/tags/Go%E5%9F%BA%E7%A1%80/" style="font-size: 13px;">Go基础</a>
+      <a href="/tags/Go%E5%9F%BA%E7%A1%80/" style="font-size: 13px;">Go基础</a>
     </div>
   </div>
 
@@ -247,7 +247,7 @@
   <div class="widget">
     <h3 class="widget-title">归档</h3>
     <div class="widget-body">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/timmy6.github.io/archives/2019/01/">一月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/timmy6.github.io/archives/2018/12/">十二月 2018</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/timmy6.github.io/archives/2018/11/">十一月 2018</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/timmy6.github.io/archives/2018/10/">十月 2018</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/timmy6.github.io/archives/2018/09/">九月 2018</a><span class="archive-list-count">5</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">十一月 2018</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">十月 2018</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a><span class="archive-list-count">5</span></li></ul>
     </div>
   </div>
 
@@ -263,10 +263,10 @@
             
             <div class="item-inner">
               <p class="item-category">
-                <a class="category-link" href="/timmy6.github.io/categories/Go%E5%BC%80%E5%8F%91/">Go开发</a>
+                <a class="category-link" href="/categories/Go%E5%BC%80%E5%8F%91/">Go开发</a>
               </p>
               <p class="item-title">
-                <a href="/timmy6.github.io/2019/01/05/gin-log/" class="title">gin日志记录</a>
+                <a href="/2019/01/05/gin-log/" class="title">gin日志记录</a>
               </p>
               <p class="item-date">
                 <time datetime="2019-01-05T13:22:50.000Z" itemprop="datePublished">2019-01-05</time>
@@ -278,10 +278,10 @@
             
             <div class="item-inner">
               <p class="item-category">
-                <a class="category-link" href="/timmy6.github.io/categories/Go%E5%BC%80%E5%8F%91/">Go开发</a>
+                <a class="category-link" href="/categories/Go%E5%BC%80%E5%8F%91/">Go开发</a>
               </p>
               <p class="item-title">
-                <a href="/timmy6.github.io/2018/12/20/gin-router/" class="title">路由配置</a>
+                <a href="/2018/12/20/gin-router/" class="title">路由配置</a>
               </p>
               <p class="item-date">
                 <time datetime="2018-12-20T12:22:50.000Z" itemprop="datePublished">2018-12-20</time>
@@ -293,10 +293,10 @@
             
             <div class="item-inner">
               <p class="item-category">
-                <a class="category-link" href="/timmy6.github.io/categories/Go%E5%BC%80%E5%8F%91/">Go开发</a>
+                <a class="category-link" href="/categories/Go%E5%BC%80%E5%8F%91/">Go开发</a>
               </p>
               <p class="item-title">
-                <a href="/timmy6.github.io/2018/12/15/sync-WaitGroup/" class="title">使用 sync.WaitGroup 来实现并发操作</a>
+                <a href="/2018/12/15/sync-WaitGroup/" class="title">使用 sync.WaitGroup 来实现并发操作</a>
               </p>
               <p class="item-date">
                 <time datetime="2018-12-15T12:22:50.000Z" itemprop="datePublished">2018-12-15</time>
@@ -308,10 +308,10 @@
             
             <div class="item-inner">
               <p class="item-category">
-                <a class="category-link" href="/timmy6.github.io/categories/Go%E5%BC%80%E5%8F%91/">Go开发</a>
+                <a class="category-link" href="/categories/Go%E5%BC%80%E5%8F%91/">Go开发</a>
               </p>
               <p class="item-title">
-                <a href="/timmy6.github.io/2018/12/12/sync-map/" class="title">使用sync.Map来解决map的并发操作问题</a>
+                <a href="/2018/12/12/sync-map/" class="title">使用sync.Map来解决map的并发操作问题</a>
               </p>
               <p class="item-date">
                 <time datetime="2018-12-12T12:22:50.000Z" itemprop="datePublished">2018-12-12</time>
@@ -323,10 +323,10 @@
             
             <div class="item-inner">
               <p class="item-category">
-                <a class="category-link" href="/timmy6.github.io/categories/Go%E5%BC%80%E5%8F%91/">Go开发</a>
+                <a class="category-link" href="/categories/Go%E5%BC%80%E5%8F%91/">Go开发</a>
               </p>
               <p class="item-title">
-                <a href="/timmy6.github.io/2018/12/10/escape/" class="title">基于逃逸分析来提升程序性能</a>
+                <a href="/2018/12/10/escape/" class="title">基于逃逸分析来提升程序性能</a>
               </p>
               <p class="item-date">
                 <time datetime="2018-12-10T11:17:50.000Z" itemprop="datePublished">2018-12-10</time>
@@ -371,26 +371,26 @@
       <div class="article-meta">
         <span class="article-date">
     <i class="icon icon-calendar-check"></i>
-	<a href="/timmy6.github.io/2018/09/20/grpc1/" class="article-date">
+	<a href="/2018/09/20/grpc1/" class="article-date">
 	  <time datetime="2018-09-20T06:07:50.000Z" itemprop="datePublished">2018-09-20</time>
 	</a>
 </span>
         
   <span class="article-category">
     <i class="icon icon-folder"></i>
-    <a class="article-category-link" href="/timmy6.github.io/categories/Go%E5%BC%80%E5%8F%91/">Go开发</a>
+    <a class="article-category-link" href="/categories/Go%E5%BC%80%E5%8F%91/">Go开发</a>
   </span>
 
         
   <span class="article-tag">
     <i class="icon icon-tags"></i>
-	<a class="article-tag-link-link" href="/timmy6.github.io/tags/Go%E5%9F%BA%E7%A1%80/" rel="tag">Go基础</a>
+	<a class="article-tag-link-link" href="/tags/Go%E5%9F%BA%E7%A1%80/" rel="tag">Go基础</a>
   </span>
 
 
         
 
-        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/timmy6.github.io/2018/09/20/grpc1/#comments" class="article-comment-link">评论</a></span>
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2018/09/20/grpc1/#comments" class="article-comment-link">评论</a></span>
         
       </div>
     </div>
@@ -415,7 +415,7 @@
 <p>*<em>注:下面Protocol Buffers简写protobuf.</em></p>
 <p>这篇我们先介绍protobuf的相关语法、怎么书写<code>.proto</code>文件以及go代码生成。</p>
 <h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>要熟练的使用GRPC，protobuf的熟练使用必不可少。</p>
-<p>gRPC使用<a href="https://github.com/google/protobuf">protobuf</a>来定义服务。protobuf是由Google开发的一种数据序列化协议，可以把它想象成是XML或JSON格式，但更小，更快更简洁。而且一次定义，可生成多种语言的代码。</p>
+<p>gRPC使用<a target="_blank" rel="noopener" href="https://github.com/google/protobuf">protobuf</a>来定义服务。protobuf是由Google开发的一种数据序列化协议，可以把它想象成是XML或JSON格式，但更小，更快更简洁。而且一次定义，可生成多种语言的代码。</p>
 <h3 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h3><p>首先我们需要编写一些<code>.proto</code>文件，定义我们在程序中需要处理的结构化数据。我们直接从一个实例开始讲起，下面是一个proto文件：</p>
 <figure class="highlight protobuf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">syntax = <span class="string">&quot;proto3&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">option</span> go_package = <span class="string">&quot;github.com/razeencheng/demo-go/grpc/demo1/helloworld&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">package</span> helloworld;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="string">&quot;github.com/golang/protobuf/ptypes/any/any.proto&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">message </span><span class="title class_">HelloWorldRequest</span> &#123;</span><br><span class="line">  <span class="type">string</span> greeting = <span class="number">1</span>;</span><br><span class="line">  map&lt;<span class="type">string</span>, <span class="type">string</span>&gt; infos  = <span class="number">2</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">message </span><span class="title class_">HelloWorldResponse</span> &#123;</span><br><span class="line">  <span class="type">string</span> reply = <span class="number">1</span>;</span><br><span class="line">  <span class="keyword">repeated</span> google.protobuf.Any details = <span class="number">2</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">service </span><span class="title class_">HelloWorldService</span> &#123;</span><br><span class="line">  <span class="function"><span class="keyword">rpc</span> SayHelloWorld(HelloWorldRequest) <span class="keyword">returns</span> (HelloWorldResponse)</span>&#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
@@ -516,7 +516,7 @@
 <p>看到这里你也许会疑惑，go里面的切片，map，接口等类型我怎么定义呢？别急，下面一一替你解答。</p>
 <p>1.map类型，<code>HelloWorldRequest</code>的<code>infos</code>就是一个map类型，它的结构为<code>map&lt;key_type, value_type&gt; map_field = N</code>  但是在使用的时候你需要注意map类型不能<code>repetead</code>。</p>
 <p>2.切片类型，我们直接定义其规则为<code>repeated</code>就可以了。就像<code>HelloWorldResponse</code>中的<code>details</code>字段一样，它就是一个切片类型。那么你会问了它是什么类型的切片？这就看下面了~</p>
-<p>3.接口类型在proto中没有直接实现，但在<a href="https://github.com/golang/protobuf/blob/master/ptypes/any/any.proto">google&#x2F;protobuf&#x2F;any.proto</a>中定义了一个<code>google.protobuf.Any</code>类型，然后结合<a href="https://github.com/golang/protobuf/blob/master/ptypes/any.go">protobuf&#x2F;go</a>也算是曲线救国了~</p>
+<p>3.接口类型在proto中没有直接实现，但在<a target="_blank" rel="noopener" href="https://github.com/golang/protobuf/blob/master/ptypes/any/any.proto">google&#x2F;protobuf&#x2F;any.proto</a>中定义了一个<code>google.protobuf.Any</code>类型，然后结合<a target="_blank" rel="noopener" href="https://github.com/golang/protobuf/blob/master/ptypes/any.go">protobuf&#x2F;go</a>也算是曲线救国了~</p>
 <ul>
 <li><p>字段编号</p>
 <p>最后的1，2代表的是每个字段在该消息中的唯一标签，在与消息二进制格式中标识这些字段，而且当你的消息在使用的时候该值不能改变。1到15都是用一个字节编码的，通常用于标签那些频繁发生修改的字段。16到2047用两个字节编码，最大的是2^29-1(536,870,911)，其中19000-19999为预留的，你也不可使用。</p>
@@ -526,7 +526,7 @@
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">service HelloWorldService &#123;</span><br><span class="line">  rpc SayHelloWorld(HelloWorldRequest) returns (HelloWorldResponse)&#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>protobuf编译器将产生一个抽象接口<code>HelloWorldService</code>以及一个相应的存根实现。存根将所有的调用指向RpcChannel(SayHelloWorld)，它是一个抽象接口，必须在RPC系统中对该接口进行实现。具体如何使用，将在下一篇博客中详细介绍。</p>
-<h3 id="生成Go代码"><a href="#生成Go代码" class="headerlink" title="生成Go代码"></a>生成Go代码</h3><h4 id="安装protoc"><a href="#安装protoc" class="headerlink" title="安装protoc"></a>安装protoc</h4><p>首先要安装<code>protoc</code>,可直接到<a href="https://github.com/google/protobuf/releases/tag/v3.0.0">这里</a>下载二进制安装到 <code>$PATH</code>里面，也可以直接下载源码编译。除此之外，你还需要安装go的proto插件<code>protoc-gen-go</code>。</p>
+<h3 id="生成Go代码"><a href="#生成Go代码" class="headerlink" title="生成Go代码"></a>生成Go代码</h3><h4 id="安装protoc"><a href="#安装protoc" class="headerlink" title="安装protoc"></a>安装protoc</h4><p>首先要安装<code>protoc</code>,可直接到<a target="_blank" rel="noopener" href="https://github.com/google/protobuf/releases/tag/v3.0.0">这里</a>下载二进制安装到 <code>$PATH</code>里面，也可以直接下载源码编译。除此之外，你还需要安装go的proto插件<code>protoc-gen-go</code>。</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// mac terminal</span></span><br><span class="line"><span class="keyword">go</span> get -u github.com/golang/protobuf/&#123;proto,protoc-gen-<span class="keyword">go</span>&#125;</span><br><span class="line"><span class="comment">// win powershell</span></span><br><span class="line"><span class="keyword">go</span> get -u github.com/golang/protobuf/proto</span><br><span class="line"><span class="keyword">go</span> get -u github.com/golang/protobuf/protoc-gen-<span class="keyword">go</span></span><br></pre></td></tr></table></figure>
 
 <h4 id="生成go代码"><a href="#生成go代码" class="headerlink" title="生成go代码"></a>生成go代码</h4><p>接下来，使用<code>protoc</code>命令即可生成。</p>
@@ -559,7 +559,7 @@
     
     <li class="post-copyright-link hidden-xs">
       <strong>本文链接：</strong>
-      <a href="https://github.com/2018/09/20/grpc1/" title="gRPC在Go中的使用（一）Protocol Buffers语法与相关使用" target="_blank" rel="external">https://github.com/2018/09/20/grpc1/</a>
+      <a href="https://timmy6.github.io/2018/09/20/grpc1/" title="gRPC在Go中的使用（一）Protocol Buffers语法与相关使用" target="_blank" rel="external">https://timmy6.github.io/2018/09/20/grpc1/</a>
     </li>
     
     <li class="post-copyright-license">
@@ -574,7 +574,7 @@
     <figure class="media">
       <div class="media-left">
         <a href="https://github.com/timmy6" target="_blank" class="img-burn thumb-sm visible-lg">
-          <img src="/timmy6.github.io/images/avatar.jpg" class="img-rounded w-full" alt="">
+          <img src="/images/avatar.jpg" class="img-rounded w-full" alt="">
         </a>
       </div>
       <div class="media-body">
@@ -606,12 +606,12 @@
   <ul class="pager pull-left">
     
     <li class="prev">
-      <a href="/timmy6.github.io/2018/09/25/grpc2/" title="gRPC在Go中的使用（二）gRPC实现简单通讯"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;上一篇</span></a>
+      <a href="/2018/09/25/grpc2/" title="gRPC在Go中的使用（二）gRPC实现简单通讯"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;上一篇</span></a>
     </li>
     
     
     <li class="next">
-      <a href="/timmy6.github.io/2018/09/15/benchmark/" title="怎么写Go基准测试（性能测试)"><span>下一篇&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+      <a href="/2018/09/15/benchmark/" title="怎么写Go基准测试（性能测试)"><span>下一篇&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
     </li>
     
     
@@ -654,14 +654,14 @@
           <div class="tab-content">
             <div role="tabpanel" class="tab-pane fade active in" id="alipay">
               <div class="donate-payimg">
-                <img src="/timmy6.github.io/images/donate/alipayimg.png" alt="扫码支持" title="扫一扫" />
+                <img src="/images/donate/alipayimg.png" alt="扫码支持" title="扫一扫" />
               </div>
               <p class="text-muted mv">扫码打赏，你说多少就多少</p>
               <p class="text-grey">打开支付宝扫一扫，即可进行扫码打赏哦</p>
             </div>
             <div role="tabpanel" class="tab-pane fade" id="wechatpay">
               <div class="donate-payimg">
-                <img src="/timmy6.github.io/images/donate/wechatpayimg.png" alt="扫码支持" title="扫一扫" />
+                <img src="/images/donate/wechatpayimg.png" alt="扫码支持" title="扫一扫" />
               </div>
               <p class="text-muted mv">扫码打赏，你说多少就多少</p>
               <p class="text-grey">打开微信扫一扫，即可进行扫码打赏哦</p>
@@ -710,10 +710,10 @@
 window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
 </script>
 
-<script src="/timmy6.github.io/js/plugin.min.js"></script>
+<script src="/js/plugin.min.js"></script>
 
 
-<script src="/timmy6.github.io/js/application.js"></script>
+<script src="/js/application.js"></script>
 
 
     <script>
@@ -726,14 +726,14 @@ window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
             TAGS: '标签',
             UNTITLED: '(未命名)',
         },
-        ROOT_URL: '/timmy6.github.io/',
-        CONTENT_URL: '/timmy6.github.io/content.json',
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
     };
     window.INSIGHT_CONFIG = INSIGHT_CONFIG;
 })(window);
 </script>
 
-<script src="/timmy6.github.io/js/insight.js"></script>
+<script src="/js/insight.js"></script>
 
 
 
