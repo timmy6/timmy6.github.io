@@ -16,8 +16,8 @@ https://github.com/2018/09/25/grpc2/
 https://github.com/2018/09/20/grpc1/
 https://github.com/2018/09/15/benchmark/
 https://github.com/2018/09/12/var_dec/
-https://github.com/categories/index.html
 https://github.com/repository/index.html
+https://github.com/categories/index.html
 https://github.com/
 https://github.com/tags/Go%E5%9F%BA%E7%A1%80/
 https://github.com/categories/Go%E5%BC%80%E5%8F%91/
