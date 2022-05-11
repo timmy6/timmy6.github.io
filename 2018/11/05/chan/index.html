@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000" />
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top" />
+  
+  
+  <title>chan通道 | Hexo</title>
+  <meta name="description" content="概述chan 可以理解为队列，遵循先进先出的规则。 在说 chan 之前，咱们先说一下 go 关键字。 在 go 关键字后面加一个函数，就可以创建一个线程，函数可以为已经写好的函数，也可以是匿名函数。 举个例子： 123456789func main() &amp;#123;	fmt.Println(&quot;main start&quot;)	go func() &amp;#123;		fmt.Println">
+<meta property="og:type" content="article">
+<meta property="og:title" content="chan通道">
+<meta property="og:url" content="https://github.com/timmy6/2018/11/05/chan/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="概述chan 可以理解为队列，遵循先进先出的规则。 在说 chan 之前，咱们先说一下 go 关键字。 在 go 关键字后面加一个函数，就可以创建一个线程，函数可以为已经写好的函数，也可以是匿名函数。 举个例子： 123456789func main() &amp;#123;	fmt.Println(&quot;main start&quot;)	go func() &amp;#123;		fmt.Println">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2018-11-05T11:17:50.000Z">
+<meta property="article:modified_time" content="2022-05-11T08:32:03.154Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="程序员">
+<meta name="twitter:card" content="summary">
+  <!-- Canonical links -->
+  <link rel="canonical" href="https://github.com/timmy6/2018/11/05/chan/index.html">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png" type="image/x-icon">
+  
+  
+<link rel="stylesheet" href="/timmy6/css/style.css">
+
+  
+  
+  
+  
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+
+<body class="main-center" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/timmy6" target="_blank">
+          <img class="img-circle img-rotate" src="/timmy6/images/avatar.jpg" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">刘启明</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">Go Developer</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> Changsha, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="搜索" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="想要查找什么..." x-webkit-speech />
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav ">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/timmy6/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">首页</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/timmy6/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">归档</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/timmy6/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">分类</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/timmy6/tags">
+            
+            <i class="icon icon-tags"></i>
+            
+            <span class="menu-title">标签</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-repository">
+          <a href="/timmy6/repository">
+            
+            <i class="icon icon-project"></i>
+            
+            <span class="menu-title">项目</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-books">
+          <a href="/timmy6/books">
+            
+            <i class="icon icon-book-fill"></i>
+            
+            <span class="menu-title">书单</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-links">
+          <a href="/timmy6/links">
+            
+            <i class="icon icon-friendship"></i>
+            
+            <span class="menu-title">友链</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-about">
+          <a href="/timmy6/about">
+            
+            <i class="icon icon-cup-fill"></i>
+            
+            <span class="menu-title">关于</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/timmy6" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://weibo.com/u/3917867123" target="_blank" title="Weibo" data-toggle=tooltip data-placement=top><i class="icon icon-weibo"></i></a></li>
+        
+    </ul>
+
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">公告</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>欢迎交流与分享经验!</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget-body">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/timmy6/categories/Go%E5%BC%80%E5%8F%91/">Go开发</a><span class="category-list-count">16</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget-body">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/timmy6/tags/%E7%A8%8B%E5%BA%8F%E5%91%98/" rel="tag">程序员</a><span class="tag-list-count">15</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget-body tagcloud">
+      <a href="/timmy6/tags/%E7%A8%8B%E5%BA%8F%E5%91%98/" style="font-size: 13px;">程序员</a>
+    </div>
+  </div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/timmy6/archives/2018/12/">十二月 2018</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/timmy6/archives/2018/11/">十一月 2018</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/timmy6/archives/2018/10/">十月 2018</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/timmy6/archives/2018/09/">九月 2018</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/timmy6/archives/2018/05/">五月 2018</a><span class="archive-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget-body">
+      <ul class="recent-post-list list-unstyled no-thumbnail">
+        
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/timmy6/categories/Go%E5%BC%80%E5%8F%91/">Go开发</a>
+              </p>
+              <p class="item-title">
+                <a href="/timmy6/2018/12/15/sync-WaitGroup/" class="title">使用 sync.WaitGroup 来实现并发操作</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2018-12-15T12:22:50.000Z" itemprop="datePublished">2018-12-15</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/timmy6/categories/Go%E5%BC%80%E5%8F%91/">Go开发</a>
+              </p>
+              <p class="item-title">
+                <a href="/timmy6/2018/12/12/sync-map/" class="title">使用sync.Map来解决map的并发操作问题</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2018-12-12T12:22:50.000Z" itemprop="datePublished">2018-12-12</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/timmy6/categories/Go%E5%BC%80%E5%8F%91/">Go开发</a>
+              </p>
+              <p class="item-title">
+                <a href="/timmy6/2018/12/10/escape/" class="title">基于逃逸分析来提升程序性能</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2018-12-10T11:17:50.000Z" itemprop="datePublished">2018-12-10</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/timmy6/categories/Go%E5%BC%80%E5%8F%91/">Go开发</a>
+              </p>
+              <p class="item-title">
+                <a href="/timmy6/2018/12/05/string-append/" class="title">不要使用 + 和 fmt.Sprintf 操作字符串</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2018-12-05T10:17:50.000Z" itemprop="datePublished">2018-12-05</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/timmy6/categories/Go%E5%BC%80%E5%8F%91/">Go开发</a>
+              </p>
+              <p class="item-title">
+                <a href="/timmy6/2018/11/25/json-unmarshal/" class="title">json.Unmarshal遇到的小坑</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2018-11-25T10:17:50.000Z" itemprop="datePublished">2018-11-25</time>
+              </p>
+            </div>
+          </li>
+          
+      </ul>
+    </div>
+  </div>
+  
+
+    
+  </div>
+</aside>
+
+  
+  
+  <aside class="sidebar sidebar-toc collapse   in  " id="collapseToc" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    <nav id="toc" class="article-toc">
+      <h3 class="toc-title">文章目录</h3>
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A6%82%E8%BF%B0"><span class="toc-number">1.</span> <span class="toc-text">概述</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A3%B0%E6%98%8E-chan"><span class="toc-number">2.</span> <span class="toc-text">声明 chan</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%86%99%E5%85%A5-chan"><span class="toc-number">3.</span> <span class="toc-text">写入 chan</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AF%BB%E5%8F%96-chan"><span class="toc-number">4.</span> <span class="toc-text">读取 chan</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%B3%E9%97%AD-chan"><span class="toc-number">5.</span> <span class="toc-text">关闭 chan</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%A4%BA%E4%BE%8B"><span class="toc-number">6.</span> <span class="toc-text">示例</span></a></li></ol>
+    </nav>
+  </div>
+</aside>
+
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-chan" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      chan通道
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/timmy6/2018/11/05/chan/" class="article-date">
+	  <time datetime="2018-11-05T11:17:50.000Z" itemprop="datePublished">2018-11-05</time>
+	</a>
+</span>
+        
+  <span class="article-category">
+    <i class="icon icon-folder"></i>
+    <a class="article-category-link" href="/timmy6/categories/Go%E5%BC%80%E5%8F%91/">Go开发</a>
+  </span>
+
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link-link" href="/timmy6/tags/%E7%A8%8B%E5%BA%8F%E5%91%98/" rel="tag">程序员</a>
+  </span>
+
+
+        
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/timmy6/2018/11/05/chan/#comments" class="article-comment-link">评论</a></span>
+        
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>chan 可以理解为队列，遵循先进先出的规则。</p>
+<p>在说 chan 之前，咱们先说一下 go 关键字。</p>
+<p>在 go 关键字后面加一个函数，就可以创建一个线程，函数可以为已经写好的函数，也可以是匿名函数。</p>
+<p>举个例子：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">func main() &#123;</span><br><span class="line">	fmt.Println(&quot;main start&quot;)</span><br><span class="line"></span><br><span class="line">	go func() &#123;</span><br><span class="line">		fmt.Println(&quot;goroutine&quot;)</span><br><span class="line">	&#125;()</span><br><span class="line"></span><br><span class="line">	fmt.Println(&quot;main end&quot;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">main start</span><br><span class="line">main end</span><br></pre></td></tr></table></figure>
+
+<p>为什么没有输出 goroutine ？</p>
+<p>首先，我们清楚 Go 语言的线程是并发机制，不是并行机制。</p>
+<p>那么，什么是并发，什么是并行？</p>
+<p>并发是不同的代码块交替执行，也就是交替可以做不同的事情。</p>
+<p>并行是不同的代码块同时执行，也就是同时可以做不同的事情。</p>
+<p>举个生活化场景的例子：</p>
+<p>你正在家看书，忽然电话来了，然后你接电话，通话完成后继续看书，这就是并发，看书和接电话交替做。</p>
+<p>如果电话来了，你一边看书一遍接电话，这就是并行，看书和接电话一起做。</p>
+<p>说回上面的例子，为什么没有输出 goroutine ？</p>
+<p>main 函数是一个主线程，是因为主线程执行太快了，子线程还没来得及执行，所以看不到输出。</p>
+<p>现在让主线程休眠 1 秒钟，再试试。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">func main() &#123;</span><br><span class="line">	fmt.Println(&quot;main start&quot;)</span><br><span class="line"></span><br><span class="line">	go func() &#123;</span><br><span class="line">		fmt.Println(&quot;goroutine&quot;)</span><br><span class="line">	&#125;()</span><br><span class="line"></span><br><span class="line">	time.Sleep(1 * time.Second)</span><br><span class="line"></span><br><span class="line">	fmt.Println(&quot;main end&quot;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">main start</span><br><span class="line">goroutine</span><br><span class="line">main end</span><br></pre></td></tr></table></figure>
+
+<p>这就对了。</p>
+<p>接下来，看看如何使用 chan 。</p>
+<h2 id="声明-chan"><a href="#声明-chan" class="headerlink" title="声明 chan"></a>声明 chan</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">// 声明不带缓冲的通道</span><br><span class="line">ch1 := make(chan string)</span><br><span class="line"></span><br><span class="line">// 声明带10个缓冲的通道</span><br><span class="line">ch2 := make(chan string, 10)</span><br><span class="line"></span><br><span class="line">// 声明只读通道</span><br><span class="line">ch3 := make(&lt;-chan string)</span><br><span class="line"></span><br><span class="line">// 声明只写通道</span><br><span class="line">ch4 := make(chan&lt;- string)</span><br></pre></td></tr></table></figure>
+
+<p>注意：</p>
+<p>不带缓冲的通道，进和出都会阻塞。</p>
+<p>带缓冲的通道，进一次长度 +1，出一次长度 -1，如果长度等于缓冲长度时，再进就会阻塞。</p>
+<h2 id="写入-chan"><a href="#写入-chan" class="headerlink" title="写入 chan"></a>写入 chan</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ch1 := make(chan string, 10)</span><br><span class="line"></span><br><span class="line">ch1 &lt;- &quot;a&quot;</span><br></pre></td></tr></table></figure>
+
+<h2 id="读取-chan"><a href="#读取-chan" class="headerlink" title="读取 chan"></a>读取 chan</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">val, ok := &lt;- ch1</span><br><span class="line">// 或</span><br><span class="line">val := &lt;- ch1</span><br></pre></td></tr></table></figure>
+
+<h2 id="关闭-chan"><a href="#关闭-chan" class="headerlink" title="关闭 chan"></a>关闭 chan</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">close(chan)</span><br></pre></td></tr></table></figure>
+
+<p>注意：</p>
+<ul>
+<li>close 以后不能再写入，写入会出现 panic</li>
+<li>重复 close 会出现 panic</li>
+<li>只读的 chan 不能 close</li>
+<li>close 以后还可以读取数据</li>
+</ul>
+<h2 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">func main() &#123;</span><br><span class="line">	fmt.Println(&quot;main start&quot;)</span><br><span class="line">	ch := make(chan string)</span><br><span class="line">	ch &lt;- &quot;a&quot; // 入 chan</span><br><span class="line">	go func() &#123;</span><br><span class="line">		val := &lt;- ch // 出 chan</span><br><span class="line">		fmt.Println(val)</span><br><span class="line">	&#125;()</span><br><span class="line">	fmt.Println(&quot;main end&quot;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">main start</span><br><span class="line">fatal error: all goroutines are asleep - deadlock!</span><br></pre></td></tr></table></figure>
+
+<p>What ? 这是为啥，刚开始就出师不利呀？</p>
+<p>因为，定义的是一个无缓冲的 chan，赋值后就陷入了阻塞。</p>
+<p>怎么解决它？</p>
+<p>声明一个有缓冲的 chan。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">func main() &#123;</span><br><span class="line">	fmt.Println(&quot;main start&quot;)</span><br><span class="line">	ch := make(chan string, 1)</span><br><span class="line">	ch &lt;- &quot;a&quot; // 入 chan</span><br><span class="line">	go func() &#123;</span><br><span class="line">		val := &lt;- ch // 出 chan</span><br><span class="line">		fmt.Println(val)</span><br><span class="line">	&#125;()</span><br><span class="line">	fmt.Println(&quot;main end&quot;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">main start</span><br><span class="line">main end</span><br></pre></td></tr></table></figure>
+
+<p>为啥没有输出 a , 和前面一样，主线程执行太快了，加个休眠 1 秒钟，再试试。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">func main() &#123;</span><br><span class="line">	fmt.Println(&quot;main start&quot;)</span><br><span class="line">	ch := make(chan string, 1)</span><br><span class="line">	ch &lt;- &quot;a&quot; // 入 chan</span><br><span class="line">	go func() &#123;</span><br><span class="line">		val := &lt;- ch // 出 chan</span><br><span class="line">		fmt.Println(val)</span><br><span class="line">	&#125;()</span><br><span class="line">	time.Sleep(1 * time.Second)</span><br><span class="line">	fmt.Println(&quot;main end&quot;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">main start</span><br><span class="line">a</span><br><span class="line">main end</span><br></pre></td></tr></table></figure>
+
+<p>这就对了。</p>
+<p>再看一个例子：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">func main() &#123;</span><br><span class="line">	fmt.Println(&quot;main start&quot;)</span><br><span class="line">	ch := make(chan string)</span><br><span class="line">	go func() &#123;</span><br><span class="line">		ch &lt;- &quot;a&quot; // 入 chan</span><br><span class="line">	&#125;()</span><br><span class="line">	go func() &#123;</span><br><span class="line">		val := &lt;- ch // 出 chan</span><br><span class="line">		fmt.Println(val)</span><br><span class="line">	&#125;()</span><br><span class="line">	time.Sleep(1 * time.Second)</span><br><span class="line">	fmt.Println(&quot;main end&quot;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">main start</span><br><span class="line">a</span><br><span class="line">main end</span><br></pre></td></tr></table></figure>
+
+<p>再看一个例子：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">func producer(ch chan string) &#123;</span><br><span class="line">	fmt.Println(&quot;producer start&quot;)</span><br><span class="line">	ch &lt;- &quot;a&quot;</span><br><span class="line">	ch &lt;- &quot;b&quot;</span><br><span class="line">	ch &lt;- &quot;c&quot;</span><br><span class="line">	ch &lt;- &quot;d&quot;</span><br><span class="line">	fmt.Println(&quot;producer end&quot;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">func main() &#123;</span><br><span class="line">	fmt.Println(&quot;main start&quot;)</span><br><span class="line">	ch := make(chan string, 3)</span><br><span class="line">	go producer(ch)</span><br><span class="line"></span><br><span class="line">	time.Sleep(1 * time.Second)</span><br><span class="line">	fmt.Println(&quot;main end&quot;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">main start</span><br><span class="line">producer start</span><br><span class="line">main end</span><br></pre></td></tr></table></figure>
+
+<p>带缓冲的通道，如果长度等于缓冲长度时，再进就会阻塞。</p>
+<p>再看一个例子：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">func producer(ch chan string) &#123;</span><br><span class="line">	fmt.Println(&quot;producer start&quot;)</span><br><span class="line">	ch &lt;- &quot;a&quot;</span><br><span class="line">	ch &lt;- &quot;b&quot;</span><br><span class="line">	ch &lt;- &quot;c&quot;</span><br><span class="line">	ch &lt;- &quot;d&quot;</span><br><span class="line">	fmt.Println(&quot;producer end&quot;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">func customer(ch chan string) &#123;</span><br><span class="line">	for &#123;</span><br><span class="line">		msg := &lt;- ch</span><br><span class="line">		fmt.Println(msg)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">func main() &#123;</span><br><span class="line">	fmt.Println(&quot;main start&quot;)</span><br><span class="line">	ch := make(chan string, 3)</span><br><span class="line">	go producer(ch)</span><br><span class="line">	go customer(ch)</span><br><span class="line"></span><br><span class="line">	time.Sleep(1 * time.Second)</span><br><span class="line">	fmt.Println(&quot;main end&quot;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">main start</span><br><span class="line">producer start</span><br><span class="line">producer end</span><br><span class="line">a</span><br><span class="line">b</span><br><span class="line">c</span><br><span class="line">d</span><br><span class="line">main end</span><br></pre></td></tr></table></figure>
+
+<p>就到这吧。</p>
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="https://github.com/timmy6/2018/11/05/chan/" title="chan通道" target="_blank" rel="external">https://github.com/timmy6/2018/11/05/chan/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/timmy6" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/timmy6/images/avatar.jpg" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/timmy6" target="_blank"><span class="text-dark">刘启明</span><small class="ml-1x">Go Developer</small></a></h3>
+        <div>个人简介。</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    <li class="prev">
+      <a href="/timmy6/2018/11/15/defer/" title="defer 函数"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;上一篇</span></a>
+    </li>
+    
+    
+    <li class="next">
+      <a href="/timmy6/2018/10/26/gomod/" title="老项目迁移 go module 大型灾难记录"><span>下一篇&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+    <li class="toggle-toc">
+      <a class="toggle-btn " data-toggle="collapse" href="#collapseToc" aria-expanded="false" title="文章目录" role="button">    <span>[&nbsp;</span><span>文章目录</span>
+        <i class="text-collapsed icon icon-anchor"></i>
+        <i class="text-in icon icon-close"></i>
+        <span>]</span>
+      </a>
+    </li>
+    
+  </ul>
+  
+  
+  <!-- Button trigger modal -->
+  <button type="button" class="btn btn-fancy btn-donate pop-onhover bg-gradient-warning" data-toggle="modal" data-target="#donateModal"><span>赏</span></button>
+  <!-- <div class="wave-icon wave-icon-danger btn-donate" data-toggle="modal" data-target="#donateModal">
+    <div class="wave-circle"><span class="icon"><i class="icon icon-bill"></i></span></div>
+  </div> -->
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div>
+  </div>
+</nav>
+  
+<!-- Modal -->
+<div class="modal modal-center modal-small modal-xs-full fade" id="donateModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content donate">
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      <div class="modal-body">
+        <div class="donate-box">
+          <div class="donate-head">
+            <p>感谢您的支持，我会继续努力的!</p>
+          </div>
+          <div class="tab-content">
+            <div role="tabpanel" class="tab-pane fade active in" id="alipay">
+              <div class="donate-payimg">
+                <img src="/timmy6/images/donate/alipayimg.png" alt="扫码支持" title="扫一扫" />
+              </div>
+              <p class="text-muted mv">扫码打赏，你说多少就多少</p>
+              <p class="text-grey">打开支付宝扫一扫，即可进行扫码打赏哦</p>
+            </div>
+            <div role="tabpanel" class="tab-pane fade" id="wechatpay">
+              <div class="donate-payimg">
+                <img src="/timmy6/images/donate/wechatpayimg.png" alt="扫码支持" title="扫一扫" />
+              </div>
+              <p class="text-muted mv">扫码打赏，你说多少就多少</p>
+              <p class="text-grey">打开微信扫一扫，即可进行扫码打赏哦</p>
+            </div>
+          </div>
+          <div class="donate-footer">
+            <ul class="nav nav-tabs nav-justified" role="tablist">
+              <li role="presentation" class="active">
+                <a href="#alipay" id="alipay-tab" role="tab" data-toggle="tab" aria-controls="alipay" aria-expanded="true"><i class="icon icon-alipay"></i> 支付宝</a>
+              </li>
+              <li role="presentation" class="">
+                <a href="#wechatpay" role="tab" id="wechatpay-tab" data-toggle="tab" aria-controls="wechatpay" aria-expanded="false"><i class="icon icon-wepay"></i> 微信支付</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+</main>
+
+  <footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/timmy6" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://weibo.com/u/3917867123" target="_blank" title="Weibo" data-toggle=tooltip data-placement=top><i class="icon icon-weibo"></i></a></li>
+        
+    </ul>
+
+    <div class="copyright">
+    	
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+
+<script src="/timmy6/js/plugin.min.js"></script>
+
+
+<script src="/timmy6/js/application.js"></script>
+
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/timmy6/',
+        CONTENT_URL: '/timmy6/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/timmy6/js/insight.js"></script>
+
+
+
+
+
+
+   
+
+
+
+
+   
+    
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: '',
+    appKey: '',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: false
+  });
+  </script>
+
+     
+
+
+
+
+
+
+
+</body>
+</html>

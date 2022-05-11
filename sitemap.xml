@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>http://example.com/2018/09/11/hello-wrold/</loc>
+    <loc>https://github.com/timmy6/2018/12/15/sync-WaitGroup/</loc>
     
     <lastmod>2022-05-11</lastmod>
     
@@ -11,7 +11,7 @@
   </url>
   
   <url>
-    <loc>http://example.com/2018/05/11/var_dec/</loc>
+    <loc>https://github.com/timmy6/2018/12/12/sync-map/</loc>
     
     <lastmod>2022-05-11</lastmod>
     
@@ -20,7 +20,133 @@
   </url>
   
   <url>
-    <loc>http://example.com/repository/index.html</loc>
+    <loc>https://github.com/timmy6/2018/12/10/escape/</loc>
+    
+    <lastmod>2022-05-11</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://github.com/timmy6/2018/12/05/string-append/</loc>
+    
+    <lastmod>2022-05-11</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://github.com/timmy6/2018/11/25/json-unmarshal/</loc>
+    
+    <lastmod>2022-05-11</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://github.com/timmy6/2018/11/15/defer/</loc>
+    
+    <lastmod>2022-05-11</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://github.com/timmy6/2018/11/05/chan/</loc>
+    
+    <lastmod>2022-05-11</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://github.com/timmy6/2018/10/26/gomod/</loc>
+    
+    <lastmod>2022-05-11</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://github.com/timmy6/2018/10/22/restful/</loc>
+    
+    <lastmod>2022-05-11</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://github.com/timmy6/2018/10/12/gin-file/</loc>
+    
+    <lastmod>2022-05-11</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://github.com/timmy6/2018/10/02/grpc3/</loc>
+    
+    <lastmod>2022-05-11</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://github.com/timmy6/2018/09/25/grpc2/</loc>
+    
+    <lastmod>2022-05-11</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://github.com/timmy6/2018/09/20/grpc1/</loc>
+    
+    <lastmod>2022-05-11</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://github.com/timmy6/2018/09/15/benchmark/</loc>
+    
+    <lastmod>2022-05-11</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://github.com/timmy6/2018/09/11/hello-wrold/</loc>
+    
+    <lastmod>2022-05-11</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://github.com/timmy6/2018/05/11/var_dec/</loc>
+    
+    <lastmod>2022-05-11</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://github.com/timmy6/repository/index.html</loc>
     
     <lastmod>2022-03-21</lastmod>
     
@@ -29,7 +155,7 @@
   </url>
   
   <url>
-    <loc>http://example.com/categories/index.html</loc>
+    <loc>https://github.com/timmy6/categories/index.html</loc>
     
     <lastmod>2022-03-21</lastmod>
     
@@ -39,7 +165,7 @@
   
 
   <url>
-    <loc>http://example.com/</loc>
+    <loc>https://github.com/timmy6</loc>
     <lastmod>2022-05-11</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
@@ -47,7 +173,7 @@
 
   
   <url>
-    <loc>http://example.com/tags/%E7%A8%8B%E5%BA%8F%E5%91%98/</loc>
+    <loc>https://github.com/timmy6/tags/%E7%A8%8B%E5%BA%8F%E5%91%98/</loc>
     <lastmod>2022-05-11</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -56,7 +182,7 @@
 
   
   <url>
-    <loc>http://example.com/categories/Go%E5%BC%80%E5%8F%91/</loc>
+    <loc>https://github.com/timmy6/categories/Go%E5%BC%80%E5%8F%91/</loc>
     <lastmod>2022-05-11</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
