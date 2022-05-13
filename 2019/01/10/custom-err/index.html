@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000" />
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top" />
+  
+  
+  <title>自定义错误处理 | 刘启明的blog</title>
+  <meta name="description" content="概述开始今天的文章，为什么要自定义错误处理？默认的错误处理方式是什么？ 那好，咱们就先说下默认的错误处理。 默认的错误处理是 errors.New(&quot;错误信息&quot;)，这个信息通过 error 类型的返回值进行返回。 举个简单的例子： 12345678func hello(name string) (str string, err error) &amp;#123;	if name &#x3D;&#x3D;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="自定义错误处理">
+<meta property="og:url" content="https://timmy6.github.io/2019/01/10/custom-err/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="概述开始今天的文章，为什么要自定义错误处理？默认的错误处理方式是什么？ 那好，咱们就先说下默认的错误处理。 默认的错误处理是 errors.New(&quot;错误信息&quot;)，这个信息通过 error 类型的返回值进行返回。 举个简单的例子： 12345678func hello(name string) (str string, err error) &amp;#123;	if name &#x3D;&#x3D;">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2019-01-10T13:22:50.000Z">
+<meta property="article:modified_time" content="2022-05-13T07:16:06.972Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="gin框架">
+<meta name="twitter:card" content="summary">
+  <!-- Canonical links -->
+  <link rel="canonical" href="https://timmy6.github.io/2019/01/10/custom-err/index.html">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png" type="image/x-icon">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+  
+  
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+
+<body class="main-center" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/timmy6" target="_blank">
+          <img class="img-circle img-rotate" src="/images/avatar.jpg" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">刘启明</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">Go Developer</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> Changsha, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="搜索" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="想要查找什么..." x-webkit-speech />
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav ">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">首页</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">归档</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">分类</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags">
+            
+            <i class="icon icon-tags"></i>
+            
+            <span class="menu-title">标签</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-repository">
+          <a href="/repository">
+            
+            <i class="icon icon-project"></i>
+            
+            <span class="menu-title">项目</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-books">
+          <a href="/books">
+            
+            <i class="icon icon-book-fill"></i>
+            
+            <span class="menu-title">书单</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-links">
+          <a href="/links">
+            
+            <i class="icon icon-friendship"></i>
+            
+            <span class="menu-title">友链</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about">
+            
+            <i class="icon icon-cup-fill"></i>
+            
+            <span class="menu-title">关于</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/timmy6" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://weibo.com/u/3917867123" target="_blank" title="Weibo" data-toggle=tooltip data-placement=top><i class="icon icon-weibo"></i></a></li>
+        
+    </ul>
+
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">公告</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>欢迎交流与分享经验!</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget-body">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Go%E5%BC%80%E5%8F%91/">Go开发</a><span class="category-list-count">26</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget-body">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Go%E5%9F%BA%E7%A1%80/" rel="tag">Go基础</a><span class="tag-list-count">18</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gRPC/" rel="tag">gRPC</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gin%E6%A1%86%E6%9E%B6/" rel="tag">gin框架</a><span class="tag-list-count">6</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget-body tagcloud">
+      <a href="/tags/Go%E5%9F%BA%E7%A1%80/" style="font-size: 14px;">Go基础</a> <a href="/tags/gRPC/" style="font-size: 13px;">gRPC</a> <a href="/tags/gin%E6%A1%86%E6%9E%B6/" style="font-size: 13.5px;">gin框架</a>
+    </div>
+  </div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">三月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">十一月 2018</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">十月 2018</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a><span class="archive-list-count">5</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget-body">
+      <ul class="recent-post-list list-unstyled no-thumbnail">
+        
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/Go%E5%BC%80%E5%8F%91/">Go开发</a>
+              </p>
+              <p class="item-title">
+                <a href="/2019/03/25/catch-error/" class="title">路由中间件 - 捕获异常</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2019-03-25T13:25:20.000Z" itemprop="datePublished">2019-03-25</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/Go%E5%BC%80%E5%8F%91/">Go开发</a>
+              </p>
+              <p class="item-title">
+                <a href="/2019/03/10/gin-log-1/" class="title">路由中间件 - 日志记录</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2019-03-10T11:22:20.000Z" itemprop="datePublished">2019-03-10</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/Go%E5%BC%80%E5%8F%91/">Go开发</a>
+              </p>
+              <p class="item-title">
+                <a href="/2019/02/25/gin-modules2/" class="title">规划项目目录和参数验证</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2019-02-25T11:22:20.000Z" itemprop="datePublished">2019-02-25</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/Go%E5%BC%80%E5%8F%91/">Go开发</a>
+              </p>
+              <p class="item-title">
+                <a href="/2019/02/15/gin-modules/" class="title">使用 go modules 初始化项目</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2019-02-15T13:12:50.000Z" itemprop="datePublished">2019-02-15</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/Go%E5%BC%80%E5%8F%91/">Go开发</a>
+              </p>
+              <p class="item-title">
+                <a href="/2019/02/10/grpc-tools/" class="title">gRPC 工具</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2019-02-10T14:22:50.000Z" itemprop="datePublished">2019-02-10</time>
+              </p>
+            </div>
+          </li>
+          
+      </ul>
+    </div>
+  </div>
+  
+
+    
+  </div>
+</aside>
+
+  
+  
+  <aside class="sidebar sidebar-toc collapse   in  " id="collapseToc" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    <nav id="toc" class="article-toc">
+      <h3 class="toc-title">文章目录</h3>
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A6%82%E8%BF%B0"><span class="toc-number">1.</span> <span class="toc-text">概述</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%94%99%E8%AF%AF%E5%A4%84%E7%90%86"><span class="toc-number">2.</span> <span class="toc-text">错误处理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%87%AA%E5%AE%9A%E4%B9%89%E9%94%99%E8%AF%AF%E5%A4%84%E7%90%86"><span class="toc-number">3.</span> <span class="toc-text">自定义错误处理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#panic-%E5%92%8C-recover"><span class="toc-number">4.</span> <span class="toc-text">panic 和 recover</span></a></li></ol>
+    </nav>
+  </div>
+</aside>
+
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-custom-err" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      自定义错误处理
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/2019/01/10/custom-err/" class="article-date">
+	  <time datetime="2019-01-10T13:22:50.000Z" itemprop="datePublished">2019-01-10</time>
+	</a>
+</span>
+        
+  <span class="article-category">
+    <i class="icon icon-folder"></i>
+    <a class="article-category-link" href="/categories/Go%E5%BC%80%E5%8F%91/">Go开发</a>
+  </span>
+
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link-link" href="/tags/gin%E6%A1%86%E6%9E%B6/" rel="tag">gin框架</a>
+  </span>
+
+
+        
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2019/01/10/custom-err/#comments" class="article-comment-link">评论</a></span>
+        
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>开始今天的文章，为什么要自定义错误处理？默认的错误处理方式是什么？</p>
+<p>那好，咱们就先说下默认的错误处理。</p>
+<p>默认的错误处理是 <code>errors.New(&quot;错误信息&quot;)</code>，这个信息通过 error 类型的返回值进行返回。</p>
+<p>举个简单的例子：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">func hello(name string) (str string, err error) &#123;</span><br><span class="line">	if name == &quot;&quot; &#123;</span><br><span class="line">		err = errors.New(&quot;name 不能为空&quot;)</span><br><span class="line">		return</span><br><span class="line">	&#125;</span><br><span class="line">	str = fmt.Sprintf(&quot;hello: %s&quot;, name)</span><br><span class="line">	return</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>当调用这个方法时：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">var name = &quot;&quot;</span><br><span class="line">str, err :=  hello(name)</span><br><span class="line">if err != nil &#123;</span><br><span class="line">	fmt.Println(err.Error())</span><br><span class="line">	return</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这就是默认的错误处理，下面还会用这个例子进行说。</p>
+<p>这个默认的错误处理，只是得到了一个错误信息的字符串。</p>
+<p>然而…</p>
+<p>我还想得到发生错误时的 <code>时间</code>、<code>文件名</code>、<code>方法名</code>、<code>行号</code> 等信息。</p>
+<p>我还想得到错误时进行告警，比如 <code>短信告警</code>、<code>邮件告警</code>、<code>微信告警</code> 等。</p>
+<p>我还想调用的时候，不那么复杂，就和默认错误处理类似，比如：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">alarm.WeChat(&quot;错误信息&quot;)</span><br><span class="line">return</span><br></pre></td></tr></table></figure>
+
+<p>这样，我们就得到了我们想要的信息（<code>时间</code>、<code>文件名</code>、<code>方法名</code>、<code>行号</code>），并通过 <code>微信</code> 的方式进行告警通知我们。</p>
+<p>同理，<code>alarm.Email(&quot;错误信息&quot;)</code>、<code>alarm.Sms(&quot;错误信息&quot;)</code> 我们得到的信息是一样的，只是告警方式不同而已。</p>
+<p>还要保证，我们业务逻辑中，获取错误的时候，只获取错误信息即可。</p>
+<p>上面这些想出来的，就是今天要实现的，自定义错误处理，我们就实现之前，先说下 Go 的错误处理。</p>
+<h2 id="错误处理"><a href="#错误处理" class="headerlink" title="错误处理"></a>错误处理</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">package main</span><br><span class="line"></span><br><span class="line">import (</span><br><span class="line">	&quot;errors&quot;</span><br><span class="line">	&quot;fmt&quot;</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">func hello(name string) (str string, err error) &#123;</span><br><span class="line">	if name == &quot;&quot; &#123;</span><br><span class="line">		err = errors.New(&quot;name 不能为空&quot;)</span><br><span class="line">		return</span><br><span class="line">	&#125;</span><br><span class="line">	str = fmt.Sprintf(&quot;hello: %s&quot;, name)</span><br><span class="line">	return</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">func main() &#123;</span><br><span class="line">	var name = &quot;&quot;</span><br><span class="line">	fmt.Println(&quot;param:&quot;, name)</span><br><span class="line"></span><br><span class="line">	str, err := hello(name)</span><br><span class="line">	if err != nil &#123;</span><br><span class="line">		fmt.Println(err.Error())</span><br><span class="line">		return</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	fmt.Println(str)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">param: Tom</span><br><span class="line">hello: Tom</span><br></pre></td></tr></table></figure>
+
+<p>当 name &#x3D; “” 时，输出：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">param:</span><br><span class="line">name 不能为空</span><br></pre></td></tr></table></figure>
+
+<p>建议每个函数都要有错误处理，error 应该为最后一个返回值。</p>
+<p>咱们一起看下官方 errors.go</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">// Copyright 2011 The Go Authors. All rights reserved.</span><br><span class="line">// Use of this source code is governed by a BSD-style</span><br><span class="line">// license that can be found in the LICENSE file.</span><br><span class="line"></span><br><span class="line">// Package errors implements functions to manipulate errors.</span><br><span class="line">package errors</span><br><span class="line"></span><br><span class="line">// New returns an error that formats as the given text.</span><br><span class="line">func New(text string) error &#123;</span><br><span class="line">	return &amp;errorString&#123;text&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// errorString is a trivial implementation of error.</span><br><span class="line">type errorString struct &#123;</span><br><span class="line">	s string</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">func (e *errorString) Error() string &#123;</span><br><span class="line">	return e.s</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上面的代码，并不复杂，参照上面的，咱们进行写一个自定义错误处理。</p>
+<h2 id="自定义错误处理"><a href="#自定义错误处理" class="headerlink" title="自定义错误处理"></a>自定义错误处理</h2><p>咱们定义一个 alarm.go，用于处理告警。</p>
+<p>废话不多说，直接看代码。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br></pre></td><td class="code"><pre><span class="line">package alarm</span><br><span class="line"></span><br><span class="line">import (</span><br><span class="line">	&quot;encoding/json&quot;</span><br><span class="line">	&quot;fmt&quot;</span><br><span class="line">	&quot;ginDemo/common/function&quot;</span><br><span class="line">	&quot;path/filepath&quot;</span><br><span class="line">	&quot;runtime&quot;</span><br><span class="line">	&quot;strings&quot;</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">type errorString struct &#123;</span><br><span class="line">	s string</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">type errorInfo struct &#123;</span><br><span class="line">	Time     string `json:&quot;time&quot;`</span><br><span class="line">	Alarm    string `json:&quot;alarm&quot;`</span><br><span class="line">	Message  string `json:&quot;message&quot;`</span><br><span class="line">	Filename string `json:&quot;filename&quot;`</span><br><span class="line">	Line     int    `json:&quot;line&quot;`</span><br><span class="line">	Funcname string `json:&quot;funcname&quot;`</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">func (e *errorString) Error() string &#123;</span><br><span class="line">	return e.s</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">func New (text string) error &#123;</span><br><span class="line">	alarm(&quot;INFO&quot;, text)</span><br><span class="line">	return &amp;errorString&#123;text&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 发邮件</span><br><span class="line">func Email (text string) error &#123;</span><br><span class="line">	alarm(&quot;EMAIL&quot;, text)</span><br><span class="line">	return &amp;errorString&#123;text&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 发短信</span><br><span class="line">func Sms (text string) error &#123;</span><br><span class="line">	alarm(&quot;SMS&quot;, text)</span><br><span class="line">	return &amp;errorString&#123;text&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 发微信</span><br><span class="line">func WeChat (text string) error &#123;</span><br><span class="line">	alarm(&quot;WX&quot;, text)</span><br><span class="line">	return &amp;errorString&#123;text&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 告警方法</span><br><span class="line">func  alarm(level string, str string) &#123;</span><br><span class="line">	// 当前时间</span><br><span class="line">	currentTime := function.GetTimeStr()</span><br><span class="line"></span><br><span class="line">	// 定义 文件名、行号、方法名</span><br><span class="line">	fileName, line, functionName := &quot;?&quot;, 0 , &quot;?&quot;</span><br><span class="line"></span><br><span class="line">	pc, fileName, line, ok := runtime.Caller(2)</span><br><span class="line">	if ok &#123;</span><br><span class="line">		functionName = runtime.FuncForPC(pc).Name()</span><br><span class="line">		functionName = filepath.Ext(functionName)</span><br><span class="line">		functionName = strings.TrimPrefix(functionName, &quot;.&quot;)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	var msg = errorInfo &#123;</span><br><span class="line">		Time     : currentTime,</span><br><span class="line">		Alarm    : level,</span><br><span class="line">		Message  : str,</span><br><span class="line">		Filename : fileName,</span><br><span class="line">		Line     : line,</span><br><span class="line">		Funcname : functionName,</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	jsons, errs := json.Marshal(msg)</span><br><span class="line"></span><br><span class="line">	if errs != nil &#123;</span><br><span class="line">		fmt.Println(&quot;json marshal error:&quot;, errs)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	errorJsonInfo := string(jsons)</span><br><span class="line"></span><br><span class="line">	fmt.Println(errorJsonInfo)</span><br><span class="line"></span><br><span class="line">	if level == &quot;EMAIL&quot; &#123;</span><br><span class="line">		// 执行发邮件</span><br><span class="line"></span><br><span class="line">	&#125; else if level == &quot;SMS&quot; &#123;</span><br><span class="line">		// 执行发短信</span><br><span class="line"></span><br><span class="line">	&#125; else if level == &quot;WX&quot; &#123;</span><br><span class="line">		// 执行发微信</span><br><span class="line"></span><br><span class="line">	&#125; else if level == &quot;INFO&quot; &#123;</span><br><span class="line">		// 执行记日志</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>看下如何调用：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">package v1</span><br><span class="line"></span><br><span class="line">import (</span><br><span class="line">	&quot;fmt&quot;</span><br><span class="line">	&quot;ginDemo/common/alarm&quot;</span><br><span class="line">	&quot;ginDemo/entity&quot;</span><br><span class="line">	&quot;github.com/gin-gonic/gin&quot;</span><br><span class="line">	&quot;net/http&quot;</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">func AddProduct(c *gin.Context)  &#123;</span><br><span class="line">	// 获取 Get 参数</span><br><span class="line">	name := c.Query(&quot;name&quot;)</span><br><span class="line"></span><br><span class="line">	var res = entity.Result&#123;&#125;</span><br><span class="line"></span><br><span class="line">	str, err := hello(name)</span><br><span class="line">	if err != nil &#123;</span><br><span class="line">		res.SetCode(entity.CODE_ERROR)</span><br><span class="line">		res.SetMessage(err.Error())</span><br><span class="line">		c.JSON(http.StatusOK, res)</span><br><span class="line">		c.Abort()</span><br><span class="line">		return</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	res.SetCode(entity.CODE_SUCCESS)</span><br><span class="line">	res.SetMessage(str)</span><br><span class="line">	c.JSON(http.StatusOK, res)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">func hello(name string) (str string, err error) &#123;</span><br><span class="line">	if name == &quot;&quot; &#123;</span><br><span class="line">		err = alarm.WeChat(&quot;name 不能为空&quot;)</span><br><span class="line">		return</span><br><span class="line">	&#125;</span><br><span class="line">	str = fmt.Sprintf(&quot;hello: %s&quot;, name)</span><br><span class="line">	return</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>访问：<code>http://localhost:8080/v1/product/add?name=a</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    &quot;code&quot;: 1,</span><br><span class="line">    &quot;msg&quot;: &quot;hello: a&quot;,</span><br><span class="line">    &quot;data&quot;: null</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>未抛出错误，不会输出信息。</p>
+<p>访问：<code>http://localhost:8080/v1/product/add</code></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    &quot;code&quot;: -1,</span><br><span class="line">    &quot;msg&quot;: &quot;name 不能为空&quot;,</span><br><span class="line">    &quot;data&quot;: null</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>抛出了错误，输出信息如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;&quot;time&quot;:&quot;2019-07-23 22:19:17&quot;,&quot;alarm&quot;:&quot;WX&quot;,&quot;message&quot;:&quot;name 不能为空&quot;,&quot;filename&quot;:&quot;绝对路径/ginDemo/router/v1/product.go&quot;,&quot;line&quot;:33,&quot;funcname&quot;:&quot;hello&quot;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这只是个例子，大家可以在一些复杂的业务逻辑判断场景中使用自定义错误处理”。</p>
+<p>到这里，报错时我们收到了 <code>时间</code>、<code>错误信息</code>、<code>文件名</code>、<code>行号</code>、<code>方法名</code> 了。</p>
+<p>调用起来，也比较简单。</p>
+<p>虽然标记了告警方式，还是没有进行告警通知呀。</p>
+<p>我想说，在这里存储数据到队列中，再执行异步任务具体去消耗，这块就不实现了，大家可以去完善。</p>
+<p>读取 <code>文件名</code>、<code>方法名</code>、<code>行号</code> 使用的是 <code>runtime.Caller()</code>。</p>
+<p>我们还知道，Go 有 <code>panic</code> 和 <code>recover</code>，它们是干什么的呢，接下来咱们就说说。</p>
+<h2 id="panic-和-recover"><a href="#panic-和-recover" class="headerlink" title="panic 和 recover"></a>panic 和 recover</h2><p>当程序不能继续运行的时候，才应该使用 panic 抛出错误。</p>
+<p>当程序发生 panic 后，在 defer(延迟函数) 内部可以调用 recover 进行控制，不过有个前提条件，只有在相同的 Go 协程中才可以。</p>
+<p>panic 分两个，一种是有意抛出的，一种是无意的写程序马虎造成的，咱们一个个说。</p>
+<p>有意抛出的 panic：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">package main</span><br><span class="line"></span><br><span class="line">import (</span><br><span class="line">	&quot;fmt&quot;</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">func main() &#123;</span><br><span class="line"></span><br><span class="line">	fmt.Println(&quot;-- 1 --&quot;)</span><br><span class="line"></span><br><span class="line">	defer func() &#123;</span><br><span class="line">		if r := recover(); r != nil &#123;</span><br><span class="line">			fmt.Printf(&quot;panic: %s\n&quot;, r)</span><br><span class="line">		&#125;</span><br><span class="line">		fmt.Println(&quot;-- 2 --&quot;)</span><br><span class="line">	&#125;()</span><br><span class="line">	</span><br><span class="line">	panic(&quot;i am panic&quot;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">-- 1 --</span><br><span class="line">panic: i am panic</span><br><span class="line">-- 2 --</span><br></pre></td></tr></table></figure>
+
+<p>无意抛出的 panic：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">package main</span><br><span class="line"></span><br><span class="line">import (</span><br><span class="line">	&quot;fmt&quot;</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">func main() &#123;</span><br><span class="line"></span><br><span class="line">	fmt.Println(&quot;-- 1 --&quot;)</span><br><span class="line"></span><br><span class="line">	defer func() &#123;</span><br><span class="line">		if r := recover(); r != nil &#123;</span><br><span class="line">			fmt.Printf(&quot;panic: %s\n&quot;, r)</span><br><span class="line">		&#125;</span><br><span class="line">		fmt.Println(&quot;-- 2 --&quot;)</span><br><span class="line">	&#125;()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">	var slice = [] int &#123;1, 2, 3, 4, 5&#125;</span><br><span class="line"></span><br><span class="line">	slice[6] = 6</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">-- 1 --</span><br><span class="line">panic: runtime error: index out of range</span><br><span class="line">-- 2 --</span><br></pre></td></tr></table></figure>
+
+<p>上面的两个我们都通过 <code>recover</code> 捕获到了，那我们如何在 Gin 框架中使用呢？如果收到 <code>panic</code> 时，也想进行告警怎么实现呢？ </p>
+<p>既然想实现告警，先在 ararm.go 中定义一个 <code>Panic()</code> 方法，当项目发生 <code>panic</code> 异常时，调用这个方法，这样就实现告警了。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">// Panic 异常</span><br><span class="line">func Panic (text string) error &#123;</span><br><span class="line">	alarm(&quot;PANIC&quot;, text)</span><br><span class="line">	return &amp;errorString&#123;text&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>那我们怎么捕获到呢？</p>
+<p>使用中间件进行捕获，写一个 <code>recover</code> 中间件。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">package recover</span><br><span class="line"></span><br><span class="line">import (</span><br><span class="line">	&quot;fmt&quot;</span><br><span class="line">	&quot;ginDemo/common/alarm&quot;</span><br><span class="line">	&quot;github.com/gin-gonic/gin&quot;</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">func Recover()  gin.HandlerFunc &#123;</span><br><span class="line">	return func(c *gin.Context) &#123;</span><br><span class="line">		defer func() &#123;</span><br><span class="line">			if r := recover(); r != nil &#123;</span><br><span class="line">				alarm.Panic(fmt.Sprintf(&quot;%s&quot;, r))</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;()</span><br><span class="line">		c.Next()</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>路由调用中间件：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">r.Use(logger.LoggerToFile(), recover.Recover())</span><br><span class="line"></span><br><span class="line">//Use 可以传递多个中间件。</span><br></pre></td></tr></table></figure>
+
+<p>验证下吧，咱们先抛出两个异常，看看能否捕获到？</p>
+<p>还是修改 product.go 这个文件吧。</p>
+<p>有意抛出 panic：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">package v1</span><br><span class="line"></span><br><span class="line">import (</span><br><span class="line">	&quot;fmt&quot;</span><br><span class="line">	&quot;ginDemo/entity&quot;</span><br><span class="line">	&quot;github.com/gin-gonic/gin&quot;</span><br><span class="line">	&quot;net/http&quot;</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">func AddProduct(c *gin.Context)  &#123;</span><br><span class="line">	// 获取 Get 参数</span><br><span class="line">	name := c.Query(&quot;name&quot;)</span><br><span class="line"></span><br><span class="line">	var res = entity.Result&#123;&#125;</span><br><span class="line"></span><br><span class="line">	str, err := hello(name)</span><br><span class="line">	if err != nil &#123;</span><br><span class="line">		res.SetCode(entity.CODE_ERROR)</span><br><span class="line">		res.SetMessage(err.Error())</span><br><span class="line">		c.JSON(http.StatusOK, res)</span><br><span class="line">		c.Abort()</span><br><span class="line">		return</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	res.SetCode(entity.CODE_SUCCESS)</span><br><span class="line">	res.SetMessage(str)</span><br><span class="line">	c.JSON(http.StatusOK, res)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">func hello(name string) (str string, err error) &#123;</span><br><span class="line">	if name == &quot;&quot; &#123;</span><br><span class="line">		// 有意抛出 panic</span><br><span class="line">		panic(&quot;i am panic&quot;)</span><br><span class="line">		return</span><br><span class="line">	&#125;</span><br><span class="line">	str = fmt.Sprintf(&quot;hello: %s&quot;, name)</span><br><span class="line">	return</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>访问：<code>http://localhost:8080/v1/product/add</code></p>
+<p>界面是空白的。</p>
+<p>抛出了异常，输出信息如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;&quot;time&quot;:&quot;2019-07-23 22:42:37&quot;,&quot;alarm&quot;:&quot;PANIC&quot;,&quot;message&quot;:&quot;i am panic&quot;,&quot;filename&quot;:&quot;绝对路径/ginDemo/middleware/recover/recover.go&quot;,&quot;line&quot;:13,&quot;funcname&quot;:&quot;1&quot;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>很显然，定位的文件名、方法名、行号不是我们想要的。</p>
+<p>需要调整 <code>runtime.Caller(2)</code>，这个代码在 <code>alarm.go 的 alarm</code> 方法中。</p>
+<p>将 2 调整成 4 ，看下输出信息：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;&quot;time&quot;:&quot;2019-07-23 22:45:24&quot;,&quot;alarm&quot;:&quot;PANIC&quot;,&quot;message&quot;:&quot;i am panic&quot;,&quot;filename&quot;:&quot;绝对路径/ginDemo/router/v1/product.go&quot;,&quot;line&quot;:33,&quot;funcname&quot;:&quot;hello&quot;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这就对了。</p>
+<p>无意抛出 panic：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">// 上面代码不变</span><br><span class="line"></span><br><span class="line">func hello(name string) (str string, err error) &#123;</span><br><span class="line">	if name == &quot;&quot; &#123;</span><br><span class="line">		// 无意抛出 panic</span><br><span class="line">		var slice = [] int &#123;1, 2, 3, 4, 5&#125;</span><br><span class="line">		slice[6] = 6</span><br><span class="line">		return</span><br><span class="line">	&#125;</span><br><span class="line">	str = fmt.Sprintf(&quot;hello: %s&quot;, name)</span><br><span class="line">	return</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>访问：<code>http://localhost:8080/v1/product/add</code></p>
+<p>界面是空白的。</p>
+<p>抛出了异常，输出信息如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;&quot;time&quot;:&quot;2019-07-23 22:50:06&quot;,&quot;alarm&quot;:&quot;PANIC&quot;,&quot;message&quot;:&quot;runtime error: index out of range&quot;,&quot;filename&quot;:&quot;绝对路径/runtime/panic.go&quot;,&quot;line&quot;:44,&quot;funcname&quot;:&quot;panicindex&quot;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>很显然，定位的文件名、方法名、行号也不是我们想要的。</p>
+<p>将 4 调整成 5 ，看下输出信息：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;&quot;time&quot;:&quot;2019-07-23 22:55:27&quot;,&quot;alarm&quot;:&quot;PANIC&quot;,&quot;message&quot;:&quot;runtime error: index out of range&quot;,&quot;filename&quot;:&quot;绝对路径/ginDemo/router/v1/product.go&quot;,&quot;line&quot;:34,&quot;funcname&quot;:&quot;hello&quot;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这就对了。</p>
+<p>奇怪了，这是为什么？</p>
+<p>在这里，有必要说下 <code>runtime.Caller(skip)</code> 了。</p>
+<p>skip 指的调用的深度。</p>
+<p>为 0 时，打印当前调用文件及行数。</p>
+<p>为 1 时，打印上级调用的文件及行数。</p>
+<p>依次类推…</p>
+<p>在这块，调用的时候需要注意下，我现在还没有好的解决方案。</p>
+<p>我是将 skip（调用深度），当一个参数传递进去。</p>
+<p>比如：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">// 发微信</span><br><span class="line">func WeChat (text string) error &#123;</span><br><span class="line">	alarm(&quot;WX&quot;, text, 2)</span><br><span class="line">	return &amp;errorString&#123;text&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// Panic 异常</span><br><span class="line">func Panic (text string) error &#123;</span><br><span class="line">	alarm(&quot;PANIC&quot;, text, 5)</span><br><span class="line">	return &amp;errorString&#123;text&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>具体的代码就不贴了。</p>
+<p>但是，有意抛出 Panic 和 无意抛出 Panic 的调用深度又不同，怎么办？</p>
+<p>1、尽量将有意抛出的 Panic 改成抛出错误的方式。</p>
+<p>2、想其他办法搞定它。</p>
+<p>就到这吧。</p>
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="https://timmy6.github.io/2019/01/10/custom-err/" title="自定义错误处理" target="_blank" rel="external">https://timmy6.github.io/2019/01/10/custom-err/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/timmy6" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/avatar.jpg" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/timmy6" target="_blank"><span class="text-dark">刘启明</span><small class="ml-1x">Go Developer</small></a></h3>
+        <div>很高兴认识你。</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    <li class="prev">
+      <a href="/2019/01/15/error-code/" title="统一定义API错误码"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;上一篇</span></a>
+    </li>
+    
+    
+    <li class="next">
+      <a href="/2019/01/05/gin-log/" title="gin日志记录"><span>下一篇&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+    <li class="toggle-toc">
+      <a class="toggle-btn " data-toggle="collapse" href="#collapseToc" aria-expanded="false" title="文章目录" role="button">    <span>[&nbsp;</span><span>文章目录</span>
+        <i class="text-collapsed icon icon-anchor"></i>
+        <i class="text-in icon icon-close"></i>
+        <span>]</span>
+      </a>
+    </li>
+    
+  </ul>
+  
+  
+  <!-- Button trigger modal -->
+  <button type="button" class="btn btn-fancy btn-donate pop-onhover bg-gradient-warning" data-toggle="modal" data-target="#donateModal"><span>赏</span></button>
+  <!-- <div class="wave-icon wave-icon-danger btn-donate" data-toggle="modal" data-target="#donateModal">
+    <div class="wave-circle"><span class="icon"><i class="icon icon-bill"></i></span></div>
+  </div> -->
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div>
+  </div>
+</nav>
+  
+<!-- Modal -->
+<div class="modal modal-center modal-small modal-xs-full fade" id="donateModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content donate">
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      <div class="modal-body">
+        <div class="donate-box">
+          <div class="donate-head">
+            <p>感谢您的支持，我会继续努力的!</p>
+          </div>
+          <div class="tab-content">
+            <div role="tabpanel" class="tab-pane fade active in" id="alipay">
+              <div class="donate-payimg">
+                <img src="/images/donate/alipayimg.png" alt="扫码支持" title="扫一扫" />
+              </div>
+              <p class="text-muted mv">扫码打赏，你说多少就多少</p>
+              <p class="text-grey">打开支付宝扫一扫，即可进行扫码打赏哦</p>
+            </div>
+            <div role="tabpanel" class="tab-pane fade" id="wechatpay">
+              <div class="donate-payimg">
+                <img src="/images/donate/wechatpayimg.png" alt="扫码支持" title="扫一扫" />
+              </div>
+              <p class="text-muted mv">扫码打赏，你说多少就多少</p>
+              <p class="text-grey">打开微信扫一扫，即可进行扫码打赏哦</p>
+            </div>
+          </div>
+          <div class="donate-footer">
+            <ul class="nav nav-tabs nav-justified" role="tablist">
+              <li role="presentation" class="active">
+                <a href="#alipay" id="alipay-tab" role="tab" data-toggle="tab" aria-controls="alipay" aria-expanded="true"><i class="icon icon-alipay"></i> 支付宝</a>
+              </li>
+              <li role="presentation" class="">
+                <a href="#wechatpay" role="tab" id="wechatpay-tab" data-toggle="tab" aria-controls="wechatpay" aria-expanded="false"><i class="icon icon-wepay"></i> 微信支付</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+</main>
+
+  <footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/timmy6" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://weibo.com/u/3917867123" target="_blank" title="Weibo" data-toggle=tooltip data-placement=top><i class="icon icon-weibo"></i></a></li>
+        
+    </ul>
+
+    <div class="copyright">
+    	
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+
+<script src="/js/plugin.min.js"></script>
+
+
+<script src="/js/application.js"></script>
+
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+
+
+
+
+   
+
+
+
+
+   
+    
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: '4737d1ihG9bSORDvOhg93sGV-gzGzoHsz',
+    appKey: 'G7fMbInGD0wzoXGMQvF5RIHt',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: false
+  });
+  </script>
+
+     
+
+
+
+
+
+
+
+</body>
+</html>

@@ -1,6 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>https://timmy6.github.io/2019/03/25/catch-error/</loc>
+    <lastmod>2022-05-13</lastmod>
+  </url>
+  <url>
+    <loc>https://timmy6.github.io/2019/03/10/gin-log-1/</loc>
+    <lastmod>2022-05-13</lastmod>
+  </url>
+  <url>
+    <loc>https://timmy6.github.io/2019/02/25/gin-modules2/</loc>
+    <lastmod>2022-05-13</lastmod>
+  </url>
+  <url>
+    <loc>https://timmy6.github.io/2019/02/15/gin-modules/</loc>
+    <lastmod>2022-05-13</lastmod>
+  </url>
+  <url>
+    <loc>https://timmy6.github.io/2019/02/10/grpc-tools/</loc>
+    <lastmod>2022-05-13</lastmod>
+  </url>
+  <url>
+    <loc>https://timmy6.github.io/2019/01/25/grpc-hello/</loc>
+    <lastmod>2022-05-13</lastmod>
+  </url>
+  <url>
+    <loc>https://timmy6.github.io/2019/01/15/error-code/</loc>
+    <lastmod>2022-05-13</lastmod>
+  </url>
+  <url>
+    <loc>https://timmy6.github.io/2019/01/10/custom-err/</loc>
+    <lastmod>2022-05-13</lastmod>
+  </url>
+  <url>
+    <loc>https://timmy6.github.io/2018/09/12/var_dec/</loc>
+    <lastmod>2022-05-11</lastmod>
+  </url>
+  <url>
     <loc>https://timmy6.github.io/2018/09/11/hello-wrold/</loc>
     <lastmod>2022-05-11</lastmod>
   </url>
@@ -66,10 +102,6 @@
   </url>
   <url>
     <loc>https://timmy6.github.io/2018/09/15/benchmark/</loc>
-    <lastmod>2022-05-11</lastmod>
-  </url>
-  <url>
-    <loc>https://timmy6.github.io/2018/09/12/var_dec/</loc>
     <lastmod>2022-05-11</lastmod>
   </url>
 </urlset> 
