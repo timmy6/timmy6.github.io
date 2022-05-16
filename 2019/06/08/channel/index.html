@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000" />
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top" />
+  
+  
+  <title>channel 实现原理分析 | 刘启明的blog</title>
+  <meta name="description" content="#channel 实现原理分析 channel一个类型管道，通过它可以在goroutine之间发送和接收消息。它是Golang在语言层面提供的goroutine间的通信方式。 众所周知，Go依赖于称为CSP（Communicating Sequential Processes）的并发模型，通过Channel实现这种同步模式。Go并发的核心哲学是不要通过共享内存进行通信; 相反，通过沟通分享记忆。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="channel 实现原理分析">
+<meta property="og:url" content="https://timmy6.github.io/2019/06/08/channel/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="#channel 实现原理分析 channel一个类型管道，通过它可以在goroutine之间发送和接收消息。它是Golang在语言层面提供的goroutine间的通信方式。 众所周知，Go依赖于称为CSP（Communicating Sequential Processes）的并发模型，通过Channel实现这种同步模式。Go并发的核心哲学是不要通过共享内存进行通信; 相反，通过沟通分享记忆。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://timmy6.github.io/images/other/9.9.3.png">
+<meta property="og:image" content="https://timmy6.github.io/images/other/9.9.5.png">
+<meta property="og:image" content="https://timmy6.github.io/images/other/9.9.6.png">
+<meta property="og:image" content="https://timmy6.github.io/images/other/9.9.9.png">
+<meta property="og:image" content="https://timmy6.github.io/images/other/9.9.7.png">
+<meta property="og:image" content="https://timmy6.github.io/images/other/9.9.8.png">
+<meta property="og:image" content="https://timmy6.github.io/images/other/9.9.10.png">
+<meta property="og:image" content="https://timmy6.github.io/images/other/9.9.11.jpeg">
+<meta property="article:published_time" content="2019-06-08T13:05:10.000Z">
+<meta property="article:modified_time" content="2022-05-16T09:34:29.826Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="Go基础">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://timmy6.github.io/images/other/9.9.3.png">
+  <!-- Canonical links -->
+  <link rel="canonical" href="https://timmy6.github.io/2019/06/08/channel/index.html">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png" type="image/x-icon">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+  
+  
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+
+<body class="main-center" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/timmy6" target="_blank">
+          <img class="img-circle img-rotate" src="/images/avatar.jpg" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">刘启明</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">Go Developer</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> Changsha, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="搜索" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="想要查找什么..." x-webkit-speech />
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav ">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">首页</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">归档</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">分类</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags">
+            
+            <i class="icon icon-tags"></i>
+            
+            <span class="menu-title">标签</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-repository">
+          <a href="/repository">
+            
+            <i class="icon icon-project"></i>
+            
+            <span class="menu-title">项目</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-books">
+          <a href="/books">
+            
+            <i class="icon icon-book-fill"></i>
+            
+            <span class="menu-title">书单</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-links">
+          <a href="/links">
+            
+            <i class="icon icon-friendship"></i>
+            
+            <span class="menu-title">友链</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about">
+            
+            <i class="icon icon-cup-fill"></i>
+            
+            <span class="menu-title">关于</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/timmy6" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://weibo.com/u/3917867123" target="_blank" title="Weibo" data-toggle=tooltip data-placement=top><i class="icon icon-weibo"></i></a></li>
+        
+    </ul>
+
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">公告</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>欢迎交流与分享经验!</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget-body">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Go%E5%BC%80%E5%8F%91/">Go开发</a><span class="category-list-count">37</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/MySql/">MySql</a><span class="category-list-count">2</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget-body">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Go%E5%9F%BA%E7%A1%80/" rel="tag">Go基础</a><span class="tag-list-count">25</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gRPC/" rel="tag">gRPC</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gin%E6%A1%86%E6%9E%B6/" rel="tag">gin框架</a><span class="tag-list-count">9</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/" rel="tag">redis</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93%E4%BC%98%E5%8C%96/" rel="tag">数据库优化</a><span class="tag-list-count">2</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget-body tagcloud">
+      <a href="/tags/Go%E5%9F%BA%E7%A1%80/" style="font-size: 14px;">Go基础</a> <a href="/tags/gRPC/" style="font-size: 13.33px;">gRPC</a> <a href="/tags/gin%E6%A1%86%E6%9E%B6/" style="font-size: 13.67px;">gin框架</a> <a href="/tags/redis/" style="font-size: 13px;">redis</a> <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93%E4%BC%98%E5%8C%96/" style="font-size: 13.33px;">数据库优化</a>
+    </div>
+  </div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">八月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">七月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">六月 2019</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">五月 2019</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/04/">四月 2019</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">三月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">十一月 2018</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">十月 2018</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a><span class="archive-list-count">5</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget-body">
+      <ul class="recent-post-list list-unstyled no-thumbnail">
+        
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/MySql/">MySql</a>
+              </p>
+              <p class="item-title">
+                <a href="/2019/08/15/CentOS%E5%8F%82%E6%95%B0%E9%85%8D%E7%BD%AE%E5%AF%B9mysql%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/" class="title">CentOS参数配置对mysql性能优化</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2019-08-15T13:15:10.000Z" itemprop="datePublished">2019-08-15</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/MySql/">MySql</a>
+              </p>
+              <p class="item-title">
+                <a href="/2019/08/10/%E5%BD%B1%E5%93%8D%E6%95%B0%E6%8D%AE%E5%BA%93%E6%80%A7%E8%83%BD%E7%9A%84%E5%9B%A0%E7%B4%A0/" class="title">影响数据库性能的因素</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2019-08-10T15:15:10.000Z" itemprop="datePublished">2019-08-10</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/Go%E5%BC%80%E5%8F%91/">Go开发</a>
+              </p>
+              <p class="item-title">
+                <a href="/2019/07/25/go-interface/" class="title">go interface</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2019-07-25T15:15:10.000Z" itemprop="datePublished">2019-07-25</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/Go%E5%BC%80%E5%8F%91/">Go开发</a>
+              </p>
+              <p class="item-title">
+                <a href="/2019/07/16/go-mod/" class="title">go mod</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2019-07-16T14:15:10.000Z" itemprop="datePublished">2019-07-16</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/Go%E5%BC%80%E5%8F%91/">Go开发</a>
+              </p>
+              <p class="item-title">
+                <a href="/2019/06/16/%E4%B8%8D%E5%90%8C%E7%B1%BB%E5%9E%8B%E6%AF%94%E8%BE%83/" class="title">Golang不同类型比较</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2019-06-16T14:15:10.000Z" itemprop="datePublished">2019-06-16</time>
+              </p>
+            </div>
+          </li>
+          
+      </ul>
+    </div>
+  </div>
+  
+
+    
+  </div>
+</aside>
+
+  
+  
+  <aside class="sidebar sidebar-toc collapse   in  " id="collapseToc" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    <nav id="toc" class="article-toc">
+      <h3 class="toc-title">文章目录</h3>
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#hchan"><span class="toc-number">1.</span> <span class="toc-text">hchan</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%90%91channel%E5%86%99%E5%85%A5%E6%95%B0%E6%8D%AE"><span class="toc-number">2.</span> <span class="toc-text">向channel写入数据</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%8Echannel%E8%AF%BB%E5%8F%96%E6%93%8D%E4%BD%9C"><span class="toc-number">3.</span> <span class="toc-text">从channel读取操作</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#recvq%E5%92%8Csendq-%E7%BB%93%E6%9E%84"><span class="toc-number">4.</span> <span class="toc-text">recvq和sendq 结构</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#select"><span class="toc-number">5.</span> <span class="toc-text">select</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#range"><span class="toc-number">6.</span> <span class="toc-text">range</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%AD%BB%E9%94%81%EF%BC%88deadlock%EF%BC%89"><span class="toc-number">7.</span> <span class="toc-text">死锁（deadlock）</span></a></li></ol>
+    </nav>
+  </div>
+</aside>
+
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-channel" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      channel 实现原理分析
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/2019/06/08/channel/" class="article-date">
+	  <time datetime="2019-06-08T13:05:10.000Z" itemprop="datePublished">2019-06-08</time>
+	</a>
+</span>
+        
+  <span class="article-category">
+    <i class="icon icon-folder"></i>
+    <a class="article-category-link" href="/categories/Go%E5%BC%80%E5%8F%91/">Go开发</a>
+  </span>
+
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link-link" href="/tags/Go%E5%9F%BA%E7%A1%80/" rel="tag">Go基础</a>
+  </span>
+
+
+        
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2019/06/08/channel/#comments" class="article-comment-link">评论</a></span>
+        
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <p>#channel 实现原理分析</p>
+<p>channel一个类型管道，通过它可以在goroutine之间发送和接收消息。它是Golang在语言层面提供的goroutine间的通信方式。</p>
+<p>众所周知，Go依赖于称为CSP（Communicating Sequential Processes）的并发模型，通过Channel实现这种同步模式。Go并发的核心哲学是不要通过共享内存进行通信; 相反，通过沟通分享记忆。</p>
+<p>下面以简单的示例来演示Go如何通过channel来实现通信。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">package main</span><br><span class="line">import (</span><br><span class="line">	&quot;fmt&quot;</span><br><span class="line">	&quot;time&quot;</span><br><span class="line">)</span><br><span class="line">func goRoutineA(a &lt;-chan int) &#123;</span><br><span class="line">	val := &lt;-a</span><br><span class="line">	fmt.Println(&quot;goRoutineA received the data&quot;, val)</span><br><span class="line">&#125;</span><br><span class="line">func goRoutineB(b chan int) &#123;</span><br><span class="line">	val := &lt;-b</span><br><span class="line">	fmt.Println(&quot;goRoutineB  received the data&quot;, val)</span><br><span class="line">&#125;</span><br><span class="line">func main() &#123;</span><br><span class="line">	ch := make(chan int, 3)</span><br><span class="line">	go goRoutineA(ch)</span><br><span class="line">	go goRoutineB(ch)</span><br><span class="line">	ch &lt;- 3</span><br><span class="line">	time.Sleep(time.Second * 1)</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>结果为：</p>
+<p>goRoutineA received the data 3</p>
+<p>上面只是个简单的例子，只输出goRoutineA ，没有执行goRoutineB，说明channel仅允许被一个goroutine读写。</p>
+<p>说道channel这里不得不提通道的结构hchan。</p>
+<h3 id="hchan"><a href="#hchan" class="headerlink" title="hchan"></a>hchan</h3><p>源代码在src&#x2F;runtime&#x2F;chan.go</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">type hchan struct &#123;</span><br><span class="line">   qcount   uint           // total data in the queue</span><br><span class="line">   dataqsiz uint           // size of the circular queue</span><br><span class="line">   buf      unsafe.Pointer // points to an array of dataqsiz elements</span><br><span class="line">   elemsize uint16</span><br><span class="line">   closed   uint32</span><br><span class="line">   elemtype *_type // element type</span><br><span class="line">   sendx    uint   // send index</span><br><span class="line">   recvx    uint   // receive index</span><br><span class="line">   recvq    waitq  // list of recv waiters</span><br><span class="line">   sendq    waitq  // list of send waiters</span><br><span class="line"></span><br><span class="line">   // lock protects all fields in hchan, as well as several</span><br><span class="line">   // fields in sudogs blocked on this channel.</span><br><span class="line">   //</span><br><span class="line">   // Do not change another G&#x27;s status while holding this lock</span><br><span class="line">   // (in particular, do not ready a G), as this can deadlock</span><br><span class="line">   // with stack shrinking.</span><br><span class="line">   lock mutex</span><br><span class="line">&#125;</span><br><span class="line">type waitq struct &#123;</span><br><span class="line">	first *sudog</span><br><span class="line">	last  *sudog</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>说明：</p>
+<p><strong>qcount</strong>   uint           &#x2F;&#x2F; 当前队列中剩余元素个数<br><strong>dataqsiz</strong> uint           &#x2F;&#x2F; 环形队列长度，即缓冲区的大小，即make（chan T，N），N.<br><strong>buf</strong>      unsafe.Pointer &#x2F;&#x2F; 环形队列指针<br><strong>elemsize</strong> uint16         &#x2F;&#x2F; 每个元素的大小<br><strong>closed</strong>   uint32	        &#x2F;&#x2F; 表示当前通道是否处于关闭状态。创建通道后，该字段设置为0，即通道打开; 通过调用close将其设置为1，通道关闭。<br><strong>elemtype</strong> *_type         &#x2F;&#x2F; 元素类型，用于数据传递过程中的赋值；<br><strong>sendx <strong>uint和</strong>recvx</strong> uint是环形缓冲区的状态字段，它指示缓冲区的当前索引 - 支持数组，它可以从中发送数据和接收数据。<br><strong>recvq</strong>    waitq          &#x2F;&#x2F; 等待读消息的goroutine队列<br><strong>sendq</strong>    waitq          &#x2F;&#x2F; 等待写消息的goroutine队列<br><strong>lock</strong> mutex              &#x2F;&#x2F; 互斥锁，为每个读写操作锁定通道，因为发送和接收必须是互斥操作。</p>
+<p>这里<strong>sudog代表goroutine。</strong></p>
+<p>创建channel 有两种，一种是带缓冲的channel，一种是不带缓冲的channel</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">// 带缓冲</span><br><span class="line">ch := make(chan Task, 3)</span><br><span class="line">// 不带缓冲</span><br><span class="line">ch := make(chan int)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>这里我们先讨论带缓冲</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ch := make(chan int, 3)</span><br></pre></td></tr></table></figure>
+
+<p>创建通道后的缓冲通道结构</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">hchan struct &#123;</span><br><span class="line">	qcount uint : 0 </span><br><span class="line">	dataqsiz uint : 3 </span><br><span class="line">	buf unsafe.Pointer : 0xc00007e0e0 </span><br><span class="line">	elemsize uint16 : 8 </span><br><span class="line">	closed uint32 : 0 </span><br><span class="line">	elemtype *runtime._type : &amp;&#123;</span><br><span class="line">		size:8 </span><br><span class="line">		ptrdata:0 </span><br><span class="line">		hash:4149441018 </span><br><span class="line">		tflag:7 </span><br><span class="line">		align:8 </span><br><span class="line">		fieldalign:8 </span><br><span class="line">		kind:130 </span><br><span class="line">		alg:0x55cdf0 </span><br><span class="line">		gcdata:0x4d61b4 </span><br><span class="line">		str:1055 </span><br><span class="line">		ptrToThis:45152</span><br><span class="line">		&#125;</span><br><span class="line">	sendx uint : 0 </span><br><span class="line">	recvx uint : 0 </span><br><span class="line">	recvq runtime.waitq : </span><br><span class="line">		&#123;first:&lt;nil&gt; last:&lt;nil&gt;&#125;</span><br><span class="line">	sendq runtime.waitq : </span><br><span class="line">		&#123;first:&lt;nil&gt; last:&lt;nil&gt;&#125;</span><br><span class="line">	lock runtime.mutex : </span><br><span class="line">		&#123;key:0&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>源代码</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">func makechan(t *chantype, size int) *hchan &#123;</span><br><span class="line"></span><br><span class="line">   elem := t.elem</span><br><span class="line">   ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果我们创建一个带buffer的channel，底层的数据模型如下图：</p>
+<p><img src="/images/other/9.9.3.png"></p>
+<h3 id="向channel写入数据"><a href="#向channel写入数据" class="headerlink" title="向channel写入数据"></a>向channel写入数据</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ch &lt;- 3</span><br></pre></td></tr></table></figure>
+
+<p>底层hchan数据流程如图</p>
+<p><img src="/images/other/9.9.5.png"><br><img src="/images/other/9.9.6.png"></p>
+<p>发送操作概要</p>
+<p>1、锁定整个通道结构。</p>
+<p>2、确定写入。尝试<code>recvq</code>从等待队列中等待goroutine，然后将元素直接写入goroutine。</p>
+<p>3、如果recvq为Empty，则确定缓冲区是否可用。如果可用，从当前goroutine复制数据到缓冲区。</p>
+<p>4、如果缓冲区已满，<strong>则要</strong>写入的元素将保存在当前正在执行的goroutine的结构中，并且当前goroutine将在<strong>sendq中</strong>排队并从运行时挂起。</p>
+<p>5、写入完成释放锁。</p>
+<p>这里我们要注意几个属性buf、sendx、lock的变化。</p>
+<p>流程图</p>
+<p><img src="/images/other/9.9.9.png"></p>
+<h3 id="从channel读取操作"><a href="#从channel读取操作" class="headerlink" title="从channel读取操作"></a>从channel读取操作</h3><p>几乎和写入操作相同</p>
+<p>代码</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">func goRoutineA(a &lt;-chan int) &#123;</span><br><span class="line">   val := &lt;-a</span><br><span class="line">   fmt.Println(&quot;goRoutineA received the data&quot;, val)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>底层hchan数据流程如图</p>
+<p><img src="/images/other/9.9.7.png"></p>
+<p><img src="/images/other/9.9.8.png"></p>
+<p>这里我们要注意几个属性buf、sendx、recvx、lock的变化。</p>
+<p>读取操作概要</p>
+<p>1、先获取channel全局锁</p>
+<p>2、尝试sendq从等待队列中获取等待的goroutine，</p>
+<p>3、 如有等待的goroutine，没有缓冲区，取出goroutine并读取数据，然后唤醒这个goroutine，结束读取释放锁。</p>
+<p>4、如有等待的goroutine，且有缓冲区（此时缓冲区已满），从缓冲区队首取出数据，再从sendq取出一个goroutine，将goroutine中的数据存入buf队尾，结束读取释放锁。</p>
+<p>5、如没有等待的goroutine，且缓冲区有数据，直接读取缓冲区数据，结束读取释放锁。</p>
+<p>6、如没有等待的goroutine，且没有缓冲区或缓冲区为空，将当前的goroutine加入recvq排队，进入睡眠，等待被写goroutine唤醒。结束读取释放锁。</p>
+<p>流程图</p>
+<p><img src="/images/other/9.9.10.png"></p>
+<h3 id="recvq和sendq-结构"><a href="#recvq和sendq-结构" class="headerlink" title="recvq和sendq 结构"></a>recvq和sendq 结构</h3><p>recvq和sendq基本上是链表，看起来基本如下</p>
+<p><img src="/images/other/9.9.11.jpeg"></p>
+<h3 id="select"><a href="#select" class="headerlink" title="select"></a>select</h3><p>select就是用来监听和channel有关的IO操作，当 IO 操作发生时，触发相应的动作。</p>
+<p>一个简单的示例如下</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">package main</span><br><span class="line"></span><br><span class="line">import (</span><br><span class="line">   &quot;fmt&quot;</span><br><span class="line">   &quot;time&quot;</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">func goRoutineD(ch chan int, i int) &#123;</span><br><span class="line">   time.Sleep(time.Second * 3)</span><br><span class="line">   ch &lt;- i</span><br><span class="line">&#125;</span><br><span class="line">func goRoutineE(chs chan string, i string) &#123;</span><br><span class="line">   time.Sleep(time.Second * 3)</span><br><span class="line">   chs &lt;- i</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">func main() &#123;</span><br><span class="line">   ch := make(chan int, 5)</span><br><span class="line">   chs := make(chan string, 5)</span><br><span class="line"></span><br><span class="line">   go goRoutineD(ch, 5)</span><br><span class="line">   go goRoutineE(chs, &quot;ok&quot;)</span><br><span class="line"></span><br><span class="line">	select &#123;</span><br><span class="line">	case msg := &lt;-ch:</span><br><span class="line">		fmt.Println(&quot; received the data &quot;, msg)</span><br><span class="line">	case msgs := &lt;-chs:</span><br><span class="line">		fmt.Println(&quot; received the data &quot;, msgs)</span><br><span class="line">	default:</span><br><span class="line">		fmt.Println(&quot;no data received &quot;)</span><br><span class="line">		time.Sleep(time.Second * 1)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>运行程序，因为当前时间没有到3s，所以select 选择defult</p>
+<p>no data received </p>
+<p>修改程序，我们注释掉default，并多执行几次结果为</p>
+<p> received the data  5</p>
+<p>received the data  ok</p>
+<p>received the data  ok</p>
+<p>received the data  ok</p>
+<p>select语句会阻塞，直到监测到一个可以执行的IO操作为止，而这里goRoutineD和goRoutineE睡眠时间是相同的，都是3s，从输出可看出，从channel中读出数据的顺序是随机的。</p>
+<p>再修改代码，goRoutineD睡眠时间改成4s</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">func goRoutineD(ch chan int, i int) &#123;</span><br><span class="line">   time.Sleep(time.Second * 4)</span><br><span class="line">   ch &lt;- i</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>此时会先执行goRoutineE，select 选择case msgs :&#x3D; &lt;-chs。</p>
+<h3 id="range"><a href="#range" class="headerlink" title="range"></a>range</h3><p>可以持续从channel读取数据，一直到channel被关闭，当channel中没有数据时会阻塞当前goroutine，与读channel时阻塞处理机制一样。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">package main</span><br><span class="line"></span><br><span class="line">import (</span><br><span class="line">   &quot;fmt&quot;</span><br><span class="line">   &quot;time&quot;</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">func goRoutineD(ch chan int, i int) &#123;</span><br><span class="line">   for   i := 1; i &lt;= 5; i++&#123;</span><br><span class="line">      ch &lt;- i</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line">func chanRange(chanName chan int) &#123;</span><br><span class="line">   for e := range chanName &#123;</span><br><span class="line">      fmt.Printf(&quot;Get element from chan: %d\n&quot;, e)</span><br><span class="line">      if len(chanName) &lt;= 0 &#123; // 如果现有数据量为0，跳出循环</span><br><span class="line">			break</span><br><span class="line">	  &#125;</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br><span class="line">func main() &#123;</span><br><span class="line">   ch := make(chan int, 5)</span><br><span class="line">   go goRoutineD(ch, 5)</span><br><span class="line">   chanRange(ch)</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>结果：<br>Get element from chan: 1<br>Get element from chan: 2<br>Get element from chan: 3<br>Get element from chan: 4<br>Get element from chan: 5</p>
+<h3 id="死锁（deadlock）"><a href="#死锁（deadlock）" class="headerlink" title="死锁（deadlock）"></a>死锁（deadlock）</h3><p>指两个或两个以上的协程的执行过程中，由于竞争资源或由于彼此通信而造成的一种阻塞的现象。</p>
+<p>在非缓冲信道若发生只流入不流出，或只流出不流入，就会发生死锁。</p>
+<p>下面是一些死锁的例子</p>
+<p>1、</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">package main</span><br><span class="line"></span><br><span class="line">func main() &#123;</span><br><span class="line">   ch := make(chan int)</span><br><span class="line">   ch &lt;- 3</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上面情况，向非缓冲通道写数据会发生阻塞，导致死锁。解决办法创建缓冲区 ch :&#x3D; make(chan int，3)</p>
+<p>2、</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">package main</span><br><span class="line"></span><br><span class="line">import (</span><br><span class="line">   &quot;fmt&quot;</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">func main() &#123;</span><br><span class="line">   ch := make(chan int)</span><br><span class="line">   fmt.Println(&lt;-ch)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>向非缓冲通道读取数据会发生阻塞，导致死锁。 解决办法开启缓冲区，先向channel写入数据。</p>
+<p>3、</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">package main</span><br><span class="line"></span><br><span class="line">func main() &#123;</span><br><span class="line">   ch := make(chan int, 3)</span><br><span class="line">   ch &lt;- 3</span><br><span class="line">   ch &lt;- 4</span><br><span class="line">   ch &lt;- 5</span><br><span class="line">   ch &lt;- 6</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>写入数据超过缓冲区数量也会发生死锁。解决办法将写入数据取走。</p>
+<p>死锁的情况有很多这里不再赘述。</p>
+<p>还有一种情况，向关闭的channel写入数据，不会产生死锁，产生panic。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">package main</span><br><span class="line"></span><br><span class="line">func main() &#123;</span><br><span class="line">	ch := make(chan int, 3)</span><br><span class="line">	ch &lt;- 1</span><br><span class="line">	close(ch)</span><br><span class="line">	ch &lt;- 2</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>解决办法别向关闭的channel写入数据。</p>
+<p>参考：</p>
+<p><a target="_blank" rel="noopener" href="https://codeburst.io/diving-deep-into-the-golang-channels-549fd4ed21a8">https://codeburst.io/diving-deep-into-the-golang-channels-549fd4ed21a8</a></p>
+<p><a target="_blank" rel="noopener" href="https://speakerdeck.com/kavya719/understanding-channels?slide=14">https://speakerdeck.com/kavya719/understanding-channels?slide=14</a></p>
+<p><a target="_blank" rel="noopener" href="https://my.oschina.net/renhc/blog/2246871">https://my.oschina.net/renhc/blog/2246871</a></p>
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="https://timmy6.github.io/2019/06/08/channel/" title="channel 实现原理分析" target="_blank" rel="external">https://timmy6.github.io/2019/06/08/channel/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/timmy6" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/avatar.jpg" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/timmy6" target="_blank"><span class="text-dark">刘启明</span><small class="ml-1x">Go Developer</small></a></h3>
+        <div>很高兴认识你。</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    <li class="prev">
+      <a href="/2019/06/16/%E4%B8%8D%E5%90%8C%E7%B1%BB%E5%9E%8B%E6%AF%94%E8%BE%83/" title="Golang不同类型比较"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;上一篇</span></a>
+    </li>
+    
+    
+    <li class="next">
+      <a href="/2019/06/02/%E5%8C%BF%E5%90%8D%E5%87%BD%E6%95%B0%E5%92%8C%E9%97%AD%E5%8C%85/" title="匿名函数和闭包"><span>下一篇&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+    <li class="toggle-toc">
+      <a class="toggle-btn " data-toggle="collapse" href="#collapseToc" aria-expanded="false" title="文章目录" role="button">    <span>[&nbsp;</span><span>文章目录</span>
+        <i class="text-collapsed icon icon-anchor"></i>
+        <i class="text-in icon icon-close"></i>
+        <span>]</span>
+      </a>
+    </li>
+    
+  </ul>
+  
+  
+  <!-- Button trigger modal -->
+  <button type="button" class="btn btn-fancy btn-donate pop-onhover bg-gradient-warning" data-toggle="modal" data-target="#donateModal"><span>赏</span></button>
+  <!-- <div class="wave-icon wave-icon-danger btn-donate" data-toggle="modal" data-target="#donateModal">
+    <div class="wave-circle"><span class="icon"><i class="icon icon-bill"></i></span></div>
+  </div> -->
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div>
+  </div>
+</nav>
+  
+<!-- Modal -->
+<div class="modal modal-center modal-small modal-xs-full fade" id="donateModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content donate">
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      <div class="modal-body">
+        <div class="donate-box">
+          <div class="donate-head">
+            <p>感谢您的支持，我会继续努力的!</p>
+          </div>
+          <div class="tab-content">
+            <div role="tabpanel" class="tab-pane fade active in" id="alipay">
+              <div class="donate-payimg">
+                <img src="/images/donate/alipayimg.png" alt="扫码支持" title="扫一扫" />
+              </div>
+              <p class="text-muted mv">扫码打赏，你说多少就多少</p>
+              <p class="text-grey">打开支付宝扫一扫，即可进行扫码打赏哦</p>
+            </div>
+            <div role="tabpanel" class="tab-pane fade" id="wechatpay">
+              <div class="donate-payimg">
+                <img src="/images/donate/wechatpayimg.png" alt="扫码支持" title="扫一扫" />
+              </div>
+              <p class="text-muted mv">扫码打赏，你说多少就多少</p>
+              <p class="text-grey">打开微信扫一扫，即可进行扫码打赏哦</p>
+            </div>
+          </div>
+          <div class="donate-footer">
+            <ul class="nav nav-tabs nav-justified" role="tablist">
+              <li role="presentation" class="active">
+                <a href="#alipay" id="alipay-tab" role="tab" data-toggle="tab" aria-controls="alipay" aria-expanded="true"><i class="icon icon-alipay"></i> 支付宝</a>
+              </li>
+              <li role="presentation" class="">
+                <a href="#wechatpay" role="tab" id="wechatpay-tab" data-toggle="tab" aria-controls="wechatpay" aria-expanded="false"><i class="icon icon-wepay"></i> 微信支付</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+</main>
+
+  <footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/timmy6" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://weibo.com/u/3917867123" target="_blank" title="Weibo" data-toggle=tooltip data-placement=top><i class="icon icon-weibo"></i></a></li>
+        
+    </ul>
+
+    <div class="copyright">
+    	
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+
+<script src="/js/plugin.min.js"></script>
+
+
+<script src="/js/application.js"></script>
+
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+
+
+
+
+   
+
+
+
+
+   
+    
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: '4737d1ihG9bSORDvOhg93sGV-gzGzoHsz',
+    appKey: 'G7fMbInGD0wzoXGMQvF5RIHt',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: false
+  });
+  </script>
+
+     
+
+
+
+
+
+
+
+</body>
+</html>

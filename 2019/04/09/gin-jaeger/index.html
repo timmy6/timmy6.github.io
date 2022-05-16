@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000" />
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top" />
+  
+  
+  <title>路由中间件 - 链路追踪 | 刘启明的blog</title>
+  <meta name="description" content="概述首先同步下项目概况：  上篇文章分享了，路由中间件 - 捕获异常，这篇文章咱们分享：路由中间件 - Jaeger 链路追踪。 啥是链路追踪？ 我理解链路追踪其实是为微服务架构提供服务的，当一个请求中，请求了多个服务单元，如果请求出现了错误或异常，很难去定位是哪个服务出了问题，这时就需要链路追踪。 咱们先看一张图：  这张图的调用链还比较清晰，咱们想象一下，随着服务的越来越多，服务与服务之间调用">
+<meta property="og:type" content="article">
+<meta property="og:title" content="路由中间件 - 链路追踪">
+<meta property="og:url" content="https://timmy6.github.io/2019/04/09/gin-jaeger/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="概述首先同步下项目概况：  上篇文章分享了，路由中间件 - 捕获异常，这篇文章咱们分享：路由中间件 - Jaeger 链路追踪。 啥是链路追踪？ 我理解链路追踪其实是为微服务架构提供服务的，当一个请求中，请求了多个服务单元，如果请求出现了错误或异常，很难去定位是哪个服务出了问题，这时就需要链路追踪。 咱们先看一张图：  这张图的调用链还比较清晰，咱们想象一下，随着服务的越来越多，服务与服务之间调用">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://timmy6.github.io/images/gin/5_api_1.png">
+<meta property="og:image" content="https://timmy6.github.io/images/gin/5_api_2.png">
+<meta property="og:image" content="https://timmy6.github.io/images/gin/5_api_3.png">
+<meta property="og:image" content="https://timmy6.github.io/images/gin/5_api_4.jpeg">
+<meta property="og:image" content="https://timmy6.github.io/images/gin/5_api_5.jpeg">
+<meta property="og:image" content="https://timmy6.github.io/images/gin/5_api_6.png">
+<meta property="og:image" content="https://timmy6.github.io/images/gin/5_api_7.png">
+<meta property="og:image" content="https://timmy6.github.io/images/gin/5_api_8.png">
+<meta property="og:image" content="https://timmy6.github.io/images/gin/5_api_9.jpg">
+<meta property="og:image" content="https://timmy6.github.io/images/gin/5_api_10.jpeg">
+<meta property="article:published_time" content="2019-04-09T14:15:20.000Z">
+<meta property="article:modified_time" content="2022-05-16T02:44:05.503Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="gin框架">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://timmy6.github.io/images/gin/5_api_1.png">
+  <!-- Canonical links -->
+  <link rel="canonical" href="https://timmy6.github.io/2019/04/09/gin-jaeger/index.html">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png" type="image/x-icon">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+  
+  
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+
+<body class="main-center" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/timmy6" target="_blank">
+          <img class="img-circle img-rotate" src="/images/avatar.jpg" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">刘启明</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">Go Developer</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> Changsha, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="搜索" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="想要查找什么..." x-webkit-speech />
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav ">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">首页</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">归档</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">分类</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags">
+            
+            <i class="icon icon-tags"></i>
+            
+            <span class="menu-title">标签</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-repository">
+          <a href="/repository">
+            
+            <i class="icon icon-project"></i>
+            
+            <span class="menu-title">项目</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-books">
+          <a href="/books">
+            
+            <i class="icon icon-book-fill"></i>
+            
+            <span class="menu-title">书单</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-links">
+          <a href="/links">
+            
+            <i class="icon icon-friendship"></i>
+            
+            <span class="menu-title">友链</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about">
+            
+            <i class="icon icon-cup-fill"></i>
+            
+            <span class="menu-title">关于</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/timmy6" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://weibo.com/u/3917867123" target="_blank" title="Weibo" data-toggle=tooltip data-placement=top><i class="icon icon-weibo"></i></a></li>
+        
+    </ul>
+
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">公告</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>欢迎交流与分享经验!</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget-body">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Go%E5%BC%80%E5%8F%91/">Go开发</a><span class="category-list-count">37</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/MySql/">MySql</a><span class="category-list-count">2</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget-body">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Go%E5%9F%BA%E7%A1%80/" rel="tag">Go基础</a><span class="tag-list-count">25</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gRPC/" rel="tag">gRPC</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gin%E6%A1%86%E6%9E%B6/" rel="tag">gin框架</a><span class="tag-list-count">9</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/" rel="tag">redis</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93%E4%BC%98%E5%8C%96/" rel="tag">数据库优化</a><span class="tag-list-count">2</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget-body tagcloud">
+      <a href="/tags/Go%E5%9F%BA%E7%A1%80/" style="font-size: 14px;">Go基础</a> <a href="/tags/gRPC/" style="font-size: 13.33px;">gRPC</a> <a href="/tags/gin%E6%A1%86%E6%9E%B6/" style="font-size: 13.67px;">gin框架</a> <a href="/tags/redis/" style="font-size: 13px;">redis</a> <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93%E4%BC%98%E5%8C%96/" style="font-size: 13.33px;">数据库优化</a>
+    </div>
+  </div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">八月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">七月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">六月 2019</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">五月 2019</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/04/">四月 2019</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">三月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">十一月 2018</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">十月 2018</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a><span class="archive-list-count">5</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget-body">
+      <ul class="recent-post-list list-unstyled no-thumbnail">
+        
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/MySql/">MySql</a>
+              </p>
+              <p class="item-title">
+                <a href="/2019/08/15/CentOS%E5%8F%82%E6%95%B0%E9%85%8D%E7%BD%AE%E5%AF%B9mysql%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/" class="title">CentOS参数配置对mysql性能优化</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2019-08-15T13:15:10.000Z" itemprop="datePublished">2019-08-15</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/MySql/">MySql</a>
+              </p>
+              <p class="item-title">
+                <a href="/2019/08/10/%E5%BD%B1%E5%93%8D%E6%95%B0%E6%8D%AE%E5%BA%93%E6%80%A7%E8%83%BD%E7%9A%84%E5%9B%A0%E7%B4%A0/" class="title">影响数据库性能的因素</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2019-08-10T15:15:10.000Z" itemprop="datePublished">2019-08-10</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/Go%E5%BC%80%E5%8F%91/">Go开发</a>
+              </p>
+              <p class="item-title">
+                <a href="/2019/07/25/go-interface/" class="title">go interface</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2019-07-25T15:15:10.000Z" itemprop="datePublished">2019-07-25</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/Go%E5%BC%80%E5%8F%91/">Go开发</a>
+              </p>
+              <p class="item-title">
+                <a href="/2019/07/16/go-mod/" class="title">go mod</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2019-07-16T14:15:10.000Z" itemprop="datePublished">2019-07-16</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/Go%E5%BC%80%E5%8F%91/">Go开发</a>
+              </p>
+              <p class="item-title">
+                <a href="/2019/06/16/%E4%B8%8D%E5%90%8C%E7%B1%BB%E5%9E%8B%E6%AF%94%E8%BE%83/" class="title">Golang不同类型比较</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2019-06-16T14:15:10.000Z" itemprop="datePublished">2019-06-16</time>
+              </p>
+            </div>
+          </li>
+          
+      </ul>
+    </div>
+  </div>
+  
+
+    
+  </div>
+</aside>
+
+  
+  
+  <aside class="sidebar sidebar-toc collapse   in  " id="collapseToc" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    <nav id="toc" class="article-toc">
+      <h3 class="toc-title">文章目录</h3>
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A6%82%E8%BF%B0"><span class="toc-number">1.</span> <span class="toc-text">概述</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A6%82%E4%BD%95%E8%AE%BE%E8%AE%A1%E6%97%A5%E5%BF%97%E8%AE%B0%E5%BD%95%EF%BC%9F"><span class="toc-number">2.</span> <span class="toc-text">如何设计日志记录？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BC%80%E6%BA%90%E5%B7%A5%E5%85%B7"><span class="toc-number">3.</span> <span class="toc-text">开源工具</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Jaeger-%E6%9E%B6%E6%9E%84%E5%9B%BE"><span class="toc-number">4.</span> <span class="toc-text">Jaeger 架构图</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Jaeger-Span"><span class="toc-number">5.</span> <span class="toc-text">Jaeger Span</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Jaeger-%E9%83%A8%E7%BD%B2"><span class="toc-number">6.</span> <span class="toc-text">Jaeger 部署</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Jaeger-%E7%AB%AF%E5%8F%A3"><span class="toc-number">7.</span> <span class="toc-text">Jaeger 端口</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Jaeger-%E9%87%87%E6%A0%B7%E7%8E%87"><span class="toc-number">8.</span> <span class="toc-text">Jaeger 采样率</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Jaeger-%E7%BC%BA%E7%82%B9"><span class="toc-number">9.</span> <span class="toc-text">Jaeger 缺点</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%9E%E6%88%98"><span class="toc-number">10.</span> <span class="toc-text">实战</span></a></li></ol>
+    </nav>
+  </div>
+</aside>
+
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-gin-jaeger" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      路由中间件 - 链路追踪
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/2019/04/09/gin-jaeger/" class="article-date">
+	  <time datetime="2019-04-09T14:15:20.000Z" itemprop="datePublished">2019-04-09</time>
+	</a>
+</span>
+        
+  <span class="article-category">
+    <i class="icon icon-folder"></i>
+    <a class="article-category-link" href="/categories/Go%E5%BC%80%E5%8F%91/">Go开发</a>
+  </span>
+
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link-link" href="/tags/gin%E6%A1%86%E6%9E%B6/" rel="tag">gin框架</a>
+  </span>
+
+
+        
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2019/04/09/gin-jaeger/#comments" class="article-comment-link">评论</a></span>
+        
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>首先同步下项目概况：</p>
+<p><img src="/images/gin/5_api_1.png"></p>
+<p>上篇文章分享了，路由中间件 - 捕获异常，这篇文章咱们分享：路由中间件 - Jaeger 链路追踪。</p>
+<p>啥是链路追踪？</p>
+<p>我理解链路追踪其实是为微服务架构提供服务的，当一个请求中，请求了多个服务单元，如果请求出现了错误或异常，很难去定位是哪个服务出了问题，这时就需要链路追踪。</p>
+<p>咱们先看一张图：</p>
+<p><img src="/images/gin/5_api_2.png"></p>
+<p>这张图的调用链还比较清晰，咱们想象一下，随着服务的越来越多，服务与服务之间调用关系也越来越多，可能就会发展成下图的情况。</p>
+<p><img src="/images/gin/5_api_3.png"></p>
+<p>这调用关系真的是… 看到这，我的内心是崩溃的。</p>
+<p><img src="/images/gin/5_api_4.jpeg"></p>
+<p>那么问题来了，这种情况下怎么快速定位问题？</p>
+<h2 id="如何设计日志记录？"><a href="#如何设计日志记录？" class="headerlink" title="如何设计日志记录？"></a>如何设计日志记录？</h2><p>我们自己也可以设计一个链路追踪，比如当发生一个请求，咱们记录它的：</p>
+<ul>
+<li>请求的唯一标识</li>
+<li>请求了哪些服务？</li>
+<li>请求的服务依次顺序？</li>
+<li>请求的 Request 和 Response 日志？</li>
+<li>对日志进行收集、整理，并友好展示</li>
+</ul>
+<p>怎么去实现请求的唯一标识？</p>
+<p><strong>以 Go 为例</strong> 写一个中间件，在每次请求的 Header 中包含：X-Request-Id，代码如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">func SetUp() gin.HandlerFunc &#123;</span><br><span class="line">	return func(c *gin.Context) &#123;</span><br><span class="line">		requestId := c.Request.Header.Get(&quot;X-Request-Id&quot;)</span><br><span class="line">		if requestId == &quot;&quot; &#123;</span><br><span class="line">			requestId = util.GenUUID()</span><br><span class="line">		&#125;</span><br><span class="line">		c.Set(&quot;X-Request-Id&quot;, requestId)</span><br><span class="line">		c.Writer.Header().Set(&quot;X-Request-Id&quot;, requestId)</span><br><span class="line">		c.Next()</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>每个 Request 和 Response 日志中都要包含 X-Request-Id。</p>
+<p>问题又来了，每次调用都记录日志，当调用的服务过多时，频繁的记录日志，就会有性能问题呀，肿么办？</p>
+<p><img src="/images/gin/5_api_5.jpeg"></p>
+<p>哎，这么麻烦，看看市面上有没有一些开源工具呢？</p>
+<h2 id="开源工具"><a href="#开源工具" class="headerlink" title="开源工具"></a>开源工具</h2><ul>
+<li>Jaeger：<a target="_blank" rel="noopener" href="https://www.jaegertracing.io/">https://www.jaegertracing.io</a></li>
+<li>Zipkin：<a target="_blank" rel="noopener" href="https://zipkin.io/">https://zipkin.io/</a></li>
+<li>Appdash：<a target="_blank" rel="noopener" href="https://about.sourcegraph.com/">https://about.sourcegraph.com/</a></li>
+</ul>
+<p>这个就不多做介绍了，基本上都能满足需求，至于优缺点，大家可以挨个去瞅瞅，喜欢哪个就用哪个？</p>
+<p><strong>我为什么选择 Jaeger</strong> ？</p>
+<p>因为我目前只会用这个，其他还不会 … </p>
+<p>咱们一起看下 Jaeger 是怎么回事吧。</p>
+<h2 id="Jaeger-架构图"><a href="#Jaeger-架构图" class="headerlink" title="Jaeger 架构图"></a>Jaeger 架构图</h2><p><img src="/images/gin/5_api_6.png"></p>
+<p>图片来源于官网。</p>
+<p>简单介绍下上图三个关键组件：</p>
+<p><strong>Agent</strong></p>
+<p>Agent是一个网络守护进程，监听通过UDP发送过来的Span，它会将其批量发送给collector。按照设计，Agent要被部署到所有主机上，作为基础设施。Agent将collector和客户端之间的路由与发现机制抽象了出来。</p>
+<p><strong>Collector</strong></p>
+<p>Collector从Jaeger Agent接收Trace，并通过一个处理管道对其进行处理。目前的管道会校验Trace、建立索引、执行转换并最终进行存储。存储是一个可插入的组件，现在支持Cassandra和elasticsearch。</p>
+<p><strong>Query</strong></p>
+<p>Query服务会从存储中检索Trace并通过UI界面进行展现，该UI界面通过React技术实现，其页面UI如下图所示，展现了一条Trace的详细信息。</p>
+<p>其他组件，大家可以了解下并选择性使用。</p>
+<h2 id="Jaeger-Span"><a href="#Jaeger-Span" class="headerlink" title="Jaeger Span"></a>Jaeger Span</h2><p><img src="/images/gin/5_api_7.png"></p>
+<p>图片来源于官网。</p>
+<p>怎么操作 Span 呢？Span 有哪些可以调用的 API ？</p>
+<p><img src="/images/gin/5_api_8.png"></p>
+<h2 id="Jaeger-部署"><a href="#Jaeger-部署" class="headerlink" title="Jaeger 部署"></a>Jaeger 部署</h2><p><strong>All in one</strong></p>
+<p>为了方便大家快速使用，Jaeger 直接提供一个 All in one 包，我们可以直接执行，启动一套完整的 Jaeger tracing 系统。</p>
+<p>启动成功后，访问 <a target="_blank" rel="noopener" href="http://localhost:16686/">http://localhost:16686</a> 就可以看到 Jaeger UI。</p>
+<p><strong>独立部署</strong></p>
+<ul>
+<li>jaeger-agent</li>
+<li>jaeger-collector</li>
+<li>jaeger-query</li>
+<li>jaeger-ingester</li>
+<li>jaeger-operator</li>
+<li>jaeger-cassandra-schema</li>
+<li>jaeger-es-index-cleaner</li>
+<li>spark-dependencies</li>
+</ul>
+<p>可以自由搭配，组合使用。</p>
+<h2 id="Jaeger-端口"><a href="#Jaeger-端口" class="headerlink" title="Jaeger 端口"></a>Jaeger 端口</h2><ul>
+<li><p>端口：6831 </p>
+</li>
+<li><p>协议：UDP </p>
+</li>
+<li><p>所属模块：Agent</p>
+</li>
+<li><p>功能：通过兼容性 Thrift 协议，接收 Jaeger thrift 类型数据</p>
+</li>
+<li><p>端口：14267 </p>
+</li>
+<li><p>协议：HTTP </p>
+</li>
+<li><p>所属模块：Collector</p>
+</li>
+<li><p>功能：接收客户端 Jaeger thrift 类型数据</p>
+</li>
+<li><p>端口：16686 </p>
+</li>
+<li><p>协议：HTTP </p>
+</li>
+<li><p>所属模块：Query</p>
+</li>
+<li><p>功能：客户端前端界面展示端口</p>
+</li>
+</ul>
+<h2 id="Jaeger-采样率"><a href="#Jaeger-采样率" class="headerlink" title="Jaeger 采样率"></a>Jaeger 采样率</h2><p>分布式追踪系统本身也会造成一定的性能低损耗，如果完整记录每次请求，对于生产环境可能会有极大的性能损耗，一般需要进行采样设置。</p>
+<p><strong>固定采样</strong></p>
+<p>（sampler.type&#x3D;const）</p>
+<ul>
+<li>sampler.param&#x3D;1 全采样， </li>
+<li>sampler.param&#x3D;0 不采样；</li>
+</ul>
+<p><strong>按百分比采样</strong></p>
+<p>（sampler.type&#x3D;probabilistic）</p>
+<ul>
+<li>sampler.param&#x3D;0.1 则随机采十分之一的样本；</li>
+</ul>
+<p><strong>采样速度限制</strong></p>
+<p>（sampler.type&#x3D;ratelimiting）</p>
+<ul>
+<li>sampler.param&#x3D;2.0 每秒采样两个traces；</li>
+</ul>
+<p><strong>动态获取采样率</strong> </p>
+<p>（sampler.type&#x3D;remote）</p>
+<ul>
+<li>这个是默认配置，可以通过配置从 Agent 中获取采样率的动态设置。</li>
+</ul>
+<h2 id="Jaeger-缺点"><a href="#Jaeger-缺点" class="headerlink" title="Jaeger 缺点"></a>Jaeger 缺点</h2><ul>
+<li>接入过程有一定的侵入性；</li>
+<li>本身缺少监控和报警机制，需要结合第三方工具来实现，比如配合Grafana 和 Prometheus实现；</li>
+</ul>
+<p>看到这，说的都是理论，大家的心里话可能是：</p>
+<p><img src="/images/gin/5_api_9.jpg"></p>
+<h2 id="实战"><a href="#实战" class="headerlink" title="实战"></a>实战</h2><ul>
+<li>Jaeger 部署</li>
+<li>Jaeger 在 Gin 中使用</li>
+<li>Jaeger 在 gRPC 中使用</li>
+</ul>
+<p><img src="/images/gin/5_api_10.jpeg"></p>
+<p>关于实战的分享，我准备整理出 4 个服务，然后实现服务与服务之间进行相互调用，目前 Demo 还没写完…</p>
+<p>下篇文章再给大家分享。</p>
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="https://timmy6.github.io/2019/04/09/gin-jaeger/" title="路由中间件 - 链路追踪" target="_blank" rel="external">https://timmy6.github.io/2019/04/09/gin-jaeger/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/timmy6" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/avatar.jpg" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/timmy6" target="_blank"><span class="text-dark">刘启明</span><small class="ml-1x">Go Developer</small></a></h3>
+        <div>很高兴认识你。</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    <li class="prev">
+      <a href="/2019/04/19/gin-jaeger-demo/" title="路由中间件 - Jaeger实战"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;上一篇</span></a>
+    </li>
+    
+    
+    <li class="next">
+      <a href="/2019/03/25/catch-error/" title="路由中间件 - 捕获异常"><span>下一篇&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+    <li class="toggle-toc">
+      <a class="toggle-btn " data-toggle="collapse" href="#collapseToc" aria-expanded="false" title="文章目录" role="button">    <span>[&nbsp;</span><span>文章目录</span>
+        <i class="text-collapsed icon icon-anchor"></i>
+        <i class="text-in icon icon-close"></i>
+        <span>]</span>
+      </a>
+    </li>
+    
+  </ul>
+  
+  
+  <!-- Button trigger modal -->
+  <button type="button" class="btn btn-fancy btn-donate pop-onhover bg-gradient-warning" data-toggle="modal" data-target="#donateModal"><span>赏</span></button>
+  <!-- <div class="wave-icon wave-icon-danger btn-donate" data-toggle="modal" data-target="#donateModal">
+    <div class="wave-circle"><span class="icon"><i class="icon icon-bill"></i></span></div>
+  </div> -->
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div>
+  </div>
+</nav>
+  
+<!-- Modal -->
+<div class="modal modal-center modal-small modal-xs-full fade" id="donateModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content donate">
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      <div class="modal-body">
+        <div class="donate-box">
+          <div class="donate-head">
+            <p>感谢您的支持，我会继续努力的!</p>
+          </div>
+          <div class="tab-content">
+            <div role="tabpanel" class="tab-pane fade active in" id="alipay">
+              <div class="donate-payimg">
+                <img src="/images/donate/alipayimg.png" alt="扫码支持" title="扫一扫" />
+              </div>
+              <p class="text-muted mv">扫码打赏，你说多少就多少</p>
+              <p class="text-grey">打开支付宝扫一扫，即可进行扫码打赏哦</p>
+            </div>
+            <div role="tabpanel" class="tab-pane fade" id="wechatpay">
+              <div class="donate-payimg">
+                <img src="/images/donate/wechatpayimg.png" alt="扫码支持" title="扫一扫" />
+              </div>
+              <p class="text-muted mv">扫码打赏，你说多少就多少</p>
+              <p class="text-grey">打开微信扫一扫，即可进行扫码打赏哦</p>
+            </div>
+          </div>
+          <div class="donate-footer">
+            <ul class="nav nav-tabs nav-justified" role="tablist">
+              <li role="presentation" class="active">
+                <a href="#alipay" id="alipay-tab" role="tab" data-toggle="tab" aria-controls="alipay" aria-expanded="true"><i class="icon icon-alipay"></i> 支付宝</a>
+              </li>
+              <li role="presentation" class="">
+                <a href="#wechatpay" role="tab" id="wechatpay-tab" data-toggle="tab" aria-controls="wechatpay" aria-expanded="false"><i class="icon icon-wepay"></i> 微信支付</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+</main>
+
+  <footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/timmy6" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://weibo.com/u/3917867123" target="_blank" title="Weibo" data-toggle=tooltip data-placement=top><i class="icon icon-weibo"></i></a></li>
+        
+    </ul>
+
+    <div class="copyright">
+    	
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+
+<script src="/js/plugin.min.js"></script>
+
+
+<script src="/js/application.js"></script>
+
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+
+
+
+
+   
+
+
+
+
+   
+    
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: '4737d1ihG9bSORDvOhg93sGV-gzGzoHsz',
+    appKey: 'G7fMbInGD0wzoXGMQvF5RIHt',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: false
+  });
+  </script>
+
+     
+
+
+
+
+
+
+
+</body>
+</html>
