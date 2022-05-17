@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000" />
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top" />
+  
+  
+  <title>rabbitmq基本操作 | 刘启明的blog</title>
+  <meta name="description" content="参考 https:&#x2F;&#x2F;www.toutiao.com&#x2F;i6826959307888656899&#x2F; https:&#x2F;&#x2F;www.cnblogs.com&#x2F;Zhangcsc&#x2F;p&#x2F;11739754.html  核心概念交换机exchange接收消息，并根据路由键转发消息到所绑定的队列 交换机的4种类型 topic 对路由键进行模式匹配，将消息转发到匹配上的队列上，其中* 表示匹配任意一个单词，# 表示匹配任意">
+<meta property="og:type" content="article">
+<meta property="og:title" content="rabbitmq基本操作">
+<meta property="og:url" content="https://timmy6.github.io/2020/07/05/rabbitmq%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="参考 https:&#x2F;&#x2F;www.toutiao.com&#x2F;i6826959307888656899&#x2F; https:&#x2F;&#x2F;www.cnblogs.com&#x2F;Zhangcsc&#x2F;p&#x2F;11739754.html  核心概念交换机exchange接收消息，并根据路由键转发消息到所绑定的队列 交换机的4种类型 topic 对路由键进行模式匹配，将消息转发到匹配上的队列上，其中* 表示匹配任意一个单词，# 表示匹配任意">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-07-05T14:15:10.000Z">
+<meta property="article:modified_time" content="2022-05-17T07:03:05.181Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+  <!-- Canonical links -->
+  <link rel="canonical" href="https://timmy6.github.io/2020/07/05/rabbitmq%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C/index.html">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png" type="image/x-icon">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+  
+  
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+
+<body class="main-center" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/timmy6" target="_blank">
+          <img class="img-circle img-rotate" src="/images/avatar.jpg" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">刘启明</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">Go Developer</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> Changsha, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="搜索" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="想要查找什么..." x-webkit-speech />
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav ">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">首页</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">归档</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">分类</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags">
+            
+            <i class="icon icon-tags"></i>
+            
+            <span class="menu-title">标签</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-repository">
+          <a href="/repository">
+            
+            <i class="icon icon-project"></i>
+            
+            <span class="menu-title">项目</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-books">
+          <a href="/books">
+            
+            <i class="icon icon-book-fill"></i>
+            
+            <span class="menu-title">书单</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-links">
+          <a href="/links">
+            
+            <i class="icon icon-friendship"></i>
+            
+            <span class="menu-title">友链</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about">
+            
+            <i class="icon icon-cup-fill"></i>
+            
+            <span class="menu-title">关于</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/timmy6" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://weibo.com/u/3917867123" target="_blank" title="Weibo" data-toggle=tooltip data-placement=top><i class="icon icon-weibo"></i></a></li>
+        
+    </ul>
+
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">公告</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>欢迎交流与分享经验!</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget-body">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Go%E5%BC%80%E5%8F%91/">Go开发</a><span class="category-list-count">37</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Linux/">Linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/MySql/">MySql</a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/rabbitmq/">rabbitmq</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/redis/">redis</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%BE%AE%E6%9C%8D%E5%8A%A1/">微服务</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/">数据结构与算法</a><span class="category-list-count">2</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget-body">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Go%E5%9F%BA%E7%A1%80/" rel="tag">Go基础</a><span class="tag-list-count">25</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gRPC/" rel="tag">gRPC</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gin%E6%A1%86%E6%9E%B6/" rel="tag">gin框架</a><span class="tag-list-count">9</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/" rel="tag">redis</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/" rel="tag">常用命令</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93%E4%BC%98%E5%8C%96/" rel="tag">数据库优化</a><span class="tag-list-count">8</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget-body tagcloud">
+      <a href="/tags/Go%E5%9F%BA%E7%A1%80/" style="font-size: 14px;">Go基础</a> <a href="/tags/gRPC/" style="font-size: 13.25px;">gRPC</a> <a href="/tags/gin%E6%A1%86%E6%9E%B6/" style="font-size: 13.75px;">gin框架</a> <a href="/tags/redis/" style="font-size: 13px;">redis</a> <a href="/tags/%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/" style="font-size: 13px;">常用命令</a> <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93%E4%BC%98%E5%8C%96/" style="font-size: 13.5px;">数据库优化</a>
+    </div>
+  </div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/07/">七月 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/06/">六月 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/05/">五月 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/04/">四月 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/03/">三月 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/02/">二月 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/01/">一月 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">十二月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">十一月 2019</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">十月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">九月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">八月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">七月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">六月 2019</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">五月 2019</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/04/">四月 2019</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">三月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">十一月 2018</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">十月 2018</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a><span class="archive-list-count">5</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget-body">
+      <ul class="recent-post-list list-unstyled no-thumbnail">
+        
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/rabbitmq/">rabbitmq</a>
+              </p>
+              <p class="item-title">
+                <a href="/2020/07/05/rabbitmq%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C/" class="title">rabbitmq基本操作</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2020-07-05T14:15:10.000Z" itemprop="datePublished">2020-07-05</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E5%BE%AE%E6%9C%8D%E5%8A%A1/">微服务</a>
+              </p>
+              <p class="item-title">
+                <a href="/2020/06/02/%E5%BE%AE%E6%9C%8D%E5%8A%A1/" class="title">微服务</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2020-06-02T14:15:10.000Z" itemprop="datePublished">2020-06-02</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/">数据结构与算法</a>
+              </p>
+              <p class="item-title">
+                <a href="/2020/05/20/%E7%A8%8B%E5%BA%8F%E5%B8%B8%E7%94%A8%E7%AE%97%E6%B3%95/" class="title">程序常用算法</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2020-05-20T15:15:10.000Z" itemprop="datePublished">2020-05-20</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/">数据结构与算法</a>
+              </p>
+              <p class="item-title">
+                <a href="/2020/05/10/%E9%93%BE%E8%A1%A8/" class="title">链表</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2020-05-10T15:15:10.000Z" itemprop="datePublished">2020-05-10</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/redis/">redis</a>
+              </p>
+              <p class="item-title">
+                <a href="/2020/04/12/redis%E6%9E%B6%E6%9E%84%E6%A8%A1%E5%BC%8F/" class="title">redis架构模式</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2020-04-12T14:15:10.000Z" itemprop="datePublished">2020-04-12</time>
+              </p>
+            </div>
+          </li>
+          
+      </ul>
+    </div>
+  </div>
+  
+
+    
+  </div>
+</aside>
+
+  
+  
+  <aside class="sidebar sidebar-toc collapse   in  " id="collapseToc" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    <nav id="toc" class="article-toc">
+      <h3 class="toc-title">文章目录</h3>
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%82%E8%80%83"><span class="toc-number">1.</span> <span class="toc-text">参考</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83%E6%A6%82%E5%BF%B5"><span class="toc-number">2.</span> <span class="toc-text">核心概念</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%A4%E6%8D%A2%E6%9C%BAexchange"><span class="toc-number">2.1.</span> <span class="toc-text">交换机exchange</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%A4%E6%8D%A2%E6%9C%BA%E7%9A%844%E7%A7%8D%E7%B1%BB%E5%9E%8B"><span class="toc-number">2.2.</span> <span class="toc-text">交换机的4种类型</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4"><span class="toc-number">3.</span> <span class="toc-text">常用命令</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BA%94%E8%AF%A5%E7%94%B1%E7%94%9F%E6%88%90%E8%80%85%E8%BF%98%E6%98%AF%E6%B6%88%E8%B4%B9%E8%80%85%E5%88%9B%E5%BB%BA%E9%98%9F%E5%88%97%E5%91%A2"><span class="toc-number">4.</span> <span class="toc-text">应该由生成者还是消费者创建队列呢?</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%94%9F%E4%BA%A7%E6%B6%88%E6%81%AF"><span class="toc-number">5.</span> <span class="toc-text">生产消息</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E7%94%A8%E4%BF%A1%E9%81%93channel"><span class="toc-number">6.</span> <span class="toc-text">为什么要用信道channel</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E6%B6%88%E6%81%AF%E5%B9%82%E7%AD%89%E6%80%A7%EF%BC%9F"><span class="toc-number">7.</span> <span class="toc-text">什么是消息幂等性？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AFconfirm%E6%B6%88%E6%81%AF%E7%A1%AE%E8%AE%A4%E6%9C%BA%E5%88%B6%EF%BC%9F"><span class="toc-number">8.</span> <span class="toc-text">什么是confirm消息确认机制？</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0confirm%E7%A1%AE%E8%AE%A4%E6%B6%88%E6%81%AF%EF%BC%9F"><span class="toc-number">8.1.</span> <span class="toc-text">如何实现confirm确认消息？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A6%82%E4%BD%95%E7%94%9F%E6%88%90%E7%9A%84%E6%B6%88%E6%81%AF%E5%8C%B9%E9%85%8D%E4%B8%8D%E5%88%B0%E9%98%9F%E5%88%97%E4%BC%9A%E6%80%8E%E4%B9%88%E6%A0%B7%EF%BC%9F"><span class="toc-number">9.</span> <span class="toc-text">如何生成的消息匹配不到队列会怎么样？</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A6%82%E4%BD%95%E8%8E%B7%E5%BE%97%E8%A2%ABreturn%E5%9B%9E%E6%9D%A5%E7%9A%84%E6%B6%88%E6%81%AF%EF%BC%9F"><span class="toc-number">9.1.</span> <span class="toc-text">如何获得被return回来的消息？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E6%B6%88%E8%B4%B9%E7%AB%AF%E7%9A%84%E9%99%90%E6%B5%81%EF%BC%9F"><span class="toc-number">10.</span> <span class="toc-text">什么是消费端的限流？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AFTTL%E9%98%9F%E5%88%97-x2F-%E6%B6%88%E6%81%AF%EF%BC%9F"><span class="toc-number">11.</span> <span class="toc-text">什么是TTL队列&#x2F;消息？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E6%AD%BB%E4%BF%A1%E9%98%9F%E5%88%97%EF%BC%9F"><span class="toc-number">12.</span> <span class="toc-text">什么是死信队列？</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B6%88%E6%81%AF%E5%8F%98%E4%B8%BA%E6%AD%BB%E4%BF%A1%E7%9A%84%E5%87%A0%E7%A7%8D%E6%83%85%E5%86%B5%EF%BC%9A"><span class="toc-number">12.1.</span> <span class="toc-text">消息变为死信的几种情况：</span></a></li></ol></li></ol>
+    </nav>
+  </div>
+</aside>
+
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-rabbitmq基本操作" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      rabbitmq基本操作
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/2020/07/05/rabbitmq%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C/" class="article-date">
+	  <time datetime="2020-07-05T14:15:10.000Z" itemprop="datePublished">2020-07-05</time>
+	</a>
+</span>
+        
+  <span class="article-category">
+    <i class="icon icon-folder"></i>
+    <a class="article-category-link" href="/categories/rabbitmq/">rabbitmq</a>
+  </span>
+
+        
+
+        
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2020/07/05/rabbitmq%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C/#comments" class="article-comment-link">评论</a></span>
+        
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://www.toutiao.com/i6826959307888656899/">https://www.toutiao.com/i6826959307888656899/</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/Zhangcsc/p/11739754.html">https://www.cnblogs.com/Zhangcsc/p/11739754.html</a></li>
+</ul>
+<h2 id="核心概念"><a href="#核心概念" class="headerlink" title="核心概念"></a>核心概念</h2><h3 id="交换机exchange"><a href="#交换机exchange" class="headerlink" title="交换机exchange"></a>交换机exchange</h3><p>接收消息，并根据路由键转发消息到所绑定的队列</p>
+<h3 id="交换机的4种类型"><a href="#交换机的4种类型" class="headerlink" title="交换机的4种类型"></a>交换机的4种类型</h3><ul>
+<li>topic 对路由键进行模式匹配，将消息转发到匹配上的队列上，其中<code>*</code> 表示匹配任意一个单词，<code>#</code> 表示匹配任意一个或多个单词，使用<code>.</code>分割单词，例如路由键<code>quick.orange.rabbit</code>，可以匹配上绑定键<code>quick.#</code>,<code>*.orange.rabbit</code></li>
+<li>direct 要求路由键必须与绑定key完全匹配，这样才会被转发对应的队列</li>
+<li>fanout 不处理路由键。你只需要简单的将队列绑定到交换机上，一个发送到交换机的消息都会被转发到与该交换机绑定的所有队列上</li>
+<li>headers 不处理路由键，而是根据消息内容中的headers属性进行匹配</li>
+</ul>
+<h2 id="常用命令"><a href="#常用命令" class="headerlink" title="常用命令"></a>常用命令</h2><ul>
+<li><code>basic.consume</code>持续订阅,自动接收下一条消息</li>
+<li><code>basic.get</code>获取单条消息</li>
+<li><code>basic.ack</code>确认收到消息,或者消费者在订阅到队列的时候就将<code>auto ack</code>设置为true</li>
+<li><code>basic.reject</code>丢弃消息,如果将<code>reject</code>命令的<code>requeue</code>参数设置为true的话,<code>rabbitmq</code>会将消息投递给下个消费者,否则会立即从队列删除消息并且存放到死信队列</li>
+<li><code>queue.declare</code>创建队列,如果不指定名称则随机分配一个名称,作为匿名队列<ul>
+<li><code>exclusive</code>限制只有由一个消费者够消费</li>
+<li><code>auto-delete</code>当最后一个消费者取消订阅时候,队列会自动移除</li>
+<li>当重复声明一个已存在的队列,若声明参数完全匹配现存队列,rabbit什么都不会做并返回成功</li>
+<li>设置<code>queue.declare</code>的<code>passive</code>为<code>true</code>时,如果队列已存在,<code>queue.declare</code>返回成功,如果队列不存在,<code>queue.declare</code>命令不会创建队列而会返回一个错误</li>
+</ul>
+</li>
+</ul>
+<h2 id="应该由生成者还是消费者创建队列呢"><a href="#应该由生成者还是消费者创建队列呢" class="headerlink" title="应该由生成者还是消费者创建队列呢?"></a>应该由生成者还是消费者创建队列呢?</h2><p>假设由消费者创建队列,若生成者先投递消息,此时还没有消费者,这个时候消息会怎么样?当有消费者了并且创建队列了会怎么样?<br>答: 消息会提示发送成功,但是事实上它已经丢失了,即时消费者创建队列了也不能消费之前的发布的消息,最好的做法是消费者和生成者都要尝试创建队列,并且绑定队列和交换器</p>
+<h2 id="生产消息"><a href="#生产消息" class="headerlink" title="生产消息"></a>生产消息</h2><ul>
+<li>AMQP_NOPARAM 无</li>
+<li>AMQP_DURABLE 持久化exchange</li>
+<li>AMQP_PASSIVE 声明一个已存在的交换器的，如果不存在将抛出异常，这个一般用在consume端。因为一般produce端创建,在consume端建议设置成AMQP_PASSIVE,防止consume创建exchange</li>
+<li>AMQP_AUTODELETE 该交换器将在没有消息队列绑定时自动删除</li>
+</ul>
+<h2 id="为什么要用信道channel"><a href="#为什么要用信道channel" class="headerlink" title="为什么要用信道channel"></a>为什么要用信道channel</h2><p>为了减少tcp连接开销,多个通道可以共享tcp连接???</p>
+<h2 id="什么是消息幂等性？"><a href="#什么是消息幂等性？" class="headerlink" title="什么是消息幂等性？"></a>什么是消息幂等性？</h2><p>无论一条消息被消费多少次，消费的结果都是一样的。</p>
+<h2 id="什么是confirm消息确认机制？"><a href="#什么是confirm消息确认机制？" class="headerlink" title="什么是confirm消息确认机制？"></a>什么是confirm消息确认机制？</h2><p>生成者生成消息，Broker收到消息就会给生产者一个应答，生产者接受应答来确认broker是否收到消息。</p>
+<h3 id="如何实现confirm确认消息？"><a href="#如何实现confirm确认消息？" class="headerlink" title="如何实现confirm确认消息？"></a>如何实现confirm确认消息？</h3><ul>
+<li>在Channel上开启确认模式：<code>channel.confirmSelect()</code></li>
+<li>在channel上添加监听：<code>addConfirmListener</code>，监听成功和失败的结果，具体结果对消息进行重新发送或者记录日志。</li>
+</ul>
+<h2 id="如何生成的消息匹配不到队列会怎么样？"><a href="#如何生成的消息匹配不到队列会怎么样？" class="headerlink" title="如何生成的消息匹配不到队列会怎么样？"></a>如何生成的消息匹配不到队列会怎么样？</h2><p>如果<code>Mandatory</code>设置为true，如果找不到队列，则broker会调用<code>basic.return</code>方法将消息返还给生产者;当<code>mandatory</code>设置为false时，出现上述情况broker会直接将消息丢弃;通俗的讲，mandatory标志告诉broker代理服务器至少将消息route到一个队列中，否则就将消息return给发送者;<br><strong>Mandatory设置为true只有在confirm模式有效</strong></p>
+<h3 id="如何获得被return回来的消息？"><a href="#如何获得被return回来的消息？" class="headerlink" title="如何获得被return回来的消息？"></a>如何获得被return回来的消息？</h3><p>通过为channel信道设置<code>ReturnListener</code>监听器来实现</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="keyword">require_once</span> <span class="keyword">__DIR__</span> . <span class="string">&#x27;/vendor/autoload.php&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">use</span> <span class="title">PhpAmqpLib</span>\<span class="title">Connection</span>\<span class="title">AMQPStreamConnection</span>;</span><br><span class="line"><span class="keyword">use</span> <span class="title">PhpAmqpLib</span>\<span class="title">Message</span>\<span class="title">AMQPMessage</span>;</span><br><span class="line"></span><br><span class="line"><span class="variable">$connection</span> = <span class="keyword">new</span> <span class="title class_">AMQPStreamConnection</span>(<span class="string">&#x27;localhost&#x27;</span>, <span class="number">5672</span>, <span class="string">&#x27;guest&#x27;</span>, <span class="string">&#x27;guest&#x27;</span>, <span class="string">&#x27;/&#x27;</span>);</span><br><span class="line"><span class="variable">$channel</span> = <span class="variable">$connection</span>-&gt;<span class="title function_ invoke__">channel</span>();</span><br><span class="line"><span class="variable">$channel</span>-&gt;<span class="title function_ invoke__">set_return_listener</span>(function (<span class="variable">$i</span>,<span class="variable">$msg</span>,<span class="variable">$exchange</span>,<span class="variable">$routeKey</span>,AMQPMessage <span class="variable">$message</span>) &#123;</span><br><span class="line">   <span class="title function_ invoke__">print_r</span>(<span class="variable">$message</span>-&gt;body);</span><br><span class="line">&#125;);</span><br><span class="line"><span class="variable">$channel</span>-&gt;<span class="title function_ invoke__">confirm_select</span>();</span><br><span class="line"><span class="variable">$channel</span>-&gt;<span class="title function_ invoke__">set_ack_handler</span>(function (AMQPMessage <span class="variable">$message</span>) &#123;</span><br><span class="line">    <span class="title function_ invoke__">print_r</span>(<span class="variable">$message</span>-&gt;body);</span><br><span class="line">&#125;);</span><br><span class="line"><span class="variable">$channel</span>-&gt;<span class="title function_ invoke__">exchange_declare</span>(<span class="string">&#x27;hyperf&#x27;</span>, <span class="string">&#x27;topic&#x27;</span>, <span class="literal">true</span>, <span class="literal">true</span>, <span class="literal">false</span>);</span><br><span class="line"><span class="variable">$channel</span>-&gt;<span class="title function_ invoke__">queue_declare</span>(<span class="string">&#x27;kt-test&#x27;</span>, <span class="literal">false</span>, <span class="literal">true</span>, <span class="literal">false</span>, <span class="literal">false</span>);</span><br><span class="line"><span class="variable">$channel</span>-&gt;<span class="title function_ invoke__">queue_bind</span>(<span class="string">&#x27;kt-test&#x27;</span>, <span class="string">&#x27;kt-test&#x27;</span>, <span class="string">&#x27;kt-test&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (<span class="variable">$i</span> = <span class="number">0</span>; <span class="variable">$i</span> &lt; <span class="number">2</span>; <span class="variable">$i</span>++) &#123;</span><br><span class="line">    <span class="variable">$msg</span> = <span class="keyword">new</span> <span class="title class_">AMQPMessage</span>(<span class="string">&#x27;Hello World!&#x27;</span>);</span><br><span class="line">    <span class="comment">//设置一个匹配不到队列的路由键，mandatory设置为true</span></span><br><span class="line">    <span class="variable">$channel</span>-&gt;<span class="title function_ invoke__">basic_publish</span>(<span class="variable">$msg</span>, <span class="string">&#x27;hyperf&#x27;</span>, <span class="string">&#x27;kjfwelf&#x27;</span>,<span class="literal">true</span>); </span><br><span class="line">    <span class="keyword">echo</span> <span class="string">&quot; [x] Sent &#x27;Hello World!&#x27;\n&quot;</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="variable">$channel</span>-&gt;<span class="title function_ invoke__">wait_for_pending_acks_returns</span>(<span class="number">10</span>); <span class="comment">//等待</span></span><br><span class="line"><span class="variable">$channel</span>-&gt;<span class="title function_ invoke__">close</span>();</span><br><span class="line"><span class="variable">$connection</span>-&gt;<span class="title function_ invoke__">close</span>();</span><br></pre></td></tr></table></figure>
+
+<h2 id="什么是消费端的限流？"><a href="#什么是消费端的限流？" class="headerlink" title="什么是消费端的限流？"></a>什么是消费端的限流？</h2><p>rabbitMQ提供了一种<code>qos</code>的功能，即非自动确认消息的前提下，如果有一定数目的消息（通过consumer或者Channel设置qos）未被确认，不进行新的消费。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$channel</span>-&gt;<span class="title function_ invoke__">basic_qos</span>(<span class="variable">$prefetch_size</span>, <span class="variable">$prefetch_count</span>, <span class="variable">$a_global</span>);</span><br></pre></td></tr></table></figure>
+<ul>
+<li>prefetchSize:0 单条消息的大小限制。0就是不限制，一般都是不限制。</li>
+<li>prefetchCount: 设置一个固定的值，一旦有N个消息还没有ack，则consumer将block掉，直到有消息ack</li>
+<li>global：是否将上面的设置用于channel，也是就是说上面设置的限制是用于channel级别的还是consumer的级别的。</li>
+</ul>
+<h2 id="什么是TTL队列-x2F-消息？"><a href="#什么是TTL队列-x2F-消息？" class="headerlink" title="什么是TTL队列&#x2F;消息？"></a>什么是TTL队列&#x2F;消息？</h2><ul>
+<li>支持消息的过期时间，在消息发送时可以指定。</li>
+<li>支持队列过期时间，在消息入队列开始计算时间，只要超过了队列的超时时间配置，那么消息就会自动的清除。</li>
+</ul>
+<h2 id="什么是死信队列？"><a href="#什么是死信队列？" class="headerlink" title="什么是死信队列？"></a>什么是死信队列？</h2><p>死信队列：DLX，Dead-Letter-Exchange</p>
+<h3 id="消息变为死信的几种情况："><a href="#消息变为死信的几种情况：" class="headerlink" title="消息变为死信的几种情况："></a>消息变为死信的几种情况：</h3><ul>
+<li>消息被拒绝（basic.reject&#x2F;basic.nack）同时requeue&#x3D;false（不重回队列）</li>
+<li>TTL过期</li>
+<li>队列达到最大长度<br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/Zhangcsc/p/11739754.html">https://www.cnblogs.com/Zhangcsc/p/11739754.html</a><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="keyword">require_once</span> <span class="keyword">__DIR__</span> . <span class="string">&#x27;/vendor/autoload.php&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">use</span> <span class="title">PhpAmqpLib</span>\<span class="title">Connection</span>\<span class="title">AMQPStreamConnection</span>;</span><br><span class="line"><span class="keyword">use</span> <span class="title">PhpAmqpLib</span>\<span class="title">Message</span>\<span class="title">AMQPMessage</span>;</span><br><span class="line"><span class="keyword">use</span> <span class="title">PhpAmqpLib</span>\<span class="title">Wire</span>\<span class="title">AMQPTable</span>;</span><br><span class="line"></span><br><span class="line"><span class="variable">$connection</span> = <span class="keyword">new</span> <span class="title class_">AMQPStreamConnection</span>(<span class="string">&#x27;localhost&#x27;</span>, <span class="number">5672</span>, <span class="string">&#x27;guest&#x27;</span>, <span class="string">&#x27;guest&#x27;</span>, <span class="string">&#x27;/&#x27;</span>);</span><br><span class="line"><span class="variable">$channel</span> = <span class="variable">$connection</span>-&gt;<span class="title function_ invoke__">channel</span>();</span><br><span class="line"></span><br><span class="line"><span class="variable">$args</span> = <span class="keyword">new</span> <span class="title class_">AMQPTable</span>();</span><br><span class="line"><span class="comment">// 消息过期方式：设置 queue.normal 队列中的消息10s之后过期</span></span><br><span class="line"><span class="variable">$args</span>-&gt;<span class="title function_ invoke__">set</span>(<span class="string">&#x27;x-message-ttl&#x27;</span>, <span class="number">3000</span>);</span><br><span class="line"><span class="comment">// 设置队列最大长度方式： x-max-length</span></span><br><span class="line"><span class="comment">//$args-&gt;set(&#x27;x-max-length&#x27;, 1);</span></span><br><span class="line"><span class="variable">$args</span>-&gt;<span class="title function_ invoke__">set</span>(<span class="string">&#x27;x-dead-letter-exchange&#x27;</span>, <span class="string">&#x27;exchange.dlx&#x27;</span>);</span><br><span class="line"><span class="variable">$args</span>-&gt;<span class="title function_ invoke__">set</span>(<span class="string">&#x27;x-dead-letter-routing-key&#x27;</span>, <span class="string">&#x27;routingkey&#x27;</span>);</span><br><span class="line"><span class="variable">$channel</span>-&gt;<span class="title function_ invoke__">exchange_declare</span>(<span class="string">&#x27;exchange.dlx&#x27;</span>, <span class="string">&#x27;direct&#x27;</span>, <span class="literal">false</span>, <span class="literal">true</span>);</span><br><span class="line"><span class="variable">$channel</span>-&gt;<span class="title function_ invoke__">queue_declare</span>(<span class="string">&#x27;queue.dlx&#x27;</span>, <span class="literal">false</span>, <span class="literal">true</span>, <span class="literal">false</span>, <span class="literal">false</span>);</span><br><span class="line"><span class="variable">$channel</span>-&gt;<span class="title function_ invoke__">queue_bind</span>(<span class="string">&#x27;queue.dlx&#x27;</span>, <span class="string">&#x27;exchange.dlx&#x27;</span>, <span class="string">&#x27;routingkey&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="variable">$channel</span>-&gt;<span class="title function_ invoke__">exchange_declare</span>(<span class="string">&#x27;hyperf&#x27;</span>, <span class="string">&#x27;topic&#x27;</span>, <span class="literal">true</span>, <span class="literal">true</span>, <span class="literal">false</span>);</span><br><span class="line"><span class="variable">$channel</span>-&gt;<span class="title function_ invoke__">queue_declare</span>(<span class="string">&#x27;test-ttl&#x27;</span>, <span class="literal">false</span>, <span class="literal">true</span>, <span class="literal">false</span>, <span class="literal">false</span>,<span class="literal">false</span>,<span class="variable">$args</span>);</span><br><span class="line"><span class="variable">$channel</span>-&gt;<span class="title function_ invoke__">queue_bind</span>(<span class="string">&#x27;test-ttl&#x27;</span>, <span class="string">&#x27;hyperf&#x27;</span>, <span class="string">&#x27;kt-test&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (<span class="variable">$i</span> = <span class="number">0</span>; <span class="variable">$i</span> &lt; <span class="number">2</span>; <span class="variable">$i</span>++) &#123;</span><br><span class="line">    <span class="variable">$msg</span> = <span class="keyword">new</span> <span class="title class_">AMQPMessage</span>(<span class="string">&#x27;Hello World!&#x27;</span>);</span><br><span class="line">    <span class="comment">//设置一个匹配不到队列的路由键，mandatory设置为true</span></span><br><span class="line">    <span class="variable">$channel</span>-&gt;<span class="title function_ invoke__">basic_publish</span>(<span class="variable">$msg</span>, <span class="string">&#x27;hyperf&#x27;</span>, <span class="string">&#x27;kt-test&#x27;</span>,<span class="literal">false</span>);</span><br><span class="line">    <span class="keyword">echo</span> <span class="string">&quot; [x] Sent &#x27;Hello World!&#x27;\n&quot;</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="variable">$channel</span>-&gt;<span class="title function_ invoke__">close</span>();</span><br><span class="line"><span class="variable">$connection</span>-&gt;<span class="title function_ invoke__">close</span>();</span><br></pre></td></tr></table></figure></li>
+</ul>
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="https://timmy6.github.io/2020/07/05/rabbitmq%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C/" title="rabbitmq基本操作" target="_blank" rel="external">https://timmy6.github.io/2020/07/05/rabbitmq基本操作/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/timmy6" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/avatar.jpg" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/timmy6" target="_blank"><span class="text-dark">刘启明</span><small class="ml-1x">Go Developer</small></a></h3>
+        <div>很高兴认识你。</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    
+    <li class="next">
+      <a href="/2020/06/02/%E5%BE%AE%E6%9C%8D%E5%8A%A1/" title="微服务"><span>下一篇&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+    <li class="toggle-toc">
+      <a class="toggle-btn " data-toggle="collapse" href="#collapseToc" aria-expanded="false" title="文章目录" role="button">    <span>[&nbsp;</span><span>文章目录</span>
+        <i class="text-collapsed icon icon-anchor"></i>
+        <i class="text-in icon icon-close"></i>
+        <span>]</span>
+      </a>
+    </li>
+    
+  </ul>
+  
+  
+  <!-- Button trigger modal -->
+  <button type="button" class="btn btn-fancy btn-donate pop-onhover bg-gradient-warning" data-toggle="modal" data-target="#donateModal"><span>赏</span></button>
+  <!-- <div class="wave-icon wave-icon-danger btn-donate" data-toggle="modal" data-target="#donateModal">
+    <div class="wave-circle"><span class="icon"><i class="icon icon-bill"></i></span></div>
+  </div> -->
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div>
+  </div>
+</nav>
+  
+<!-- Modal -->
+<div class="modal modal-center modal-small modal-xs-full fade" id="donateModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content donate">
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      <div class="modal-body">
+        <div class="donate-box">
+          <div class="donate-head">
+            <p>感谢您的支持，我会继续努力的!</p>
+          </div>
+          <div class="tab-content">
+            <div role="tabpanel" class="tab-pane fade active in" id="alipay">
+              <div class="donate-payimg">
+                <img src="/images/donate/alipayimg.png" alt="扫码支持" title="扫一扫" />
+              </div>
+              <p class="text-muted mv">扫码打赏，你说多少就多少</p>
+              <p class="text-grey">打开支付宝扫一扫，即可进行扫码打赏哦</p>
+            </div>
+            <div role="tabpanel" class="tab-pane fade" id="wechatpay">
+              <div class="donate-payimg">
+                <img src="/images/donate/wechatpayimg.png" alt="扫码支持" title="扫一扫" />
+              </div>
+              <p class="text-muted mv">扫码打赏，你说多少就多少</p>
+              <p class="text-grey">打开微信扫一扫，即可进行扫码打赏哦</p>
+            </div>
+          </div>
+          <div class="donate-footer">
+            <ul class="nav nav-tabs nav-justified" role="tablist">
+              <li role="presentation" class="active">
+                <a href="#alipay" id="alipay-tab" role="tab" data-toggle="tab" aria-controls="alipay" aria-expanded="true"><i class="icon icon-alipay"></i> 支付宝</a>
+              </li>
+              <li role="presentation" class="">
+                <a href="#wechatpay" role="tab" id="wechatpay-tab" data-toggle="tab" aria-controls="wechatpay" aria-expanded="false"><i class="icon icon-wepay"></i> 微信支付</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+</main>
+
+  <footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/timmy6" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://weibo.com/u/3917867123" target="_blank" title="Weibo" data-toggle=tooltip data-placement=top><i class="icon icon-weibo"></i></a></li>
+        
+    </ul>
+
+    <div class="copyright">
+    	
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+
+<script src="/js/plugin.min.js"></script>
+
+
+<script src="/js/application.js"></script>
+
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+
+
+
+
+   
+
+
+
+
+   
+    
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: '4737d1ihG9bSORDvOhg93sGV-gzGzoHsz',
+    appKey: 'G7fMbInGD0wzoXGMQvF5RIHt',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: false
+  });
+  </script>
+
+     
+
+
+
+
+
+
+
+</body>
+</html>

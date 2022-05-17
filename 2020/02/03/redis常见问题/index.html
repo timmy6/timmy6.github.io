@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000" />
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top" />
+  
+  
+  <title>redis常见问题 | 刘启明的blog</title>
+  <meta name="description" content="参考 https:&#x2F;&#x2F;www.cnblogs.com&#x2F;jasontec&#x2F;p&#x2F;9699242.html https:&#x2F;&#x2F;zhuanlan.zhihu.com&#x2F;p&#x2F;79778696  使用过Redis分布式锁么，它是怎么实现的？redis的分布式锁主要使用set命令的nx选项抢占锁，以及ex设置过期时间，先nx获得锁并且设置过期时间，这两个过程是原子性的，中间不会被其他命令打断；另外防止锁超时过期误删">
+<meta property="og:type" content="article">
+<meta property="og:title" content="redis常见问题">
+<meta property="og:url" content="https://timmy6.github.io/2020/02/03/redis%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="参考 https:&#x2F;&#x2F;www.cnblogs.com&#x2F;jasontec&#x2F;p&#x2F;9699242.html https:&#x2F;&#x2F;zhuanlan.zhihu.com&#x2F;p&#x2F;79778696  使用过Redis分布式锁么，它是怎么实现的？redis的分布式锁主要使用set命令的nx选项抢占锁，以及ex设置过期时间，先nx获得锁并且设置过期时间，这两个过程是原子性的，中间不会被其他命令打断；另外防止锁超时过期误删">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-02-03T14:15:10.000Z">
+<meta property="article:modified_time" content="2022-05-17T06:30:07.515Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+  <!-- Canonical links -->
+  <link rel="canonical" href="https://timmy6.github.io/2020/02/03/redis%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98/index.html">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png" type="image/x-icon">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+  
+  
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+
+<body class="main-center" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/timmy6" target="_blank">
+          <img class="img-circle img-rotate" src="/images/avatar.jpg" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">刘启明</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">Go Developer</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> Changsha, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="搜索" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="想要查找什么..." x-webkit-speech />
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav ">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">首页</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">归档</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">分类</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags">
+            
+            <i class="icon icon-tags"></i>
+            
+            <span class="menu-title">标签</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-repository">
+          <a href="/repository">
+            
+            <i class="icon icon-project"></i>
+            
+            <span class="menu-title">项目</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-books">
+          <a href="/books">
+            
+            <i class="icon icon-book-fill"></i>
+            
+            <span class="menu-title">书单</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-links">
+          <a href="/links">
+            
+            <i class="icon icon-friendship"></i>
+            
+            <span class="menu-title">友链</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about">
+            
+            <i class="icon icon-cup-fill"></i>
+            
+            <span class="menu-title">关于</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/timmy6" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://weibo.com/u/3917867123" target="_blank" title="Weibo" data-toggle=tooltip data-placement=top><i class="icon icon-weibo"></i></a></li>
+        
+    </ul>
+
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">公告</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>欢迎交流与分享经验!</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget-body">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Go%E5%BC%80%E5%8F%91/">Go开发</a><span class="category-list-count">37</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Linux/">Linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/MySql/">MySql</a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/rabbitmq/">rabbitmq</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/redis/">redis</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%BE%AE%E6%9C%8D%E5%8A%A1/">微服务</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/">数据结构与算法</a><span class="category-list-count">2</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget-body">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Go%E5%9F%BA%E7%A1%80/" rel="tag">Go基础</a><span class="tag-list-count">25</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gRPC/" rel="tag">gRPC</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gin%E6%A1%86%E6%9E%B6/" rel="tag">gin框架</a><span class="tag-list-count">9</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/" rel="tag">redis</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/" rel="tag">常用命令</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93%E4%BC%98%E5%8C%96/" rel="tag">数据库优化</a><span class="tag-list-count">8</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget-body tagcloud">
+      <a href="/tags/Go%E5%9F%BA%E7%A1%80/" style="font-size: 14px;">Go基础</a> <a href="/tags/gRPC/" style="font-size: 13.25px;">gRPC</a> <a href="/tags/gin%E6%A1%86%E6%9E%B6/" style="font-size: 13.75px;">gin框架</a> <a href="/tags/redis/" style="font-size: 13px;">redis</a> <a href="/tags/%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/" style="font-size: 13px;">常用命令</a> <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93%E4%BC%98%E5%8C%96/" style="font-size: 13.5px;">数据库优化</a>
+    </div>
+  </div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/07/">七月 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/06/">六月 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/05/">五月 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/04/">四月 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/03/">三月 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/02/">二月 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/01/">一月 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">十二月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">十一月 2019</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">十月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">九月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">八月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">七月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">六月 2019</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">五月 2019</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/04/">四月 2019</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">三月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">十一月 2018</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">十月 2018</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a><span class="archive-list-count">5</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget-body">
+      <ul class="recent-post-list list-unstyled no-thumbnail">
+        
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/rabbitmq/">rabbitmq</a>
+              </p>
+              <p class="item-title">
+                <a href="/2020/07/05/rabbitmq%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C/" class="title">rabbitmq基本操作</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2020-07-05T14:15:10.000Z" itemprop="datePublished">2020-07-05</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E5%BE%AE%E6%9C%8D%E5%8A%A1/">微服务</a>
+              </p>
+              <p class="item-title">
+                <a href="/2020/06/02/%E5%BE%AE%E6%9C%8D%E5%8A%A1/" class="title">微服务</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2020-06-02T14:15:10.000Z" itemprop="datePublished">2020-06-02</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/">数据结构与算法</a>
+              </p>
+              <p class="item-title">
+                <a href="/2020/05/20/%E7%A8%8B%E5%BA%8F%E5%B8%B8%E7%94%A8%E7%AE%97%E6%B3%95/" class="title">程序常用算法</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2020-05-20T15:15:10.000Z" itemprop="datePublished">2020-05-20</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/">数据结构与算法</a>
+              </p>
+              <p class="item-title">
+                <a href="/2020/05/10/%E9%93%BE%E8%A1%A8/" class="title">链表</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2020-05-10T15:15:10.000Z" itemprop="datePublished">2020-05-10</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/redis/">redis</a>
+              </p>
+              <p class="item-title">
+                <a href="/2020/04/12/redis%E6%9E%B6%E6%9E%84%E6%A8%A1%E5%BC%8F/" class="title">redis架构模式</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2020-04-12T14:15:10.000Z" itemprop="datePublished">2020-04-12</time>
+              </p>
+            </div>
+          </li>
+          
+      </ul>
+    </div>
+  </div>
+  
+
+    
+  </div>
+</aside>
+
+  
+  
+  <aside class="sidebar sidebar-toc collapse   in  " id="collapseToc" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    <nav id="toc" class="article-toc">
+      <h3 class="toc-title">文章目录</h3>
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%82%E8%80%83"><span class="toc-number">1.</span> <span class="toc-text">参考</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8%E8%BF%87Redis%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81%E4%B9%88%EF%BC%8C%E5%AE%83%E6%98%AF%E6%80%8E%E4%B9%88%E5%AE%9E%E7%8E%B0%E7%9A%84%EF%BC%9F"><span class="toc-number">2.</span> <span class="toc-text">使用过Redis分布式锁么，它是怎么实现的？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E4%B8%80%E8%87%B4%E6%80%A7%E5%93%88%E5%B8%8C%E7%AE%97%E6%B3%95%EF%BC%9F%E4%BB%80%E4%B9%88%E6%98%AF%E5%93%88%E5%B8%8C%E6%A7%BD%EF%BC%9F"><span class="toc-number">3.</span> <span class="toc-text">什么是一致性哈希算法？什么是哈希槽？</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="toc-number">3.1.</span> <span class="toc-text">解决方案</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#redis%E9%9B%86%E7%BE%A4%E5%93%88%E5%B8%8C%E6%A7%BD"><span class="toc-number">4.</span> <span class="toc-text">redis集群哈希槽</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8%E8%BF%87Redis%E5%81%9A%E5%BC%82%E6%AD%A5%E9%98%9F%E5%88%97%E4%B9%88%EF%BC%8C%E4%BD%A0%E6%98%AF%E6%80%8E%E4%B9%88%E7%94%A8%E7%9A%84%EF%BC%9F%E6%9C%89%E4%BB%80%E4%B9%88%E7%BC%BA%E7%82%B9%EF%BC%9F"><span class="toc-number">5.</span> <span class="toc-text">使用过Redis做异步队列么，你是怎么用的？有什么缺点？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E7%BC%93%E5%AD%98%E7%A9%BF%E9%80%8F%EF%BC%9F%E5%A6%82%E4%BD%95%E9%81%BF%E5%85%8D%EF%BC%9F%E4%BB%80%E4%B9%88%E6%98%AF%E7%BC%93%E5%AD%98%E9%9B%AA%E5%B4%A9%EF%BC%9F%E4%BD%95%E5%A6%82%E9%81%BF%E5%85%8D%EF%BC%9F"><span class="toc-number">6.</span> <span class="toc-text">什么是缓存穿透？如何避免？什么是缓存雪崩？何如避免？</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BC%93%E5%AD%98%E7%A9%BF%E9%80%8F"><span class="toc-number">6.1.</span> <span class="toc-text">缓存穿透</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BC%93%E5%AD%98%E9%9B%AA%E5%B4%A9"><span class="toc-number">6.2.</span> <span class="toc-text">缓存雪崩</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Redis%E7%9A%84%E5%AD%97%E5%85%B8%E6%98%AF%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0%E7%9A%84%EF%BC%9F%E7%AE%80%E8%BF%B0%E6%B8%90%E8%BF%9B%E5%BC%8Frehash%E7%9A%84%E8%BF%87%E7%A8%8B%EF%BC%9F"><span class="toc-number">7.</span> <span class="toc-text">Redis的字典是如何实现的？简述渐进式rehash的过程？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Redis%E4%BA%8B%E5%8A%A1%E6%98%AF%E6%80%8E%E4%B9%88%E6%A0%B7%E7%9A%84%EF%BC%9F"><span class="toc-number">8.</span> <span class="toc-text">Redis事务是怎么样的？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%9B%86%E7%BE%A4%E5%8F%AF%E4%BB%A5%E4%BD%BF%E7%94%A8lua%E8%84%9A%E6%9C%AC%E5%90%97%EF%BC%9F"><span class="toc-number">9.</span> <span class="toc-text">集群可以使用lua脚本吗？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Redis%E7%9A%84%E5%A4%9A%E6%95%B0%E6%8D%AE%E5%BA%93%E6%9C%BA%E5%88%B6%EF%BC%8C%E4%BA%86%E8%A7%A3%E5%A4%9A%E5%B0%91%EF%BC%9F"><span class="toc-number">10.</span> <span class="toc-text">Redis的多数据库机制，了解多少？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%B0%88%E8%B0%88%E4%BD%A0%E5%AF%B9%E5%88%86%E5%B8%83%E5%BC%8F%E5%92%8C%E9%9B%86%E7%BE%A4%EF%BC%8C%E5%BE%AE%E6%9C%8D%E5%8A%A1%E7%9A%84%E7%90%86%E8%A7%A3%EF%BC%9F%E4%B8%A4%E5%88%99%E4%B9%8B%E9%97%B4%E6%9C%89%E4%BB%80%E4%B9%88%E5%85%B3%E7%B3%BB%EF%BC%9F"><span class="toc-number">11.</span> <span class="toc-text">谈谈你对分布式和集群，微服务的理解？两则之间有什么关系？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#redis%E9%9B%86%E7%BE%A4%E6%9C%89%E4%BB%80%E4%B9%88%E9%99%90%E5%88%B6"><span class="toc-number">12.</span> <span class="toc-text">redis集群有什么限制</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%81%87%E5%A6%82Redis%E9%87%8C%E9%9D%A2%E6%9C%891%E4%BA%BF%E4%B8%AAkey%EF%BC%8C%E5%85%B6%E4%B8%AD%E6%9C%8910w%E4%B8%AAkey%E6%98%AF%E4%BB%A5%E6%9F%90%E4%B8%AA%E5%9B%BA%E5%AE%9A%E7%9A%84%E5%B7%B2%E7%9F%A5%E7%9A%84%E5%89%8D%E7%BC%80%E5%BC%80%E5%A4%B4%E7%9A%84%EF%BC%8C%E5%A6%82%E6%9E%9C%E5%B0%86%E5%AE%83%E4%BB%AC%E5%85%A8%E9%83%A8%E6%89%BE%E5%87%BA%E6%9D%A5%EF%BC%9F"><span class="toc-number">13.</span> <span class="toc-text">假如Redis里面有1亿个key，其中有10w个key是以某个固定的已知的前缀开头的，如果将它们全部找出来？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#bgsave%E7%9A%84%E5%8E%9F%E7%90%86%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="toc-number">14.</span> <span class="toc-text">bgsave的原理是什么？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Pipeline%E6%9C%89%E4%BB%80%E4%B9%88%E5%A5%BD%E5%A4%84%EF%BC%8C%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E7%94%A8pipeline%EF%BC%9F"><span class="toc-number">15.</span> <span class="toc-text">Pipeline有什么好处，为什么要用pipeline？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Redis%E7%9A%84%E5%90%8C%E6%AD%A5%E6%9C%BA%E5%88%B6%E4%BA%86%E8%A7%A3%E4%B9%88%EF%BC%9F"><span class="toc-number">16.</span> <span class="toc-text">Redis的同步机制了解么？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%98%AF%E5%90%A6%E4%BD%BF%E7%94%A8%E8%BF%87Redis%E9%9B%86%E7%BE%A4%EF%BC%8C%E9%9B%86%E7%BE%A4%E7%9A%84%E5%8E%9F%E7%90%86%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="toc-number">17.</span> <span class="toc-text">是否使用过Redis集群，集群的原理是什么？</span></a></li></ol>
+    </nav>
+  </div>
+</aside>
+
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-redis常见问题" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      redis常见问题
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/2020/02/03/redis%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98/" class="article-date">
+	  <time datetime="2020-02-03T14:15:10.000Z" itemprop="datePublished">2020-02-03</time>
+	</a>
+</span>
+        
+  <span class="article-category">
+    <i class="icon icon-folder"></i>
+    <a class="article-category-link" href="/categories/redis/">redis</a>
+  </span>
+
+        
+
+        
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2020/02/03/redis%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98/#comments" class="article-comment-link">评论</a></span>
+        
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/jasontec/p/9699242.html">https://www.cnblogs.com/jasontec/p/9699242.html</a></li>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/79778696">https://zhuanlan.zhihu.com/p/79778696</a></li>
+</ul>
+<h2 id="使用过Redis分布式锁么，它是怎么实现的？"><a href="#使用过Redis分布式锁么，它是怎么实现的？" class="headerlink" title="使用过Redis分布式锁么，它是怎么实现的？"></a>使用过Redis分布式锁么，它是怎么实现的？</h2><p>redis的分布式锁主要使用<code>set</code>命令的<code>nx</code>选项抢占锁，以及<code>ex</code>设置过期时间，先nx获得锁并且设置过期时间，这两个过程是原子性的，中间不会被其他命令打断；<br>另外防止锁超时过期误删锁，一般使用<code>set</code>获得锁时会设置一个唯一值，释放锁的时候需要匹配一下两个值是否一致</p>
+<h2 id="什么是一致性哈希算法？什么是哈希槽？"><a href="#什么是一致性哈希算法？什么是哈希槽？" class="headerlink" title="什么是一致性哈希算法？什么是哈希槽？"></a>什么是一致性哈希算法？什么是哈希槽？</h2><p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/6ad87a1f070e">https://www.jianshu.com/p/6ad87a1f070e</a></p>
+<p>redis 的 custer 提供了两个功能：</p>
+<ul>
+<li>自动对数据分片，落到各个节点上</li>
+<li>即使集群部分节点失效或者连接不上，依然可以继续处理命令</li>
+</ul>
+<p>普通哈希算法是<code>hash(key)%number</code>对数量进行取余获得key所在节点位置，如果改变数量会导致原有节点上的数据发生变化；</p>
+<p>在一致性哈希算法中，整个哈希空间是一个虚拟圆环。 对节点取哈希值，然后分配到哈希环上。对某个值进行搜索的时候按顺时针搜索找到key第一个存在的节点，即使发生节点数据变化，也只是影响一小部分区间的数据；</p>
+<p>一致性哈希算法对于容错性和扩展性有非常好的支持。但一致性哈希算法也有一个严重的问题，就是数据倾斜。</p>
+<h3 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h3><ul>
+<li>对每个真实节点增加多个虚拟节点，然后维护一个虚拟节点和真实节点的映射关系表；（即环上都是）<a target="_blank" rel="noopener" href="https://geektutu.com/post/geecache-day4.html">https://geektutu.com/post/geecache-day4.html</a></li>
+<li>rredis 集群（cluster）并没有选用上面一致性哈希，而是采用了哈希槽（slot）的这种概念。每个redis节点会维护一部分槽以及槽上的数据，总的槽大概一万六千多，槽可以均匀分布在多个节点</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">docker run --<span class="built_in">rm</span> --net=host --name redis-manager  \</span><br><span class="line">-e DATASOURCE_DATABASE=<span class="string">&#x27;redis_manager&#x27;</span> \</span><br><span class="line">-e DATASOURCE_URL=<span class="string">&#x27;jdbc:mysql://127.0.0.1:3306/redis_manager?useUnicode=true&amp;characterEncoding=utf-8&amp;serverTimezone=GMT%2b8&#x27;</span> \</span><br><span class="line">-e DATASOURCE_USERNAME=<span class="string">&#x27;root&#x27;</span> \</span><br><span class="line">-e DATASOURCE_PASSWORD=<span class="string">&#x27;123456&#x27;</span> \</span><br><span class="line">reasonduan/redis-manager</span><br></pre></td></tr></table></figure>
+
+
+
+<p><a target="_blank" rel="noopener" href="https://www.fengpt.cn/archives/redis%E9%9B%86%E7%BE%A4%E5%9C%A8%E6%9F%A5%E6%89%BEkey%E7%9A%84%E6%97%B6%E5%80%99%E6%98%AF%E5%A6%82%E4%BD%95%E8%B7%AF%E7%94%B1%E7%9A%84">https://www.fengpt.cn/archives/redis%E9%9B%86%E7%BE%A4%E5%9C%A8%E6%9F%A5%E6%89%BEkey%E7%9A%84%E6%97%B6%E5%80%99%E6%98%AF%E5%A6%82%E4%BD%95%E8%B7%AF%E7%94%B1%E7%9A%84</a></p>
+<h2 id="redis集群哈希槽"><a href="#redis集群哈希槽" class="headerlink" title="redis集群哈希槽"></a>redis集群哈希槽</h2><p>redis cluster 包含了16384个哈希槽，每个 key 通过计算后都会落在具体一个槽位上，而这个槽位是属于哪个存储节点的，则由用户自己定义分配。例如机器硬盘小的，可以分配少一点槽位，硬盘大的可以分配多一点。如果节点硬盘都差不多则可以平均分配。所以哈希槽这种概念很好地解决了一致性哈希的弊端。</p>
+<p>在容错性和扩展性上，redis对槽位的转移，把故障节点负责的槽位转移到其他正常的节点上。 </p>
+<p>但一定要注意的是，对于槽位的转移和分派，redis 集群是不会自动进行的，而是需要人工配置的。所以 redis 集群的高可用是依赖于节点的主从复制与主从间的自动故障转移。</p>
+<h2 id="使用过Redis做异步队列么，你是怎么用的？有什么缺点？"><a href="#使用过Redis做异步队列么，你是怎么用的？有什么缺点？" class="headerlink" title="使用过Redis做异步队列么，你是怎么用的？有什么缺点？"></a>使用过Redis做异步队列么，你是怎么用的？有什么缺点？</h2><p>可以是使用<code>blpop</code>和<code>rpush</code>，<code>blpop</code>会移除列表头部元素，如果列表没有元素会阻塞直到等待超时或发现元素为止，<code>rpush</code>从尾部写入数据；缺点如下：</p>
+<ul>
+<li>消息容易丢失</li>
+<li>消息分发策略没有专业的mq丰富，例如kafka的分区，rabbitmq的路由键等等</li>
+</ul>
+<h2 id="什么是缓存穿透？如何避免？什么是缓存雪崩？何如避免？"><a href="#什么是缓存穿透？如何避免？什么是缓存雪崩？何如避免？" class="headerlink" title="什么是缓存穿透？如何避免？什么是缓存雪崩？何如避免？"></a>什么是缓存穿透？如何避免？什么是缓存雪崩？何如避免？</h2><h3 id="缓存穿透"><a href="#缓存穿透" class="headerlink" title="缓存穿透"></a>缓存穿透</h3><p>一般缓存系统会先查缓存，值不存在的时候再查数据库；一些恶意的请求会故意查询不存在的key,请求量很大，就会对后端系统造成很大的压力。这就叫做缓存穿透。如何避免？</p>
+<ul>
+<li>对查询结果为空的情况也进行缓存，缓存时间设置短一点</li>
+<li>对一定不存在的key进行过滤，可以把所有的可能存在的key放到一个大的Bitmap中，查询时通过该bitmap过滤（布尔过滤器）<h3 id="缓存雪崩"><a href="#缓存雪崩" class="headerlink" title="缓存雪崩"></a>缓存雪崩</h3>当缓存服务器重启或者大量缓存集中在某一个时间段失效，这样在失效的时候，会给后端系统带来很大压力。导致系统崩溃。如何避免？</li>
+<li>在缓存失效后，通过加锁或者队列来控制读数据库写缓存的线程数量</li>
+<li>不同的key，设置不同的过期时间，让缓存失效的时间点尽量均匀。</li>
+</ul>
+<h2 id="Redis的字典是如何实现的？简述渐进式rehash的过程？"><a href="#Redis的字典是如何实现的？简述渐进式rehash的过程？" class="headerlink" title="Redis的字典是如何实现的？简述渐进式rehash的过程？"></a>Redis的字典是如何实现的？简述渐进式rehash的过程？</h2><p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/e2697fecac0d">https://www.jianshu.com/p/e2697fecac0d</a><br><a target="_blank" rel="noopener" href="https://www.cnblogs.com/neooelric/p/9621736.html">https://www.cnblogs.com/neooelric/p/9621736.html</a></p>
+<h2 id="Redis事务是怎么样的？"><a href="#Redis事务是怎么样的？" class="headerlink" title="Redis事务是怎么样的？"></a>Redis事务是怎么样的？</h2><p>redis的事务是通过mutil实现的，mutil开始一个事务，然后将多个命令入队到事务中，最后执行exec命令触发事务。redis的事务有一些不足：</p>
+<ul>
+<li>事务可以理解为一个打包的批量执行脚本，但批量指令并非原子化的操作，中间某条指令的失败不会导致前面已做指令的回滚，也不会造成后续的指令不做</li>
+<li>同的key是有可能分配在不同的Redis节点上的，在这种情况下Redis的事务机制是不生效的</li>
+</ul>
+<h2 id="集群可以使用lua脚本吗？"><a href="#集群可以使用lua脚本吗？" class="headerlink" title="集群可以使用lua脚本吗？"></a>集群可以使用lua脚本吗？</h2><p>不可以，除非key在同一个redis节点上，可以使用<code>&#123;hash_tag&#125;</code>来是不同的key落到同一个节点上</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&gt; CLUSTER KEYSLOT somekey</span><br><span class="line">11058</span><br><span class="line">&gt; CLUSTER KEYSLOT foo&#123;hash_tag&#125;</span><br><span class="line">(<span class="built_in">integer</span>) 2515</span><br><span class="line">&gt; CLUSTER KEYSLOT bar&#123;hash_tag&#125;</span><br><span class="line">(<span class="built_in">integer</span>) 2515</span><br></pre></td></tr></table></figure>
+<p>keySlot算法中，如果key包含{}，就会使用第一个{}内部的字符串作为hash key，这样就可以保证拥有同样{}内部字符串的key就会拥有相同slot</p>
+<h2 id="Redis的多数据库机制，了解多少？"><a href="#Redis的多数据库机制，了解多少？" class="headerlink" title="Redis的多数据库机制，了解多少？"></a>Redis的多数据库机制，了解多少？</h2><p>单机版有16个数据库，每个数据库的数据相互隔离，集群版只有一个数据库</p>
+<h2 id="谈谈你对分布式和集群，微服务的理解？两则之间有什么关系？"><a href="#谈谈你对分布式和集群，微服务的理解？两则之间有什么关系？" class="headerlink" title="谈谈你对分布式和集群，微服务的理解？两则之间有什么关系？"></a>谈谈你对分布式和集群，微服务的理解？两则之间有什么关系？</h2><ul>
+<li>分布式是将一个业务拆分多个子业务，多个子业务可以部署不同机器上面，子业务之间通过rpc或消息中间件或其他方式进行通信，如果有一个子业务不可用，那么整个业务就不可用</li>
+<li>微服务是将一个业务拆分多个子业务，多个子业务可以部署在不同机器或统一机器上面（和分布式的区别）。</li>
+<li>集群是同一个业务部署到多个机器上面，比如用nginx做负载均衡。</li>
+<li>分布式下每个子业务都可以做集群，分布式和微服务类似，只是部署方式不一样</li>
+</ul>
+<h2 id="redis集群有什么限制"><a href="#redis集群有什么限制" class="headerlink" title="redis集群有什么限制"></a>redis集群有什么限制</h2><ul>
+<li>不能批量处理key</li>
+<li>不支持事务，多数据库</li>
+<li>一些大的键值对象不能映射到不同的节点上</li>
+</ul>
+<h2 id="假如Redis里面有1亿个key，其中有10w个key是以某个固定的已知的前缀开头的，如果将它们全部找出来？"><a href="#假如Redis里面有1亿个key，其中有10w个key是以某个固定的已知的前缀开头的，如果将它们全部找出来？" class="headerlink" title="假如Redis里面有1亿个key，其中有10w个key是以某个固定的已知的前缀开头的，如果将它们全部找出来？"></a>假如Redis里面有1亿个key，其中有10w个key是以某个固定的已知的前缀开头的，如果将它们全部找出来？</h2><ul>
+<li>使用keys 指定模式可以获得key列表</li>
+<li>因为redis是单线程模式，使用keys命令会导致线程阻塞一段时间，线上服务会停顿，直到命令执行完毕才能恢复</li>
+<li>可以用scan命令，无阻塞的，但是会有一定的重复概率</li>
+</ul>
+<h2 id="bgsave的原理是什么？"><a href="#bgsave的原理是什么？" class="headerlink" title="bgsave的原理是什么？"></a>bgsave的原理是什么？</h2><p>fork是指redis通过创建子进程来进行bgsave操作，cow指的是copy on write，子进程创建后，父子进程共享数据段，父进程继续提供读写服务，写脏的页面数据会逐渐和子进程分离开来。</p>
+<h2 id="Pipeline有什么好处，为什么要用pipeline？"><a href="#Pipeline有什么好处，为什么要用pipeline？" class="headerlink" title="Pipeline有什么好处，为什么要用pipeline？"></a>Pipeline有什么好处，为什么要用pipeline？</h2><p>可以将多次IO往返的时间缩减为一次</p>
+<h2 id="Redis的同步机制了解么？"><a href="#Redis的同步机制了解么？" class="headerlink" title="Redis的同步机制了解么？"></a>Redis的同步机制了解么？</h2><ul>
+<li>第一次同步时，主节点做一次bgsave，并同时将后续修改操作记录到内存buffer，待完成后将rdb文件全量同步到复制节点，复制节点接受完成后将rdb镜像加载到内存。</li>
+<li>加载完成后，再通知主节点将期间修改的操作记录同步到复制节点进行重放就完成了同步过程。</li>
+</ul>
+<h2 id="是否使用过Redis集群，集群的原理是什么？"><a href="#是否使用过Redis集群，集群的原理是什么？" class="headerlink" title="是否使用过Redis集群，集群的原理是什么？"></a>是否使用过Redis集群，集群的原理是什么？</h2><p>Redis Sentinal着眼于高可用，在master宕机时会自动将slave提升为master，继续提供服务。<br>Redis Cluster着眼于扩展性，在单个redis内存不足时，使用Cluster进行分片存储。</p>
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="https://timmy6.github.io/2020/02/03/redis%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98/" title="redis常见问题" target="_blank" rel="external">https://timmy6.github.io/2020/02/03/redis常见问题/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/timmy6" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/avatar.jpg" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/timmy6" target="_blank"><span class="text-dark">刘启明</span><small class="ml-1x">Go Developer</small></a></h3>
+        <div>很高兴认识你。</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    <li class="prev">
+      <a href="/2020/03/03/redis%E6%8C%81%E4%B9%85%E5%8C%96/" title="redis持久化"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;上一篇</span></a>
+    </li>
+    
+    
+    <li class="next">
+      <a href="/2020/01/05/Redis%E7%9A%84%E5%B8%B8%E7%94%A8%E6%B7%98%E6%B1%B0%E7%AD%96%E7%95%A5%E4%BB%A5%E5%8F%8A%E7%AE%97%E6%B3%95/" title="Redis的常用淘汰策略以及算法"><span>下一篇&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+    <li class="toggle-toc">
+      <a class="toggle-btn " data-toggle="collapse" href="#collapseToc" aria-expanded="false" title="文章目录" role="button">    <span>[&nbsp;</span><span>文章目录</span>
+        <i class="text-collapsed icon icon-anchor"></i>
+        <i class="text-in icon icon-close"></i>
+        <span>]</span>
+      </a>
+    </li>
+    
+  </ul>
+  
+  
+  <!-- Button trigger modal -->
+  <button type="button" class="btn btn-fancy btn-donate pop-onhover bg-gradient-warning" data-toggle="modal" data-target="#donateModal"><span>赏</span></button>
+  <!-- <div class="wave-icon wave-icon-danger btn-donate" data-toggle="modal" data-target="#donateModal">
+    <div class="wave-circle"><span class="icon"><i class="icon icon-bill"></i></span></div>
+  </div> -->
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div>
+  </div>
+</nav>
+  
+<!-- Modal -->
+<div class="modal modal-center modal-small modal-xs-full fade" id="donateModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content donate">
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      <div class="modal-body">
+        <div class="donate-box">
+          <div class="donate-head">
+            <p>感谢您的支持，我会继续努力的!</p>
+          </div>
+          <div class="tab-content">
+            <div role="tabpanel" class="tab-pane fade active in" id="alipay">
+              <div class="donate-payimg">
+                <img src="/images/donate/alipayimg.png" alt="扫码支持" title="扫一扫" />
+              </div>
+              <p class="text-muted mv">扫码打赏，你说多少就多少</p>
+              <p class="text-grey">打开支付宝扫一扫，即可进行扫码打赏哦</p>
+            </div>
+            <div role="tabpanel" class="tab-pane fade" id="wechatpay">
+              <div class="donate-payimg">
+                <img src="/images/donate/wechatpayimg.png" alt="扫码支持" title="扫一扫" />
+              </div>
+              <p class="text-muted mv">扫码打赏，你说多少就多少</p>
+              <p class="text-grey">打开微信扫一扫，即可进行扫码打赏哦</p>
+            </div>
+          </div>
+          <div class="donate-footer">
+            <ul class="nav nav-tabs nav-justified" role="tablist">
+              <li role="presentation" class="active">
+                <a href="#alipay" id="alipay-tab" role="tab" data-toggle="tab" aria-controls="alipay" aria-expanded="true"><i class="icon icon-alipay"></i> 支付宝</a>
+              </li>
+              <li role="presentation" class="">
+                <a href="#wechatpay" role="tab" id="wechatpay-tab" data-toggle="tab" aria-controls="wechatpay" aria-expanded="false"><i class="icon icon-wepay"></i> 微信支付</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+</main>
+
+  <footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/timmy6" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://weibo.com/u/3917867123" target="_blank" title="Weibo" data-toggle=tooltip data-placement=top><i class="icon icon-weibo"></i></a></li>
+        
+    </ul>
+
+    <div class="copyright">
+    	
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+
+<script src="/js/plugin.min.js"></script>
+
+
+<script src="/js/application.js"></script>
+
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+
+
+
+
+   
+
+
+
+
+   
+    
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: '4737d1ihG9bSORDvOhg93sGV-gzGzoHsz',
+    appKey: 'G7fMbInGD0wzoXGMQvF5RIHt',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: false
+  });
+  </script>
+
+     
+
+
+
+
+
+
+
+</body>
+</html>
