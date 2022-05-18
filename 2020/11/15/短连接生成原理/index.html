@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000" />
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top" />
+  
+  
+  <title>短链接生成原理 | 刘启明的blog</title>
+  <meta name="description" content="看业务代码的时候，有些逻辑用到了短链接服务，感觉还蛮有意思的，这里简单的记录一下。  这种营销短信大家应该都收到过，短信有最大字符限制，而且为了更好的观感体验，短信里的链接一般都很短。现成的短链接生成服务也比较多，比如新浪、百度等，谷歌之前也有短链接服务，号称是最快的，但是在 2018 年关闭了。 一、短链接原理 我们点击短链接会发起一个 GET 方式的 HTTP 请求，当请求到对应的 API 后">
+<meta property="og:type" content="article">
+<meta property="og:title" content="短链接生成原理">
+<meta property="og:url" content="https://timmy6.github.io/2020/11/15/%E7%9F%AD%E8%BF%9E%E6%8E%A5%E7%94%9F%E6%88%90%E5%8E%9F%E7%90%86/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="看业务代码的时候，有些逻辑用到了短链接服务，感觉还蛮有意思的，这里简单的记录一下。  这种营销短信大家应该都收到过，短信有最大字符限制，而且为了更好的观感体验，短信里的链接一般都很短。现成的短链接生成服务也比较多，比如新浪、百度等，谷歌之前也有短链接服务，号称是最快的，但是在 2018 年关闭了。 一、短链接原理 我们点击短链接会发起一个 GET 方式的 HTTP 请求，当请求到对应的 API 后">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://timmy6.github.io/images/other/8.message_short_url.png">
+<meta property="og:image" content="https://timmy6.github.io/images/other/9.short_url_process.png">
+<meta property="og:image" content="https://timmy6.github.io/images/other/7.short_url_http.png">
+<meta property="article:published_time" content="2020-11-15T13:11:10.000Z">
+<meta property="article:modified_time" content="2022-05-18T07:57:33.460Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://timmy6.github.io/images/other/8.message_short_url.png">
+  <!-- Canonical links -->
+  <link rel="canonical" href="https://timmy6.github.io/2020/11/15/%E7%9F%AD%E8%BF%9E%E6%8E%A5%E7%94%9F%E6%88%90%E5%8E%9F%E7%90%86/index.html">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png" type="image/x-icon">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+  
+  
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+
+<body class="main-center" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/timmy6" target="_blank">
+          <img class="img-circle img-rotate" src="/images/avatar.jpg" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">刘启明</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">Go Developer</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> Changsha, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="搜索" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="想要查找什么..." x-webkit-speech />
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav ">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">首页</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">归档</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">分类</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags">
+            
+            <i class="icon icon-tags"></i>
+            
+            <span class="menu-title">标签</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-repository">
+          <a href="/repository">
+            
+            <i class="icon icon-project"></i>
+            
+            <span class="menu-title">项目</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-books">
+          <a href="/books">
+            
+            <i class="icon icon-book-fill"></i>
+            
+            <span class="menu-title">书单</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-links">
+          <a href="/links">
+            
+            <i class="icon icon-friendship"></i>
+            
+            <span class="menu-title">友链</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about">
+            
+            <i class="icon icon-cup-fill"></i>
+            
+            <span class="menu-title">关于</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/timmy6" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://weibo.com/u/3917867123" target="_blank" title="Weibo" data-toggle=tooltip data-placement=top><i class="icon icon-weibo"></i></a></li>
+        
+    </ul>
+
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">公告</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>欢迎交流与分享经验!</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget-body">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Go%E5%BC%80%E5%8F%91/">Go开发</a><span class="category-list-count">43</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Linux/">Linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/MySql/">MySql</a><span class="category-list-count">9</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/rabbitmq/">rabbitmq</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/redis/">redis</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%BE%AE%E6%9C%8D%E5%8A%A1/">微服务</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/">数据结构与算法</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E7%BD%91%E7%BB%9C/">网络</a><span class="category-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget-body">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Go%E5%9F%BA%E7%A1%80/" rel="tag">Go基础</a><span class="tag-list-count">25</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gRPC/" rel="tag">gRPC</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gin%E6%A1%86%E6%9E%B6/" rel="tag">gin框架</a><span class="tag-list-count">9</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/" rel="tag">redis</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/" rel="tag">常用命令</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93%E4%BC%98%E5%8C%96/" rel="tag">数据库优化</a><span class="tag-list-count">9</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget-body tagcloud">
+      <a href="/tags/Go%E5%9F%BA%E7%A1%80/" style="font-size: 14px;">Go基础</a> <a href="/tags/gRPC/" style="font-size: 13.33px;">gRPC</a> <a href="/tags/gin%E6%A1%86%E6%9E%B6/" style="font-size: 13.67px;">gin框架</a> <a href="/tags/redis/" style="font-size: 13px;">redis</a> <a href="/tags/%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/" style="font-size: 13px;">常用命令</a> <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93%E4%BC%98%E5%8C%96/" style="font-size: 13.67px;">数据库优化</a>
+    </div>
+  </div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/06/">六月 2021</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/03/">三月 2021</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/02/">二月 2021</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/01/">一月 2021</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/11/">十一月 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/10/">十月 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/09/">九月 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/08/">八月 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/07/">七月 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/06/">六月 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/05/">五月 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/04/">四月 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/03/">三月 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/02/">二月 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/01/">一月 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">十二月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">十一月 2019</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">十月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">九月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">八月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">七月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">六月 2019</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">五月 2019</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/04/">四月 2019</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">三月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">十一月 2018</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">十月 2018</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a><span class="archive-list-count">5</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget-body">
+      <ul class="recent-post-list list-unstyled no-thumbnail">
+        
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/MySql/">MySql</a>
+              </p>
+              <p class="item-title">
+                <a href="/2021/06/25/%E7%BC%93%E5%AD%98%E7%A9%BF%E9%80%8F%E3%80%81%E7%BC%93%E5%AD%98%E5%87%BB%E7%A9%BF%E3%80%81%E7%BC%93%E5%AD%98%E8%A1%80%E5%B4%A9%E7%9A%84%E5%8C%BA%E5%88%AB%E4%BB%A5%E5%8F%8A%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/" class="title">缓存穿透、缓存击穿、缓存血崩的区别以及解决方案</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2021-06-25T15:15:10.000Z" itemprop="datePublished">2021-06-25</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/Go%E5%BC%80%E5%8F%91/">Go开发</a>
+              </p>
+              <p class="item-title">
+                <a href="/2021/03/02/timer%E5%A4%8D%E7%94%A8%E9%97%AE%E9%A2%98/" class="title">timer复用问题</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2021-03-02T15:22:10.000Z" itemprop="datePublished">2021-03-02</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/Go%E5%BC%80%E5%8F%91/">Go开发</a>
+              </p>
+              <p class="item-title">
+                <a href="/2021/02/20/sync-WaitGroup%E5%AE%9E%E7%8E%B0%E5%8D%8F%E7%A8%8B%E5%90%8C%E6%AD%A5/" class="title">sync.WaitGroup实现协程同步</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2021-02-20T14:11:10.000Z" itemprop="datePublished">2021-02-20</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/Go%E5%BC%80%E5%8F%91/">Go开发</a>
+              </p>
+              <p class="item-title">
+                <a href="/2021/01/15/%E7%B4%A2%E5%BC%95%E5%8E%9F%E7%90%86%E5%88%86%E6%9E%90/" class="title">索引原理分析</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2021-01-15T14:11:10.000Z" itemprop="datePublished">2021-01-15</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/Go%E5%BC%80%E5%8F%91/">Go开发</a>
+              </p>
+              <p class="item-title">
+                <a href="/2020/11/15/%E7%9F%AD%E8%BF%9E%E6%8E%A5%E7%94%9F%E6%88%90%E5%8E%9F%E7%90%86/" class="title">短链接生成原理</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2020-11-15T13:11:10.000Z" itemprop="datePublished">2020-11-15</time>
+              </p>
+            </div>
+          </li>
+          
+      </ul>
+    </div>
+  </div>
+  
+
+    
+  </div>
+</aside>
+
+  
+  
+  <aside class="sidebar sidebar-toc collapse   in  " id="collapseToc" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    <nav id="toc" class="article-toc">
+      <h3 class="toc-title">文章目录</h3>
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E7%9F%AD%E9%93%BE%E6%8E%A5%E5%8E%9F%E7%90%86"><span class="toc-number">1.</span> <span class="toc-text">一、短链接原理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E7%9F%AD%E9%93%BE%E6%8E%A5%E7%94%9F%E6%88%90%E7%AE%97%E6%B3%95"><span class="toc-number">2.</span> <span class="toc-text">二、短链接生成算法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E4%B8%80%E4%BA%9B%E7%BB%86%E8%8A%82"><span class="toc-number">3.</span> <span class="toc-text">三、一些细节</span></a></li></ol>
+    </nav>
+  </div>
+</aside>
+
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-短连接生成原理" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      短链接生成原理
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/2020/11/15/%E7%9F%AD%E8%BF%9E%E6%8E%A5%E7%94%9F%E6%88%90%E5%8E%9F%E7%90%86/" class="article-date">
+	  <time datetime="2020-11-15T13:11:10.000Z" itemprop="datePublished">2020-11-15</time>
+	</a>
+</span>
+        
+  <span class="article-category">
+    <i class="icon icon-folder"></i>
+    <a class="article-category-link" href="/categories/Go%E5%BC%80%E5%8F%91/">Go开发</a>
+  </span>
+
+        
+
+        
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2020/11/15/%E7%9F%AD%E8%BF%9E%E6%8E%A5%E7%94%9F%E6%88%90%E5%8E%9F%E7%90%86/#comments" class="article-comment-link">评论</a></span>
+        
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <p>看业务代码的时候，有些逻辑用到了短链接服务，感觉还蛮有意思的，这里简单的记录一下。</p>
+<p><img src="/images/other/8.message_short_url.png"></p>
+<p>这种营销短信大家应该都收到过，短信有最大字符限制，而且为了更好的观感体验，短信里的链接一般都很短。现成的短链接生成服务也比较多，比如<a target="_blank" rel="noopener" href="https://www.sina.lt/">新浪</a>、<a target="_blank" rel="noopener" href="https://dwz.cn/console/operation">百度</a>等，谷歌之前也有短链接服务，号称是最快的，但是在 2018 年关闭了。</p>
+<h3 id="一、短链接原理"><a href="#一、短链接原理" class="headerlink" title="一、短链接原理"></a>一、短链接原理</h3><p><img src="/images/other/9.short_url_process.png"></p>
+<p>我们点击短链接会发起一个 GET 方式的 HTTP 请求，当请求到对应的 API 后，会解析短链接里的标识获取到对应的长链接，然后重定向到长链接，这样整个流程就结束了。</p>
+<p>比如我用新浪的短链接服务为 <a target="_blank" rel="noopener" href="https://www.google.com/">https://www.google.com/</a> 生成了一个短链接：<a target="_blank" rel="noopener" href="http://dwz.date/evn">http://dwz.date/evn</a>，下面是我请求短链接时对应的 HTTP 信息：</p>
+<p><img src="/images/other/7.short_url_http.png"></p>
+<h3 id="二、短链接生成算法"><a href="#二、短链接生成算法" class="headerlink" title="二、短链接生成算法"></a>二、短链接生成算法</h3><p>短链接标识一般是 [0-9, a-z, A-Z] 随机组合而成的字符串，字符一共有 62 个，因此短链接标识可以用 62 进制的字符串表示。</p>
+<p>首先维护一个自增的 ID，当生成短链接时，将 10 进制的自增 ID 转换成 62 进制字符串，这个字符串就可以唯一标识一个长链接。由于 ID 是自增的，对应的 62 进制字符串是不同的，这样就不会出现一个短链接对应多个长链接的问题，62 个字符排列组合，可以保证短链接是用不完的，就算仅限于 6 位长度标识的短链接，也有 558 亿多种情况，这种算法在网上被称为自增序列算法。</p>
+<p>维护自增 ID 主要有以下几种方式：</p>
+<ol>
+<li>数据库主键自增</li>
+<li>redis 自增</li>
+<li>分布式自增主键 ID（雪花算法，存在 ID 浪费）</li>
+</ol>
+<p>下面是 62 进制的 encode 与 decode 方法，来自 <a target="_blank" rel="noopener" href="https://github.com/dukky/Base62/blob/master/base62/src/im/duk/base62/Base62.java">Base62</a>。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> String <span class="title function_">base62</span><span class="params">(Long b10)</span> &#123;</span><br><span class="line">    <span class="type">StringBuilder</span> <span class="variable">ret</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">StringBuilder</span>();</span><br><span class="line">    <span class="keyword">while</span> (b10 &gt; <span class="number">0</span>) &#123;</span><br><span class="line">        ret.insert(<span class="number">0</span>, characters.charAt((<span class="type">int</span>) (b10 % <span class="number">62</span>)));</span><br><span class="line">        b10 /= <span class="number">62</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> ret.toString();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="type">long</span> <span class="title function_">decodeBase62</span><span class="params">(String b62)</span> &#123;</span><br><span class="line">    <span class="type">long</span> <span class="variable">ret</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line">    b62 = <span class="keyword">new</span> <span class="title class_">StringBuffer</span>(b62).reverse().toString();</span><br><span class="line">    <span class="type">long</span> <span class="variable">count</span> <span class="operator">=</span> <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">char</span> character : b62.toCharArray()) &#123;</span><br><span class="line">        ret += characters.indexOf(character) * count;</span><br><span class="line">        count *= <span class="number">62</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> ret;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="三、一些细节"><a href="#三、一些细节" class="headerlink" title="三、一些细节"></a>三、一些细节</h3><p>自增序列算法也存在一定的缺点，当自增主键很大时，生成的 62 进制字符串会变长，以 <code>0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ</code> 顺序的 62 进制为例，当主键大于 56800235583 时，会生成 7 位长度的 62 进制字符串。可以通过控制自增主键的增长速度来解决这个问题，避免主键浪费。</p>
+<p>62 进制的顺序并不一定严格按照 <code>0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ</code> 的顺序来表示，这个顺序可以是打乱的，这样生成的短链接标识更随机不易被破解。</p>
+<p>长链接与短链接是否需要一对多关系，同一个长链接使用自增主键 ID 算法生成的短链接是不同的，因为自增主键 ID 不同，生成的 62 进制字符串自然也不同。如果我们有一个长链接唯一对应一个短链接需求，可以将长链接进行 md5 加密，将加密后的 md5 值存储在 DB 中，每次生成短链接前都根据长链接 md5 值查询 DB，如果存在，则直接返回短链接，当然也可以使用其他方式维护这种关系。</p>
+<p>跳转用 301 还是 302，301 永久重定向，302 是临时重定向。短地址一经生成就不会变化，所以用 301 是符合 http 语义的。同时对服务器压力也会有一定减少。<br>但是如果使用了 301，我们就无法统计到短地址被点击的次数了。而这个点击次数是一个非常有意思的大数据分析数据源。能够分析出的东西非常非常多。所以选择 302 虽然会增加服务器压力，但是我想是一个更好的选择。from <a target="_blank" rel="noopener" href="https://www.zhihu.com/question/29270034/answer/46446911">短 URL 系统是怎么设计的？</a> by iammutex</p>
+<p>如果短链接请求频繁，可以借助 redis 做对应的缓存优化。</p>
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="https://timmy6.github.io/2020/11/15/%E7%9F%AD%E8%BF%9E%E6%8E%A5%E7%94%9F%E6%88%90%E5%8E%9F%E7%90%86/" title="短链接生成原理" target="_blank" rel="external">https://timmy6.github.io/2020/11/15/短连接生成原理/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/timmy6" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/avatar.jpg" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/timmy6" target="_blank"><span class="text-dark">刘启明</span><small class="ml-1x">Go Developer</small></a></h3>
+        <div>很高兴认识你。</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    <li class="prev">
+      <a href="/2021/01/15/%E7%B4%A2%E5%BC%95%E5%8E%9F%E7%90%86%E5%88%86%E6%9E%90/" title="索引原理分析"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;上一篇</span></a>
+    </li>
+    
+    
+    <li class="next">
+      <a href="/2020/10/15/%E7%A7%92%E6%9D%80%E4%B8%9A%E5%8A%A1%E6%80%BB%E7%BB%93/" title="秒杀业务总结"><span>下一篇&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+    <li class="toggle-toc">
+      <a class="toggle-btn " data-toggle="collapse" href="#collapseToc" aria-expanded="false" title="文章目录" role="button">    <span>[&nbsp;</span><span>文章目录</span>
+        <i class="text-collapsed icon icon-anchor"></i>
+        <i class="text-in icon icon-close"></i>
+        <span>]</span>
+      </a>
+    </li>
+    
+  </ul>
+  
+  
+  <!-- Button trigger modal -->
+  <button type="button" class="btn btn-fancy btn-donate pop-onhover bg-gradient-warning" data-toggle="modal" data-target="#donateModal"><span>赏</span></button>
+  <!-- <div class="wave-icon wave-icon-danger btn-donate" data-toggle="modal" data-target="#donateModal">
+    <div class="wave-circle"><span class="icon"><i class="icon icon-bill"></i></span></div>
+  </div> -->
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div>
+  </div>
+</nav>
+  
+<!-- Modal -->
+<div class="modal modal-center modal-small modal-xs-full fade" id="donateModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content donate">
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      <div class="modal-body">
+        <div class="donate-box">
+          <div class="donate-head">
+            <p>感谢您的支持，我会继续努力的!</p>
+          </div>
+          <div class="tab-content">
+            <div role="tabpanel" class="tab-pane fade active in" id="alipay">
+              <div class="donate-payimg">
+                <img src="/images/donate/alipayimg.png" alt="扫码支持" title="扫一扫" />
+              </div>
+              <p class="text-muted mv">扫码打赏，你说多少就多少</p>
+              <p class="text-grey">打开支付宝扫一扫，即可进行扫码打赏哦</p>
+            </div>
+            <div role="tabpanel" class="tab-pane fade" id="wechatpay">
+              <div class="donate-payimg">
+                <img src="/images/donate/wechatpayimg.png" alt="扫码支持" title="扫一扫" />
+              </div>
+              <p class="text-muted mv">扫码打赏，你说多少就多少</p>
+              <p class="text-grey">打开微信扫一扫，即可进行扫码打赏哦</p>
+            </div>
+          </div>
+          <div class="donate-footer">
+            <ul class="nav nav-tabs nav-justified" role="tablist">
+              <li role="presentation" class="active">
+                <a href="#alipay" id="alipay-tab" role="tab" data-toggle="tab" aria-controls="alipay" aria-expanded="true"><i class="icon icon-alipay"></i> 支付宝</a>
+              </li>
+              <li role="presentation" class="">
+                <a href="#wechatpay" role="tab" id="wechatpay-tab" data-toggle="tab" aria-controls="wechatpay" aria-expanded="false"><i class="icon icon-wepay"></i> 微信支付</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+</main>
+
+  <footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/timmy6" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://weibo.com/u/3917867123" target="_blank" title="Weibo" data-toggle=tooltip data-placement=top><i class="icon icon-weibo"></i></a></li>
+        
+    </ul>
+
+    <div class="copyright">
+    	
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+
+<script src="/js/plugin.min.js"></script>
+
+
+<script src="/js/application.js"></script>
+
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+
+
+
+
+   
+
+
+
+
+   
+    
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: '4737d1ihG9bSORDvOhg93sGV-gzGzoHsz',
+    appKey: 'G7fMbInGD0wzoXGMQvF5RIHt',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: false
+  });
+  </script>
+
+     
+
+
+
+
+
+
+
+</body>
+</html>
