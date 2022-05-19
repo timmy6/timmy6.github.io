@@ -560,7 +560,7 @@
   </url>
   
   <url>
-    <loc>https://timmy6.github.io/categories/index.html</loc>
+    <loc>https://timmy6.github.io/about/index.html</loc>
     
     <lastmod>2022-03-21</lastmod>
     
@@ -578,16 +578,7 @@
   </url>
   
   <url>
-    <loc>https://timmy6.github.io/books/index.html</loc>
-    
-    <lastmod>2022-03-21</lastmod>
-    
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  
-  <url>
-    <loc>https://timmy6.github.io/about/index.html</loc>
+    <loc>https://timmy6.github.io/categories/index.html</loc>
     
     <lastmod>2022-03-21</lastmod>
     
@@ -613,10 +604,19 @@
     <priority>0.6</priority>
   </url>
   
+  <url>
+    <loc>https://timmy6.github.io/books/index.html</loc>
+    
+    <lastmod>2022-03-21</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
 
   <url>
     <loc>https://timmy6.github.io/</loc>
-    <lastmod>2022-05-18</lastmod>
+    <lastmod>2022-05-19</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
@@ -624,42 +624,42 @@
   
   <url>
     <loc>https://timmy6.github.io/tags/%E6%95%B0%E6%8D%AE%E5%BA%93%E4%BC%98%E5%8C%96/</loc>
-    <lastmod>2022-05-18</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://timmy6.github.io/tags/gin%E6%A1%86%E6%9E%B6/</loc>
-    <lastmod>2022-05-18</lastmod>
+    <lastmod>2022-05-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://timmy6.github.io/tags/Go%E5%9F%BA%E7%A1%80/</loc>
-    <lastmod>2022-05-18</lastmod>
+    <lastmod>2022-05-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://timmy6.github.io/tags/gin%E6%A1%86%E6%9E%B6/</loc>
+    <lastmod>2022-05-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://timmy6.github.io/tags/gRPC/</loc>
-    <lastmod>2022-05-18</lastmod>
+    <lastmod>2022-05-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://timmy6.github.io/tags/redis/</loc>
-    <lastmod>2022-05-18</lastmod>
+    <lastmod>2022-05-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://timmy6.github.io/tags/%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/</loc>
-    <lastmod>2022-05-18</lastmod>
+    <lastmod>2022-05-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
@@ -668,56 +668,56 @@
   
   <url>
     <loc>https://timmy6.github.io/categories/MySql/</loc>
-    <lastmod>2022-05-18</lastmod>
+    <lastmod>2022-05-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://timmy6.github.io/categories/redis/</loc>
-    <lastmod>2022-05-18</lastmod>
+    <lastmod>2022-05-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://timmy6.github.io/categories/%E7%BD%91%E7%BB%9C/</loc>
-    <lastmod>2022-05-18</lastmod>
+    <lastmod>2022-05-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://timmy6.github.io/categories/Go%E5%BC%80%E5%8F%91/</loc>
-    <lastmod>2022-05-18</lastmod>
+    <lastmod>2022-05-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://timmy6.github.io/categories/rabbitmq/</loc>
-    <lastmod>2022-05-18</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  
-  <url>
-    <loc>https://timmy6.github.io/categories/Linux/</loc>
-    <lastmod>2022-05-18</lastmod>
+    <lastmod>2022-05-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://timmy6.github.io/categories/%E5%BE%AE%E6%9C%8D%E5%8A%A1/</loc>
-    <lastmod>2022-05-18</lastmod>
+    <lastmod>2022-05-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://timmy6.github.io/categories/Linux/</loc>
+    <lastmod>2022-05-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
     <loc>https://timmy6.github.io/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/</loc>
-    <lastmod>2022-05-18</lastmod>
+    <lastmod>2022-05-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
