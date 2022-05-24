@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform" />
+  <meta http-equiv="Cache-Control" content="no-siteapp" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000" />
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top" />
+  
+  
+  <title>如何优雅地关闭channel | 刘启明的blog</title>
+  <meta name="description" content="关闭channel的难点    关闭channel的原则    不优雅的关闭方法   3.1. defer-recover兜底 3.2. 使用sync.Once保证只关闭一次    优雅的关闭方法   4.1. 一个sender，一个receiver 4.2. 一个sender，M个receiver 4.3. N个sender，一个receiver 4.4. N个sender，M个recei">
+<meta property="og:type" content="article">
+<meta property="og:title" content="如何优雅地关闭channel">
+<meta property="og:url" content="https://timmy6.github.io/2021/07/15/%E5%A6%82%E4%BD%95%E4%BC%98%E9%9B%85%E7%9A%84%E5%85%B3%E9%97%ADchannel/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="关闭channel的难点    关闭channel的原则    不优雅的关闭方法   3.1. defer-recover兜底 3.2. 使用sync.Once保证只关闭一次    优雅的关闭方法   4.1. 一个sender，一个receiver 4.2. 一个sender，M个receiver 4.3. N个sender，一个receiver 4.4. N个sender，M个recei">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-07-15T14:15:10.000Z">
+<meta property="article:modified_time" content="2022-05-23T01:54:31.885Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+  <!-- Canonical links -->
+  <link rel="canonical" href="https://timmy6.github.io/2021/07/15/%E5%A6%82%E4%BD%95%E4%BC%98%E9%9B%85%E7%9A%84%E5%85%B3%E9%97%ADchannel/index.html">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png" type="image/x-icon">
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+  
+  
+  
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+
+<body class="main-center" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/timmy6" target="_blank">
+          <img class="img-circle img-rotate" src="/images/avatar.jpg" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">刘启明</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md">Go Developer</h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> Changsha, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="搜索" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="想要查找什么..." x-webkit-speech />
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav ">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">首页</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">归档</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">分类</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags">
+            
+            <i class="icon icon-tags"></i>
+            
+            <span class="menu-title">标签</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-repository">
+          <a href="/repository">
+            
+            <i class="icon icon-project"></i>
+            
+            <span class="menu-title">项目</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-books">
+          <a href="/books">
+            
+            <i class="icon icon-book-fill"></i>
+            
+            <span class="menu-title">书单</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-links">
+          <a href="/links">
+            
+            <i class="icon icon-friendship"></i>
+            
+            <span class="menu-title">友链</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about">
+            
+            <i class="icon icon-cup-fill"></i>
+            
+            <span class="menu-title">关于</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/timmy6" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://weibo.com/u/3917867123" target="_blank" title="Weibo" data-toggle=tooltip data-placement=top><i class="icon icon-weibo"></i></a></li>
+        
+    </ul>
+
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">公告</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>欢迎交流与分享经验!</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget-body">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Go%E5%BC%80%E5%8F%91/">Go开发</a><span class="category-list-count">47</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Linux/">Linux</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/MySql/">MySql</a><span class="category-list-count">9</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/rabbitmq/">rabbitmq</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/redis/">redis</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%BE%AE%E6%9C%8D%E5%8A%A1/">微服务</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/">数据结构与算法</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E7%BD%91%E7%BB%9C/">网络</a><span class="category-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget-body">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Go%E5%9F%BA%E7%A1%80/" rel="tag">Go基础</a><span class="tag-list-count">25</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Go%E9%AB%98%E7%BA%A7/" rel="tag">Go高级</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gRPC/" rel="tag">gRPC</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gin%E6%A1%86%E6%9E%B6/" rel="tag">gin框架</a><span class="tag-list-count">9</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/redis/" rel="tag">redis</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/" rel="tag">常用命令</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93%E4%BC%98%E5%8C%96/" rel="tag">数据库优化</a><span class="tag-list-count">9</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget-body tagcloud">
+      <a href="/tags/Go%E5%9F%BA%E7%A1%80/" style="font-size: 14px;">Go基础</a> <a href="/tags/Go%E9%AB%98%E7%BA%A7/" style="font-size: 13.33px;">Go高级</a> <a href="/tags/gRPC/" style="font-size: 13.33px;">gRPC</a> <a href="/tags/gin%E6%A1%86%E6%9E%B6/" style="font-size: 13.67px;">gin框架</a> <a href="/tags/redis/" style="font-size: 13px;">redis</a> <a href="/tags/%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/" style="font-size: 13px;">常用命令</a> <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93%E4%BC%98%E5%8C%96/" style="font-size: 13.67px;">数据库优化</a>
+    </div>
+  </div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/05/">五月 2022</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/04/">四月 2022</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/03/">三月 2022</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/10/">十月 2021</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/07/">七月 2021</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/06/">六月 2021</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/03/">三月 2021</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/02/">二月 2021</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2021/01/">一月 2021</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/11/">十一月 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/10/">十月 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/09/">九月 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/08/">八月 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/07/">七月 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/06/">六月 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/05/">五月 2020</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/04/">四月 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/03/">三月 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/02/">二月 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/01/">一月 2020</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/12/">十二月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/11/">十一月 2019</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/">十月 2019</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/">九月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/">八月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">七月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/06/">六月 2019</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/05/">五月 2019</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/04/">四月 2019</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">三月 2019</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">二月 2019</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/12/">十二月 2018</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/">十一月 2018</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/">十月 2018</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">九月 2018</a><span class="archive-list-count">5</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget-body">
+      <ul class="recent-post-list list-unstyled no-thumbnail">
+        
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/Go%E5%BC%80%E5%8F%91/">Go开发</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/05/01/%E7%BC%96%E7%A0%81%E8%A7%84%E8%8C%83/" class="title">总结Go编码规范</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-05-01T15:15:10.000Z" itemprop="datePublished">2022-05-01</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/redis/">redis</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/04/06/Redis%E9%9D%A2%E8%AF%95%E9%A2%98%E6%B1%87%E6%80%BB/" class="title">Redis面试题汇总</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-04-06T15:38:10.000Z" itemprop="datePublished">2022-04-06</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/Go%E5%BC%80%E5%8F%91/">Go开发</a>
+              </p>
+              <p class="item-title">
+                <a href="/2022/03/16/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3Channel/" class="title">深入理解Channel</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2022-03-16T15:15:10.000Z" itemprop="datePublished">2022-03-16</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/Go%E5%BC%80%E5%8F%91/">Go开发</a>
+              </p>
+              <p class="item-title">
+                <a href="/2021/10/16/%E6%8E%A2%E7%A9%B6Go%E8%AF%AD%E8%A8%80%E4%B8%AD%E7%9A%84interface/" class="title">探究Go语言中的interface</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2021-10-16T11:15:10.000Z" itemprop="datePublished">2021-10-16</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/Go%E5%BC%80%E5%8F%91/">Go开发</a>
+              </p>
+              <p class="item-title">
+                <a href="/2021/07/15/%E5%A6%82%E4%BD%95%E4%BC%98%E9%9B%85%E7%9A%84%E5%85%B3%E9%97%ADchannel/" class="title">如何优雅地关闭channel</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2021-07-15T14:15:10.000Z" itemprop="datePublished">2021-07-15</time>
+              </p>
+            </div>
+          </li>
+          
+      </ul>
+    </div>
+  </div>
+  
+
+    
+  </div>
+</aside>
+
+  
+  
+  <aside class="sidebar sidebar-toc collapse   in  " id="collapseToc" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    <nav id="toc" class="article-toc">
+      <h3 class="toc-title">文章目录</h3>
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E5%85%B3%E9%97%ADchannel%E7%9A%84%E9%9A%BE%E7%82%B9"><span class="toc-number">1.</span> <span class="toc-text">1. 关闭channel的难点</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E5%85%B3%E9%97%ADchannel%E7%9A%84%E5%8E%9F%E5%88%99"><span class="toc-number">2.</span> <span class="toc-text">2. 关闭channel的原则</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E4%B8%8D%E4%BC%98%E9%9B%85%E7%9A%84%E5%85%B3%E9%97%AD%E6%96%B9%E6%B3%95"><span class="toc-number">3.</span> <span class="toc-text">3. 不优雅的关闭方法</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-defer-recover%E5%85%9C%E5%BA%95"><span class="toc-number">3.1.</span> <span class="toc-text">3.1. defer-recover兜底</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-%E4%BD%BF%E7%94%A8sync-Once%E4%BF%9D%E8%AF%81%E5%8F%AA%E5%85%B3%E9%97%AD%E4%B8%80%E6%AC%A1"><span class="toc-number">3.2.</span> <span class="toc-text">3.2. 使用sync.Once保证只关闭一次</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E4%BC%98%E9%9B%85%E7%9A%84%E5%85%B3%E9%97%AD%E6%96%B9%E6%B3%95"><span class="toc-number">4.</span> <span class="toc-text">4. 优雅的关闭方法</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-1-%E4%B8%80%E4%B8%AAsender%EF%BC%8C%E4%B8%80%E4%B8%AAreceiver"><span class="toc-number">4.1.</span> <span class="toc-text">4.1. 一个sender，一个receiver</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-%E4%B8%80%E4%B8%AAsender%EF%BC%8CM%E4%B8%AAreceiver"><span class="toc-number">4.2.</span> <span class="toc-text">4.2. 一个sender，M个receiver</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-3-N%E4%B8%AAsender%EF%BC%8C%E4%B8%80%E4%B8%AAreceiver"><span class="toc-number">4.3.</span> <span class="toc-text">4.3. N个sender，一个receiver</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-4-N%E4%B8%AAsender%EF%BC%8CM%E4%B8%AAreceiver"><span class="toc-number">4.4.</span> <span class="toc-text">4.4. N个sender，M个receiver</span></a></li></ol></li></ol>
+    </nav>
+  </div>
+</aside>
+
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-如何优雅的关闭channel" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      如何优雅地关闭channel
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/2021/07/15/%E5%A6%82%E4%BD%95%E4%BC%98%E9%9B%85%E7%9A%84%E5%85%B3%E9%97%ADchannel/" class="article-date">
+	  <time datetime="2021-07-15T14:15:10.000Z" itemprop="datePublished">2021-07-15</time>
+	</a>
+</span>
+        
+  <span class="article-category">
+    <i class="icon icon-folder"></i>
+    <a class="article-category-link" href="/categories/Go%E5%BC%80%E5%8F%91/">Go开发</a>
+  </span>
+
+        
+
+        
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/2021/07/15/%E5%A6%82%E4%BD%95%E4%BC%98%E9%9B%85%E7%9A%84%E5%85%B3%E9%97%ADchannel/#comments" class="article-comment-link">评论</a></span>
+        
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <!-- vscode-markdown-toc -->
+<ul>
+<li><ol>
+<li><a href="#channel">关闭channel的难点</a></li>
+</ol>
+</li>
+<li><ol start="2">
+<li><a href="#channel-1">关闭channel的原则</a></li>
+</ol>
+</li>
+<li><ol start="3">
+<li><a href="#">不优雅的关闭方法</a></li>
+</ol>
+<ul>
+<li>3.1. <a href="#defer-recover">defer-recover兜底</a></li>
+<li>3.2. <a href="#sync.Once">使用sync.Once保证只关闭一次</a></li>
+</ul>
+</li>
+<li><ol start="4">
+<li><a href="#-1">优雅的关闭方法</a></li>
+</ol>
+<ul>
+<li>4.1. <a href="#senderreceiver">一个sender，一个receiver</a></li>
+<li>4.2. <a href="#senderMreceiver">一个sender，M个receiver</a></li>
+<li>4.3. <a href="#Nsenderreceiver">N个sender，一个receiver</a></li>
+<li>4.4. <a href="#NsenderMreceiver">N个sender，M个receiver</a></li>
+</ul>
+</li>
+</ul>
+<!-- vscode-markdown-toc-config
+    numbering=true
+    autoSave=true
+    /vscode-markdown-toc-config -->
+<!-- /vscode-markdown-toc -->
+
+<h2 id="1-关闭channel的难点"><a href="#1-关闭channel的难点" class="headerlink" title="1. 关闭channel的难点"></a>1. <a name='channel'></a>关闭channel的难点</h2><ul>
+<li>在不改变channel自身状态下，无法获知一个channel是否关闭</li>
+<li>关闭一个closed channel会导致panic。所以，如果关闭channel的一方在不知道channel是否关闭的情况下就去贸然关闭channel是很危险的事情</li>
+<li>向一个closed channel发送数据会导致panic。所以，如果向channel发送数据的一方不知道channel被关闭就去发送数据很危险</li>
+</ul>
+<h2 id="2-关闭channel的原则"><a href="#2-关闭channel的原则" class="headerlink" title="2. 关闭channel的原则"></a>2. <a name='channel-1'></a>关闭channel的原则</h2><p><strong>不要从一个 receiver 侧关闭 channel，也不要在有多个 sender 时，关闭 channel。</strong></p>
+<h2 id="3-不优雅的关闭方法"><a href="#3-不优雅的关闭方法" class="headerlink" title="3. 不优雅的关闭方法"></a>3. <a name=''></a>不优雅的关闭方法</h2><h3 id="3-1-defer-recover兜底"><a href="#3-1-defer-recover兜底" class="headerlink" title="3.1. defer-recover兜底"></a>3.1. <a name='defer-recover'></a>defer-recover兜底</h3><p>使用defer-recover机制，放心大胆关闭channel或者向channel发送数据。即使发生了panic，有defer-recover机制兜底</p>
+<h3 id="3-2-使用sync-Once保证只关闭一次"><a href="#3-2-使用sync-Once保证只关闭一次" class="headerlink" title="3.2. 使用sync.Once保证只关闭一次"></a>3.2. <a name='sync.Once'></a>使用sync.Once保证只关闭一次</h3><p>利用sync.Once特性保证只关闭channel一次。<strong>这种方法保证了channel只被关闭一次，但是无法保证被关闭后没有sender发送数据</strong></p>
+<h2 id="4-优雅的关闭方法"><a href="#4-优雅的关闭方法" class="headerlink" title="4. 优雅的关闭方法"></a>4. <a name='-1'></a>优雅的关闭方法</h2><p><strong>增加一个关闭信号的channel，receiver通过信号channel下达关闭数据channel指令，sender接收到关闭信号之后，停止接收数据。</strong></p>
+<h3 id="4-1-一个sender，一个receiver"><a href="#4-1-一个sender，一个receiver" class="headerlink" title="4.1. 一个sender，一个receiver"></a>4.1. <a name='senderreceiver'></a>一个sender，一个receiver</h3><p>直接从sender端关闭即可</p>
+<h3 id="4-2-一个sender，M个receiver"><a href="#4-2-一个sender，M个receiver" class="headerlink" title="4.2. 一个sender，M个receiver"></a>4.2. <a name='senderMreceiver'></a>一个sender，M个receiver</h3><p>直接从sender端关闭即可</p>
+<h3 id="4-3-N个sender，一个receiver"><a href="#4-3-N个sender，一个receiver" class="headerlink" title="4.3. N个sender，一个receiver"></a>4.3. <a name='Nsenderreceiver'></a>N个sender，一个receiver</h3><p>在这种情况下，优雅地关闭channel的方法就是receiver负责通知sender不要再发送数据了，然后关闭它。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    datach := <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="type">int</span>, <span class="number">100</span>)</span><br><span class="line">    stopch := <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">struct</span>&#123;&#125;)</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// senders</span></span><br><span class="line">    <span class="keyword">for</span> i := <span class="number">0</span>; i &lt; <span class="number">100</span>; i++ &#123;</span><br><span class="line">        <span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">            <span class="keyword">for</span> &#123;</span><br><span class="line">                <span class="keyword">select</span> &#123;</span><br><span class="line">                <span class="keyword">case</span> &lt;-stopch:</span><br><span class="line">                	<span class="keyword">return</span></span><br><span class="line">                <span class="keyword">case</span> datach &lt;-rand.Intn(<span class="number">100</span>):</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;  </span><br><span class="line">        &#125;()</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// receiver</span></span><br><span class="line">    <span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">        <span class="keyword">for</span> val := <span class="keyword">range</span> datach &#123;</span><br><span class="line">            <span class="keyword">if</span> val == <span class="number">100</span> &#123;</span><br><span class="line">                fmt.Println(<span class="string">&quot;please stop the sender&quot;</span>)</span><br><span class="line">                <span class="comment">// 关闭stopch，让gc代劳</span></span><br><span class="line">                <span class="built_in">close</span>(stopch)</span><br><span class="line">                <span class="keyword">return</span></span><br><span class="line">            &#125;</span><br><span class="line">            fmt.Println(val)</span><br><span class="line">        &#125;  </span><br><span class="line">    &#125;()</span><br><span class="line">    </span><br><span class="line">    &lt;-time.After(time.Second)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-4-N个sender，M个receiver"><a href="#4-4-N个sender，M个receiver" class="headerlink" title="4.4. N个sender，M个receiver"></a>4.4. <a name='NsenderMreceiver'></a>N个sender，M个receiver</h3><p>这里有 M 个 receiver，如果直接还是采取第 3 种解决方案，由 receiver 直接关闭 stopCh 的话，就会重复关闭一个 channel，导致 panic。因此需要增加一个中间人，M 个 receiver 都向它发送关闭 dataCh 的“请求”，中间人收到第一个请求后，就会直接下达关闭dataCh 的指令（通过关闭 stopCh，这时就不会发生重复关闭的情况，因为 stopCh 的发送方只有 中间人一个）。另外，这里的 N 个 sender 也</p>
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="https://timmy6.github.io/2021/07/15/%E5%A6%82%E4%BD%95%E4%BC%98%E9%9B%85%E7%9A%84%E5%85%B3%E9%97%ADchannel/" title="如何优雅地关闭channel" target="_blank" rel="external">https://timmy6.github.io/2021/07/15/如何优雅的关闭channel/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+<div class="panel panel-default panel-badger">
+  <div class="panel-body">
+    <figure class="media">
+      <div class="media-left">
+        <a href="https://github.com/timmy6" target="_blank" class="img-burn thumb-sm visible-lg">
+          <img src="/images/avatar.jpg" class="img-rounded w-full" alt="">
+        </a>
+      </div>
+      <div class="media-body">
+        <h3 class="media-heading"><a href="https://github.com/timmy6" target="_blank"><span class="text-dark">刘启明</span><small class="ml-1x">Go Developer</small></a></h3>
+        <div>很高兴认识你。</div>
+      </div>
+    </figure>
+  </div>
+</div>
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+      <div id="vcomments"></div>
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    <li class="prev">
+      <a href="/2021/10/16/%E6%8E%A2%E7%A9%B6Go%E8%AF%AD%E8%A8%80%E4%B8%AD%E7%9A%84interface/" title="探究Go语言中的interface"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;上一篇</span></a>
+    </li>
+    
+    
+    <li class="next">
+      <a href="/2021/06/25/%E7%BC%93%E5%AD%98%E7%A9%BF%E9%80%8F%E3%80%81%E7%BC%93%E5%AD%98%E5%87%BB%E7%A9%BF%E3%80%81%E7%BC%93%E5%AD%98%E8%A1%80%E5%B4%A9%E7%9A%84%E5%8C%BA%E5%88%AB%E4%BB%A5%E5%8F%8A%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/" title="缓存穿透、缓存击穿、缓存血崩的区别以及解决方案"><span>下一篇&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+    <li class="toggle-toc">
+      <a class="toggle-btn " data-toggle="collapse" href="#collapseToc" aria-expanded="false" title="文章目录" role="button">    <span>[&nbsp;</span><span>文章目录</span>
+        <i class="text-collapsed icon icon-anchor"></i>
+        <i class="text-in icon icon-close"></i>
+        <span>]</span>
+      </a>
+    </li>
+    
+  </ul>
+  
+  
+  <!-- Button trigger modal -->
+  <button type="button" class="btn btn-fancy btn-donate pop-onhover bg-gradient-warning" data-toggle="modal" data-target="#donateModal"><span>赏</span></button>
+  <!-- <div class="wave-icon wave-icon-danger btn-donate" data-toggle="modal" data-target="#donateModal">
+    <div class="wave-circle"><span class="icon"><i class="icon icon-bill"></i></span></div>
+  </div> -->
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div>
+  </div>
+</nav>
+  
+<!-- Modal -->
+<div class="modal modal-center modal-small modal-xs-full fade" id="donateModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content donate">
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      <div class="modal-body">
+        <div class="donate-box">
+          <div class="donate-head">
+            <p>感谢您的支持，我会继续努力的!</p>
+          </div>
+          <div class="tab-content">
+            <div role="tabpanel" class="tab-pane fade active in" id="alipay">
+              <div class="donate-payimg">
+                <img src="/images/donate/alipayimg.png" alt="扫码支持" title="扫一扫" />
+              </div>
+              <p class="text-muted mv">扫码打赏，你说多少就多少</p>
+              <p class="text-grey">打开支付宝扫一扫，即可进行扫码打赏哦</p>
+            </div>
+            <div role="tabpanel" class="tab-pane fade" id="wechatpay">
+              <div class="donate-payimg">
+                <img src="/images/donate/wechatpayimg.png" alt="扫码支持" title="扫一扫" />
+              </div>
+              <p class="text-muted mv">扫码打赏，你说多少就多少</p>
+              <p class="text-grey">打开微信扫一扫，即可进行扫码打赏哦</p>
+            </div>
+          </div>
+          <div class="donate-footer">
+            <ul class="nav nav-tabs nav-justified" role="tablist">
+              <li role="presentation" class="active">
+                <a href="#alipay" id="alipay-tab" role="tab" data-toggle="tab" aria-controls="alipay" aria-expanded="true"><i class="icon icon-alipay"></i> 支付宝</a>
+              </li>
+              <li role="presentation" class="">
+                <a href="#wechatpay" role="tab" id="wechatpay-tab" data-toggle="tab" aria-controls="wechatpay" aria-expanded="false"><i class="icon icon-wepay"></i> 微信支付</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+</main>
+
+  <footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/timmy6" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="https://weibo.com/u/3917867123" target="_blank" title="Weibo" data-toggle=tooltip data-placement=top><i class="icon icon-weibo"></i></a></li>
+        
+    </ul>
+
+    <div class="copyright">
+    	
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+
+<script src="/js/plugin.min.js"></script>
+
+
+<script src="/js/application.js"></script>
+
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+
+<script src="/js/insight.js"></script>
+
+
+
+
+
+
+   
+
+
+
+
+   
+    
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/valine"></script>
+  <script type="text/javascript">
+  var GUEST = ['nick', 'mail', 'link'];
+  var meta = 'nick,mail,link';
+  meta = meta.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#vcomments',
+    verify: false,
+    notify: false,
+    appId: '4737d1ihG9bSORDvOhg93sGV-gzGzoHsz',
+    appKey: 'G7fMbInGD0wzoXGMQvF5RIHt',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: meta,
+    pageSize: '10' || 10,
+    visitor: false
+  });
+  </script>
+
+     
+
+
+
+
+
+
+
+</body>
+</html>
